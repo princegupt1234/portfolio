@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" /><title>Experience Form | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='experience')}"></div>
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Experience', unread=0)}"></div>
+        <div class="admin-content">
+            <div class="page-header">
+                <h1 th:text="${experience.id} != null ? 'Edit Experience' : 'Add Experience'">Add</h1>
+                <a th:href="@{/admin/experience}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+            </div>
+            <div class="glass-card">
+                <form th:action="@{/admin/experience/save}" th:object="${experience}" method="post" class="form-grid">
+                    <input type="hidden" th:field="*{id}" />
+                    <div class="form-group"><label>Company</label><input class="glass-input" th:field="*{company}" required /></div>
+                    <div class="form-group"><label>Role</label><input class="glass-input" th:field="*{role}" required /></div>
+                    <div class="form-group"><label>Duration</label><input class="glass-input" th:field="*{duration}" placeholder="Jan 2026 - Feb 2026" /></div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select class="glass-input" th:field="*{type}">
+                            <option value="Internship">Internship</option>
+                            <option value="Training">Training</option>
+                            <option value="Achievement">Achievement</option>
+                        </select>
+                    </div>
+                    <div class="form-group full"><label>Description (one bullet per line)</label><textarea class="glass-textarea" th:field="*{description}" rows="6"></textarea></div>
+                    <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
+                    <div class="form-actions form-group full">
+                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

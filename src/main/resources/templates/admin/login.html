@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login | Prince Gupt Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg">
+    <div class="aurora-blob b1"></div>
+    <div class="aurora-blob b2"></div>
+    <div class="aurora-blob b3"></div>
+</div>
+
+<div class="login-shell">
+    <div class="glass-card login-card">
+        <div class="logo-icon"><i class="fa-solid fa-terminal"></i></div>
+        <h2>Admin Panel</h2>
+        <p style="margin-bottom:24px;">Sign in to manage your portfolio</p>
+
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+        <div class="alert success" th:if="${message}" th:text="${message}"></div>
+
+        <form th:action="@{/admin/login}" method="post" style="display:flex; flex-direction:column; gap:16px; text-align:left;">
+            <div class="form-group">
+                <label>Username</label>
+                <input class="glass-input" type="text" name="username" required autofocus />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input class="glass-input" type="password" name="password" required />
+            </div>
+            <button type="submit" class="glass-btn primary" style="justify-content:center; margin-top:8px;">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

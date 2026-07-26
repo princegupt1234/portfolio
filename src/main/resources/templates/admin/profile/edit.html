@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" /><title>Profile Settings | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='profile')}"></div>
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Profile', unread=0)}"></div>
+        <div class="admin-content">
+            <div class="page-header"><h1>Profile Settings</h1></div>
+
+            <div class="alert success" th:if="${param.saved}">Profile updated successfully.</div>
+
+            <div class="glass-card">
+                <form th:action="@{/admin/profile/save}" method="post" enctype="multipart/form-data" class="form-grid">
+                    <div class="form-group full">
+                        <label>Profile Picture</label>
+                        <div class="file-drop"><input type="file" name="photoFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload photo</div></div>
+                        <img th:if="${admin.profileImage}" th:src="@{${admin.profileImage}}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-top:10px;" />
+                    </div>
+                    <div class="form-group"><label>Username</label><input class="glass-input" name="username" th:value="${admin.username}" required /></div>
+                    <div class="form-group"><label>Email</label><input class="glass-input" name="email" type="email" th:value="${admin.email}" required /></div>
+                    <div class="form-group full"><label>New Password (leave blank to keep current)</label><input class="glass-input" name="newPassword" type="password" /></div>
+                    <div class="form-actions form-group full">
+                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

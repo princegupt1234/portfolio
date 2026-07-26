@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" /><title>Contact Messages | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='messages')}"></div>
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Messages', unread=0)}"></div>
+        <div class="admin-content">
+            <div class="page-header">
+                <h1>Contact Messages</h1>
+                <div style="display:flex; gap:12px;">
+                    <form th:action="@{/admin/messages}" method="get" style="display:flex; gap:8px;">
+                        <input class="glass-input" type="text" name="q" placeholder="Search messages..." th:value="${q}" />
+                        <button type="submit" class="glass-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </form>
+                    <a th:href="@{/admin/messages/export}" class="glass-btn"><i class="fa-solid fa-file-csv"></i> Export CSV</a>
+                </div>
+            </div>
+            <div class="glass-card glass-table-wrap">
+                <table class="glass-table">
+                    <thead><tr><th>Status</th><th>From</th><th>Subject</th><th>Received</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:each="m : ${messages}">
+                        <td><span class="status-pill" th:classappend="${m.isRead} ? 'off' : 'unread'" th:text="${m.isRead} ? 'Read' : 'Unread'">Unread</span></td>
+                        <td><strong th:text="${m.name}">Name</strong><br/><span style="color:var(--text-secondary); font-size:0.82rem;" th:text="${m.email}">email</span></td>
+                        <td th:text="${#strings.abbreviate(m.subject ?: '(no subject)', 40)}">Subject</td>
+                        <td th:text="${#temporals.format(m.createdAt, 'dd MMM yyyy, HH:mm')}">Date</td>
+                        <td>
+                            <div class="action-icons">
+                                <a th:href="@{'/admin/messages/' + ${m.id}}"><i class="fa-solid fa-eye"></i></a>
+                                <form th:action="@{'/admin/messages/' + ${m.id} + '/delete'}" method="post" data-confirm="Delete this message?" style="margin:0;">
+                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(messages)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No messages yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='dashboard')}"></div>
+
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Dashboard', unread=${unreadMessages})}"></div>
+
+        <div class="admin-content">
+            <div class="page-header">
+                <div>
+                    <h1>Welcome back, Prince 👋</h1>
+                    <p style="margin:4px 0 0;">Here's what's happening with your portfolio today.</p>
+                </div>
+                <a th:href="@{/admin/projects/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Project</a>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="glass-card kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-eye"></i></div>
+                    <div><div class="kpi-value" th:text="${todayViews}">0</div><div class="kpi-label">Today's Visitors</div></div>
+                </div>
+                <div class="glass-card kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <div><div class="kpi-value" th:text="${totalViews30d}">0</div><div class="kpi-label">Portfolio Views (30d)</div></div>
+                </div>
+                <div class="glass-card kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                    <div><div class="kpi-value" th:text="${totalClicks30d}">0</div><div class="kpi-label">Project Views (30d)</div></div>
+                </div>
+                <div class="glass-card kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-download"></i></div>
+                    <div><div class="kpi-value" th:text="${totalDownloads30d}">0</div><div class="kpi-label">Resume Downloads (30d)</div></div>
+                </div>
+                <div class="glass-card kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <div><div class="kpi-value" th:text="${unreadMessages} + ' / ' + ${totalMessages}">0</div><div class="kpi-label">Unread Messages</div></div>
+                </div>
+                <div class="glass-card kpi-card">
+                    <div class="kpi-icon"><i class="fa-brands fa-github"></i></div>
+                    <div><div class="kpi-value" th:text="${github != null and github.available()} ? ${github.followers()} : '—'">0</div><div class="kpi-label">GitHub Followers</div></div>
+                </div>
+            </div>
+
+            <div class="dash-grid">
+                <div class="glass-card">
+                    <h3 style="margin-bottom:18px;">Visitors — Last 30 Days</h3>
+                    <canvas id="visitorsChart" height="90"></canvas>
+                </div>
+                <div class="glass-card">
+                    <h3 style="margin-bottom:18px;">Profile Completion</h3>
+                    <div style="text-align:center; padding: 10px 0 18px;">
+                        <div style="font-size:2.4rem; font-weight:700;" class="gradient-text" th:text="${profileCompletion} + '%'">0%</div>
+                    </div>
+                    <div class="progress-track" style="margin-bottom:22px;">
+                        <div class="progress-fill" th:style="'width:' + ${profileCompletion} + '%'" style="width:0"></div>
+                    </div>
+                    <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--text-secondary);">LeetCode</h4>
+                    <p th:if="${leetcode != null and leetcode.available()}" style="margin:0;">
+                        <span th:text="${leetcode.totalSolved()}">0</span> solved ·
+                        <span th:text="${leetcode.easySolved()}">0</span> easy /
+                        <span th:text="${leetcode.mediumSolved()}">0</span> med /
+                        <span th:text="${leetcode.hardSolved()}">0</span> hard
+                    </p>
+                    <p th:unless="${leetcode != null and leetcode.available()}" style="margin:0;">Not connected yet — set your LeetCode username in About.</p>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-bottom:22px;">
+                <h3 style="margin-bottom:18px;">Quick Actions</h3>
+                <div class="quick-actions">
+                    <a th:href="@{/admin/projects/new}" class="glass-card quick-action"><i class="fa-solid fa-diagram-project"></i><span>Add Project</span></a>
+                    <a th:href="@{/admin/certificates/new}" class="glass-card quick-action"><i class="fa-solid fa-certificate"></i><span>Upload Certificate</span></a>
+                    <a th:href="@{/admin/skills}" class="glass-card quick-action"><i class="fa-solid fa-layer-group"></i><span>Edit Skills</span></a>
+                    <a th:href="@{/admin/resume}" class="glass-card quick-action"><i class="fa-solid fa-file-arrow-up"></i><span>Update Resume</span></a>
+                    <a th:href="@{/}" target="_blank" class="glass-card quick-action"><i class="fa-solid fa-rocket"></i><span>Publish / View</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.chartLabels = /*[[${stats.![statDate]}]]*/ [];
+    window.chartViews = /*[[${stats.![portfolioViews]}]]*/ [];
+    /*]]>*/
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

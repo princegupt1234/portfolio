@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" /><title>Analytics | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='analytics')}"></div>
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Analytics', unread=0)}"></div>
+        <div class="admin-content">
+            <div class="page-header"><h1>Analytics</h1></div>
+
+            <div class="dash-grid">
+                <div class="glass-card">
+                    <h3 style="margin-bottom:18px;">Daily Visitors — Last 30 Days</h3>
+                    <canvas id="visitorsChart" height="100"></canvas>
+                </div>
+                <div class="glass-card">
+                    <h3 style="margin-bottom:18px;">Views by Project</h3>
+                    <canvas id="projectClicksChart" height="220"></canvas>
+                    <p style="font-size:0.78rem; margin-top:12px;">Per-project view counts, updated whenever a visitor clicks a project link.</p>
+                </div>
+            </div>
+
+            <div class="glass-card glass-table-wrap">
+                <h3 style="margin-bottom:16px;">Daily Breakdown</h3>
+                <table class="glass-table">
+                    <thead><tr><th>Date</th><th>Portfolio Views</th><th>Resume Downloads</th><th>Project Clicks</th><th>Messages</th></tr></thead>
+                    <tbody>
+                    <tr th:each="s : ${stats}">
+                        <td th:text="${s.statDate}">Date</td>
+                        <td th:text="${s.portfolioViews}">0</td>
+                        <td th:text="${s.resumeDownloads}">0</td>
+                        <td th:text="${s.projectClicks}">0</td>
+                        <td th:text="${s.messagesReceived}">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(stats)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No analytics data yet — visit the public site to generate some.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var rawStats = /*[[${stats}]]*/ [];
+    rawStats = rawStats.slice().reverse();
+    window.chartLabels = rawStats.map(function(s){ return s.statDate; });
+    window.chartViews = rawStats.map(function(s){ return s.portfolioViews; });
+    window.projectLabels = /*[[${projects.![title]}]]*/ [];
+    window.projectViews = /*[[${projects.![viewCount]}]]*/ [];
+    /*]]>*/
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

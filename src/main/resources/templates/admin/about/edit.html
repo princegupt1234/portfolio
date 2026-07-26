@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" /><title>About | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='about')}"></div>
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='About', unread=0)}"></div>
+        <div class="admin-content">
+            <div class="page-header"><h1>About Management</h1></div>
+
+            <div class="glass-card" style="margin-bottom:24px;">
+                <h3 style="margin-bottom:18px;">Profile</h3>
+                <form th:action="@{/admin/about/save}" th:object="${about}" method="post" enctype="multipart/form-data" class="form-grid">
+                    <input type="hidden" th:field="*{id}" />
+                    <div class="form-group full">
+                        <label>Profile Photo</label>
+                        <div class="file-drop"><input type="file" name="photoFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload / replace photo</div></div>
+                        <img th:if="*{profileImage}" th:src="@{*{profileImage}}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-top:10px;" />
+                    </div>
+                    <div class="form-group"><label>Full Name</label><input class="glass-input" th:field="*{fullName}" /></div>
+                    <div class="form-group"><label>Title</label><input class="glass-input" th:field="*{title}" /></div>
+                    <div class="form-group full"><label>Bio</label><textarea class="glass-textarea" th:field="*{bio}" rows="3"></textarea></div>
+                    <div class="form-group full"><label>Career Objective</label><textarea class="glass-textarea" th:field="*{careerObjective}" rows="3"></textarea></div>
+                    <div class="form-group"><label>Phone</label><input class="glass-input" th:field="*{phone}" /></div>
+                    <div class="form-group"><label>Email</label><input class="glass-input" th:field="*{email}" /></div>
+                    <div class="form-group"><label>Location</label><input class="glass-input" th:field="*{location}" /></div>
+                    <div class="form-group"><label>GitHub URL</label><input class="glass-input" th:field="*{githubUrl}" /></div>
+                    <div class="form-group"><label>LinkedIn URL</label><input class="glass-input" th:field="*{linkedinUrl}" /></div>
+                    <div class="form-group"><label>WhatsApp Link</label><input class="glass-input" th:field="*{whatsappUrl}" /></div>
+                    <div class="form-group"><label>GitHub Username (for stats)</label><input class="glass-input" th:field="*{githubUsername}" /></div>
+                    <div class="form-group"><label>LeetCode Username (for stats)</label><input class="glass-input" th:field="*{leetcodeUsername}" /></div>
+                    <div class="form-actions form-group full">
+                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save About</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="margin-bottom:18px;">Education Timeline</h3>
+                <div class="glass-table-wrap" style="margin-bottom:22px;">
+                    <table class="glass-table">
+                        <thead><tr><th>Degree</th><th>Institution</th><th>Duration</th><th>Score</th><th>Actions</th></tr></thead>
+                        <tbody>
+                        <tr th:each="edu : ${education}">
+                            <td th:text="${edu.degree}">Degree</td>
+                            <td th:text="${edu.institution}">Institution</td>
+                            <td th:text="${edu.duration}">Duration</td>
+                            <td th:text="${edu.scoreLabel}">Score</td>
+                            <td>
+                                <form th:action="@{'/admin/about/education/' + ${edu.id} + '/delete'}" method="post" data-confirm="Delete this entry?" style="margin:0;">
+                                    <button type="submit" class="action-icons danger" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4 style="margin-bottom:14px;">Add Education Entry</h4>
+                <form th:action="@{/admin/about/education/save}" th:object="${newEducation}" method="post" class="form-grid">
+                    <div class="form-group"><label>Degree</label><input class="glass-input" th:field="*{degree}" /></div>
+                    <div class="form-group"><label>Institution</label><input class="glass-input" th:field="*{institution}" /></div>
+                    <div class="form-group"><label>Duration</label><input class="glass-input" th:field="*{duration}" /></div>
+                    <div class="form-group"><label>Score</label><input class="glass-input" th:field="*{scoreLabel}" /></div>
+                    <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
+                    <div class="form-actions form-group full">
+                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Entry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<div th:fragment="topbar(pageTitle, unread)" class="admin-topbar">
+    <div style="display:flex; align-items:center; gap:16px;">
+        <button class="sidebar-toggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="admin-search">
+            <i class="fa-solid fa-magnifying-glass" style="color:var(--text-secondary)"></i>
+            <input type="text" placeholder="Search this page..." data-table-search=".glass-table-wrap table" />
+        </div>
+    </div>
+    <div class="topbar-actions">
+        <a th:href="@{/admin/messages}" class="icon-btn" title="Messages">
+            <i class="fa-solid fa-envelope"></i>
+            <span class="dot" th:if="${unread != null and unread > 0}"></span>
+        </a>
+        <div class="icon-btn" title="Notifications"><i class="fa-solid fa-bell"></i></div>
+        <div class="admin-profile-chip">
+            <div class="avatar"><i class="fa-solid fa-user"></i></div>
+            <span sec:authentication="name">admin</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

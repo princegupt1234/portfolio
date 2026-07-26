@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${about.fullName} + ' | ' + ${about.title}">Prince Gupt | Full Stack Developer</title>
+    <meta name="description" th:content="${about.bio}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body>
+
+<div class="aurora-bg">
+    <div class="aurora-blob b1"></div>
+    <div class="aurora-blob b2"></div>
+    <div class="aurora-blob b3"></div>
+</div>
+<div class="cursor-glow"></div>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar">
+    <a href="#home" class="logo">Prince<span class="gradient-text">.</span></a>
+    <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#certificates">Certificates</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a th:href="@{/resume/download}" class="glass-btn primary" style="padding:9px 20px;">Resume</a></li>
+    </ul>
+    <button class="nav-toggle"><i class="fa-solid fa-bars"></i></button>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="home">
+    <div class="hero-grid">
+        <div data-reveal>
+            <div class="hero-eyebrow">// Hello, I'm</div>
+            <h1 class="hero-name">Prince Gupt</h1>
+            <div class="hero-typed">
+                <span class="typed-text"
+                      data-phrases="Full Stack Developer|Java + Spring Boot Enthusiast|React &amp; Next.js Developer|Final Year CSE Student"></span><span class="cursor"></span>
+            </div>
+            <p class="hero-intro" th:text="${about.bio}">Bio</p>
+            <div class="hero-ctas">
+                <a href="#projects" class="glass-btn primary"><i class="fa-solid fa-diagram-project"></i> View Projects</a>
+                <a href="#contact" class="glass-btn"><i class="fa-solid fa-paper-plane"></i> Contact Me</a>
+            </div>
+            <div class="hero-socials">
+                <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank"><i class="fa-brands fa-github"></i></a>
+                <a th:if="${about.linkedinUrl}" th:href="@{${about.linkedinUrl}}" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+                <a th:if="${about.whatsappUrl}" th:href="@{${about.whatsappUrl}}" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                <a th:if="${about.email}" th:href="'mailto:' + ${about.email}"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="hero-visual" data-reveal>
+            <div class="floating-icon i1"><i class="fa-brands fa-java"></i></div>
+            <div class="floating-icon i2"><i class="fa-brands fa-react"></i></div>
+            <div class="floating-icon i3"><i class="fa-solid fa-leaf"></i></div>
+            <div class="floating-icon i4"><i class="fa-brands fa-github"></i></div>
+            <div class="hero-photo-ring">
+                <div class="hero-photo">
+                    <img th:if="${about.profileImage}" th:src="@{${about.profileImage}}" alt="Prince Gupt" />
+                    <i th:unless="${about.profileImage}" class="fa-solid fa-user" style="font-size:5rem; color: var(--text-secondary);"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="scroll-cue">Scroll<div class="dot"></div></div>
+</section>
+
+<!-- ===================== ABOUT ===================== -->
+<section class="section" id="about">
+    <div class="container">
+        <div class="section-tag">About Me</div>
+        <h2 class="section-title" data-reveal>Get to know me a little better</h2>
+        <div class="about-grid">
+            <div class="glass-card" data-reveal>
+                <h3 style="margin-bottom:18px;">Career Objective</h3>
+                <p th:text="${about.careerObjective}">Objective</p>
+                <div class="info-grid">
+                    <div><div class="label">Phone</div><div class="value" th:text="${about.phone}">Phone</div></div>
+                    <div><div class="label">Email</div><div class="value" th:text="${about.email}">Email</div></div>
+                    <div><div class="label">Location</div><div class="value" th:text="${about.location}">Location</div></div>
+                    <div><div class="label">Availability</div><div class="value">Open to opportunities</div></div>
+                </div>
+            </div>
+            <div class="glass-card" data-reveal>
+                <h3 style="margin-bottom:22px;">Education</h3>
+                <div class="timeline">
+                    <div class="timeline-item" th:each="edu : ${education}">
+                        <h4 th:text="${edu.degree}">Degree</h4>
+                        <div class="meta" th:text="${edu.institution}">Institution</div>
+                        <p style="margin-top:4px;" th:text="${edu.duration} + (${edu.scoreLabel} != null ? ' · ' + ${edu.scoreLabel} : '')">Duration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== SKILLS ===================== -->
+<section class="section" id="skills">
+    <div class="container">
+        <div class="section-tag">Skills</div>
+        <h2 class="section-title" data-reveal>Technologies I work with</h2>
+        <p class="section-sub" data-reveal>A blend of languages, frameworks, and tools I use to build full stack applications end to end.</p>
+
+        <div class="skills-tabs" data-reveal>
+            <div class="skills-tab active" data-category="all">All</div>
+            <div class="skills-tab" data-category="Programming">Programming</div>
+            <div class="skills-tab" data-category="Backend">Backend</div>
+            <div class="skills-tab" data-category="Frontend">Frontend</div>
+            <div class="skills-tab" data-category="Database">Database</div>
+            <div class="skills-tab" data-category="Tools">Tools</div>
+        </div>
+
+        <div class="skills-grid">
+            <div class="glass-card skill-card" th:each="skill : ${skills}" th:attr="data-category=${skill.category}" data-reveal>
+                <div class="skill-head">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="skill-icon"><i th:class="${skill.icon}"></i></div>
+                        <strong th:text="${skill.name}">Skill</strong>
+                    </div>
+                    <span style="color:var(--text-secondary); font-size:0.85rem;" th:text="${skill.proficiency} + '%'">80%</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" th:attr="data-value=${skill.proficiency}"></div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== EXPERIENCE ===================== -->
+<section class="section" id="experience">
+    <div class="container">
+        <div class="section-tag">Experience</div>
+        <h2 class="section-title" data-reveal>Where I've worked and trained</h2>
+        <div class="exp-timeline">
+            <div class="glass-card exp-item" th:each="exp : ${experiences}" data-reveal>
+                <div class="exp-type" th:text="${exp.type}">Internship</div>
+                <h3 th:text="${exp.role}">Role</h3>
+                <p style="color:var(--secondary); font-family:var(--font-mono); font-size:0.85rem; margin:4px 0 12px;" th:text="${exp.company} + ' · ' + ${exp.duration}">Company</p>
+                <p style="white-space:pre-line;" th:text="${exp.description}">Description</p>
+            </div>
+            <div class="glass-card" th:if="${#lists.isEmpty(experiences)}" data-reveal>
+                <p style="margin:0;">Experience entries will appear here.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== PROJECTS ===================== -->
+<section class="section" id="projects">
+    <div class="container">
+        <div class="section-tag">Projects</div>
+        <h2 class="section-title" data-reveal>Things I've built</h2>
+        <p class="section-sub" data-reveal>A selection of full stack projects covering backend APIs, databases, and responsive frontends.</p>
+        <div class="projects-grid">
+            <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
+                <div class="project-thumb">
+                    <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" />
+                    <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
+                </div>
+                <div class="project-body">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                        <h3 th:text="${project.title}">Title</h3>
+                        <span class="badge" th:if="${project.featured}">Featured</span>
+                    </div>
+                    <p th:text="${project.description}">Description</p>
+                    <div class="project-tech">
+                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech}">Tech</span>
+                    </div>
+                    <div class="project-links">
+                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}"><i class="fa-brands fa-github"></i> Code</a>
+                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" th:attr="data-track-project=${project.id}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== GITHUB ===================== -->
+<section class="section" id="github">
+    <div class="container">
+        <div class="section-tag">GitHub</div>
+        <h2 class="section-title" data-reveal>Open source activity</h2>
+        <div class="glass-card" data-reveal>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num" th:attr="data-counter=${github != null and github.available()} ? ${github.publicRepos()} : 0">0</div>
+                    <div class="stat-label">Public Repos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" th:attr="data-counter=${github != null and github.available()} ? ${github.followers()} : 0">0</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" th:attr="data-counter=${github != null and github.available()} ? ${github.following()} : 0">0</div>
+                    <div class="stat-label">Following</div>
+                </div>
+                <div class="stat-box">
+                    <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary" style="margin-top:8px;">
+                        <i class="fa-brands fa-github"></i> View Profile
+                    </a>
+                </div>
+            </div>
+            <p th:unless="${github != null and github.available()}" style="margin-top:16px; text-align:center;">Live GitHub stats load automatically once the site is deployed with internet access.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== LEETCODE ===================== -->
+<section class="section" id="leetcode">
+    <div class="container">
+        <div class="section-tag">LeetCode</div>
+        <h2 class="section-title" data-reveal>Problem solving practice</h2>
+        <div class="glass-card" data-reveal>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.totalSolved()} : 0">0</div>
+                    <div class="stat-label">Total Solved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--success);" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.easySolved()} : 0">0</div>
+                    <div class="stat-label">Easy</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--warning);" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.mediumSolved()} : 0">0</div>
+                    <div class="stat-label">Medium</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--danger);" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.hardSolved()} : 0">0</div>
+                    <div class="stat-label">Hard</div>
+                </div>
+            </div>
+            <p th:unless="${leetcode != null and leetcode.available()}" style="margin-top:16px; text-align:center;">Live LeetCode stats load automatically once the site is deployed with internet access.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CERTIFICATES ===================== -->
+<section class="section" id="certificates">
+    <div class="container">
+        <div class="section-tag">Certificates</div>
+        <h2 class="section-title" data-reveal>Certifications &amp; achievements</h2>
+        <div class="cert-carousel" data-reveal>
+            <div class="glass-card cert-card" th:each="cert : ${certificates}"
+                 th:attr="data-cert-preview=${cert.imageUrl}">
+                <div class="cert-thumb">
+                    <img th:if="${cert.imageUrl}" th:src="@{${cert.imageUrl}}" th:alt="${cert.title}" />
+                    <i th:unless="${cert.imageUrl}" class="fa-solid fa-certificate" style="font-size:2rem; color: var(--text-secondary);"></i>
+                </div>
+                <h4 th:text="${cert.title}">Title</h4>
+                <p style="margin:4px 0;" th:text="${cert.organization}">Org</p>
+                <p style="font-size:0.8rem;" th:text="${cert.issueDate}">Date</p>
+                <a th:if="${cert.pdfUrl}" th:href="@{${cert.pdfUrl}}" target="_blank" class="glass-btn" style="margin-top:10px; padding:8px 16px; font-size:0.8rem;"><i class="fa-solid fa-download"></i> Download</a>
+            </div>
+            <div class="glass-card cert-card" th:if="${#lists.isEmpty(certificates)}">
+                <p style="margin:0;">Certificates will appear here.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="certModal" style="position:fixed; inset:0; background:rgba(3,7,18,0.85); backdrop-filter: blur(6px); display:none; align-items:center; justify-content:center; z-index:200;">
+    <style>#certModal.open{display:flex;}</style>
+    <div style="position:relative; max-width:90vw; max-height:85vh;">
+        <button class="modal-close glass-btn" style="position:absolute; top:-46px; right:0;"><i class="fa-solid fa-xmark"></i></button>
+        <img id="certModalImg" src="" alt="Certificate preview" style="max-width:90vw; max-height:85vh; border-radius:16px; border:1px solid var(--glass-border);" />
+    </div>
+</div>
+
+<!-- ===================== SERVICES ===================== -->
+<section class="section" id="services">
+    <div class="container">
+        <div class="section-tag">Services</div>
+        <h2 class="section-title" data-reveal>What I can help you build</h2>
+        <div class="services-grid">
+            <div class="glass-card" th:each="service : ${services}" data-reveal>
+                <div class="service-icon"><i th:class="${service.icon}"></i></div>
+                <h3 th:text="${service.title}">Title</h3>
+                <p th:text="${service.description}">Description</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== TESTIMONIALS ===================== -->
+<section class="section" id="testimonials" th:if="${!#lists.isEmpty(testimonials)}">
+    <div class="container">
+        <div class="section-tag">Testimonials</div>
+        <h2 class="section-title" data-reveal>What people say</h2>
+        <div class="testimonial-track" data-reveal>
+            <div class="glass-card testimonial-card" th:each="t : ${testimonials}">
+                <div class="stars">
+                    <i class="fa-solid fa-star" th:each="i : ${#numbers.sequence(1, t.rating)}"></i>
+                </div>
+                <p th:text="'&quot;' + ${t.comment} + '&quot;'">Comment</p>
+                <div style="display:flex; align-items:center; gap:12px; margin-top:16px;">
+                    <img th:if="${t.photoUrl}" th:src="@{${t.photoUrl}}" style="width:44px; height:44px; border-radius:50%; object-fit:cover;" alt="" />
+                    <div>
+                        <strong th:text="${t.name}" style="display:block;">Name</strong>
+                        <span style="color:var(--text-secondary); font-size:0.82rem;" th:text="${t.role}">Role</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CONTACT ===================== -->
+<section class="section" id="contact">
+    <div class="container">
+        <div class="section-tag">Contact</div>
+        <h2 class="section-title" data-reveal>Let's build something together</h2>
+        <p class="section-sub" data-reveal>Have an opportunity or a project in mind? Send a message and I'll get back to you.</p>
+
+        <div class="contact-grid">
+            <div class="glass-card" data-reveal>
+                <div class="contact-info-item" th:if="${about.phone}">
+                    <div class="icon-box"><i class="fa-solid fa-phone"></i></div>
+                    <div><div style="color:var(--text-secondary); font-size:0.8rem;">Phone</div><div th:text="${about.phone}">Phone</div></div>
+                </div>
+                <div class="contact-info-item" th:if="${about.email}">
+                    <div class="icon-box"><i class="fa-solid fa-envelope"></i></div>
+                    <div><div style="color:var(--text-secondary); font-size:0.8rem;">Email</div><div th:text="${about.email}">Email</div></div>
+                </div>
+                <div class="contact-info-item" th:if="${about.githubUrl}">
+                    <div class="icon-box"><i class="fa-brands fa-github"></i></div>
+                    <div><div style="color:var(--text-secondary); font-size:0.8rem;">GitHub</div><div th:text="${about.githubUrl}">GitHub</div></div>
+                </div>
+                <div class="contact-info-item" th:if="${about.linkedinUrl}">
+                    <div class="icon-box"><i class="fa-brands fa-linkedin-in"></i></div>
+                    <div><div style="color:var(--text-secondary); font-size:0.8rem;">LinkedIn</div><div th:text="${about.linkedinUrl}">LinkedIn</div></div>
+                </div>
+                <div class="map-frame">
+                    <iframe th:src="'https://maps.google.com/maps?q=' + ${about.location} + '&t=&z=11&ie=UTF8&iwloc=&output=embed'" loading="lazy"></iframe>
+                </div>
+            </div>
+
+            <div class="glass-card" data-reveal>
+                <form id="contactForm" th:action="@{/contact/submit}" th:object="${contactForm}" method="post" th:attr="data-success=${contactSuccess != null and contactSuccess}">
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div>
+                            <input class="glass-input" th:field="*{name}" placeholder="Your Name" required />
+                            <p style="color:var(--danger); font-size:0.8rem; margin:4px 0 0;" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                        </div>
+                        <div>
+                            <input class="glass-input" th:field="*{email}" placeholder="Your Email" type="email" required />
+                            <p style="color:var(--danger); font-size:0.8rem; margin:4px 0 0;" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+                        </div>
+                        <input class="glass-input" th:field="*{subject}" placeholder="Subject" />
+                        <div>
+                            <textarea class="glass-textarea" th:field="*{message}" placeholder="Your Message" required></textarea>
+                            <p style="color:var(--danger); font-size:0.8rem; margin:4px 0 0;" th:if="${#fields.hasErrors('message')}" th:errors="*{message}"></p>
+                        </div>
+                        <button type="submit" class="glass-btn primary" style="justify-content:center;"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+    <div class="footer-grid">
+        <div>
+            <a href="#home" class="logo">Prince<span class="gradient-text">.</span></a>
+            <p style="max-width:280px; margin-top:10px;">Full Stack Developer building clean, production-ready web applications.</p>
+        </div>
+        <ul class="footer-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="hero-socials">
+            <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a th:if="${about.linkedinUrl}" th:href="@{${about.linkedinUrl}}" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a th:if="${about.email}" th:href="'mailto:' + ${about.email}"><i class="fa-solid fa-envelope"></i></a>
+        </div>
+    </div>
+    <p class="copyright">© <span id="year"></span> Prince Gupt. All rights reserved.</p>
+</footer>
+
+<a href="#home" class="glass-btn back-to-top"><i class="fa-solid fa-arrow-up"></i></a>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

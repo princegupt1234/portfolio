@@ -1,0 +1,264 @@
+package com.example.portfolio.config;
+
+import com.example.portfolio.entity.*;
+import com.example.portfolio.repository.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * Seeds the database with Prince Gupt's real resume content and a default
+ * admin account on first boot, ONLY if the tables are empty. Everything here
+ * is fully editable afterwards from the admin panel.
+ */
+@Component
+public class DataInitializer implements CommandLineRunner {
+
+    private final AdminRepository adminRepository;
+    private final AboutInfoRepository aboutInfoRepository;
+    private final EducationEntryRepository educationEntryRepository;
+    private final SkillRepository skillRepository;
+    private final ExperienceRepository experienceRepository;
+    private final ProjectRepository projectRepository;
+    private final CertificateRepository certificateRepository;
+    private final ServiceItemRepository serviceItemRepository;
+    private final TestimonialRepository testimonialRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.admin.default-username}")
+    private String defaultAdminUsername;
+    @Value("${app.admin.default-password}")
+    private String defaultAdminPassword;
+    @Value("${app.admin.default-email}")
+    private String defaultAdminEmail;
+
+    public DataInitializer(AdminRepository adminRepository, AboutInfoRepository aboutInfoRepository,
+                            EducationEntryRepository educationEntryRepository, SkillRepository skillRepository,
+                            ExperienceRepository experienceRepository, ProjectRepository projectRepository,
+                            CertificateRepository certificateRepository, ServiceItemRepository serviceItemRepository,
+                            TestimonialRepository testimonialRepository, PasswordEncoder passwordEncoder) {
+        this.adminRepository = adminRepository;
+        this.aboutInfoRepository = aboutInfoRepository;
+        this.educationEntryRepository = educationEntryRepository;
+        this.skillRepository = skillRepository;
+        this.experienceRepository = experienceRepository;
+        this.projectRepository = projectRepository;
+        this.certificateRepository = certificateRepository;
+        this.serviceItemRepository = serviceItemRepository;
+        this.testimonialRepository = testimonialRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public void run(String... args) {
+        seedAdmin();
+        seedAbout();
+        seedEducation();
+        seedSkills();
+        seedExperience();
+        seedProjects();
+        seedCertificates();
+        seedServices();
+        seedTestimonials();
+    }
+
+    private void seedAdmin() {
+        if (adminRepository.count() == 0) {
+            Admin admin = new Admin();
+            admin.setUsername(defaultAdminUsername);
+            admin.setEmail(defaultAdminEmail);
+            admin.setPassword(passwordEncoder.encode(defaultAdminPassword));
+            admin.setRole("ROLE_ADMIN");
+            adminRepository.save(admin);
+        }
+    }
+
+    private void seedAbout() {
+        if (aboutInfoRepository.count() == 0) {
+            AboutInfo info = new AboutInfo();
+            info.setFullName("Prince Gupt");
+            info.setTitle("Full Stack Developer | Final Year CSE Student");
+            info.setBio("Final-year B.Tech CSE student at BIET Lucknow (AKTU), currently pursuing Java Full " +
+                    "Stack Development training. Comfortable across frontend, backend, and database layers, " +
+                    "with a strong, self-driven foundation in data structures and algorithms.");
+            info.setCareerObjective("Seeking an entry-level SDE role or final-year internship to contribute to " +
+                    "real-world engineering teams, building production-oriented full stack features.");
+            info.setPhone("+91-7275807576");
+            info.setEmail("princegupt3052@gmail.com");
+            info.setLocation("Lucknow, Uttar Pradesh");
+            info.setGithubUrl("https://github.com/princegupt1234");
+            info.setLinkedinUrl("https://linkedin.com/in/princegupt");
+            info.setWhatsappUrl("https://wa.me/917275807576");
+            info.setGithubUsername("princegupt1234");
+            info.setLeetcodeUsername("princegupt1234");
+            aboutInfoRepository.save(info);
+        }
+    }
+
+    private void seedEducation() {
+        if (educationEntryRepository.count() == 0) {
+            educationEntryRepository.save(edu("B.Tech, Computer Science & Engineering",
+                    "Bansal Institute of Engineering & Technology, Lucknow (AKTU)", "Aug 2023 - Aug 2027", "Pursuing", 1));
+            educationEntryRepository.save(edu("Intermediate (12th) - PCM",
+                    "Udit Narayan Intermediate College, Padrauna, Kushinagar (UP Board)", "2022", "63%", 2));
+            educationEntryRepository.save(edu("High School (10th)",
+                    "Shree Chhatathu Prasad Uchchatar Madhyamik Vidyalaya, Kushinagar (UP Board)", "2020", "79%", 3));
+        }
+    }
+
+    private EducationEntry edu(String degree, String institution, String duration, String score, int order) {
+        EducationEntry e = new EducationEntry();
+        e.setDegree(degree);
+        e.setInstitution(institution);
+        e.setDuration(duration);
+        e.setScoreLabel(score);
+        e.setSortOrder(order);
+        return e;
+    }
+
+    private void seedSkills() {
+        if (skillRepository.count() == 0) {
+            int i = 0;
+            skillRepository.save(skill("Java", "Programming", "fa-brands fa-java", 85, i++));
+            skillRepository.save(skill("C++", "Programming", "fa-solid fa-code", 75, i++));
+            skillRepository.save(skill("C", "Programming", "fa-solid fa-code", 70, i++));
+            skillRepository.save(skill("Spring Boot", "Backend", "fa-solid fa-leaf", 78, i++));
+            skillRepository.save(skill("REST API Design", "Backend", "fa-solid fa-server", 80, i++));
+            skillRepository.save(skill("Node.js", "Backend", "fa-brands fa-node-js", 75, i++));
+            skillRepository.save(skill("Express.js", "Backend", "fa-solid fa-server", 72, i++));
+            skillRepository.save(skill("React.js", "Frontend", "fa-brands fa-react", 80, i++));
+            skillRepository.save(skill("Next.js", "Frontend", "fa-solid fa-n", 75, i++));
+            skillRepository.save(skill("TypeScript", "Frontend", "fa-solid fa-code", 72, i++));
+            skillRepository.save(skill("HTML5", "Frontend", "fa-brands fa-html5", 90, i++));
+            skillRepository.save(skill("CSS3", "Frontend", "fa-brands fa-css3-alt", 88, i++));
+            skillRepository.save(skill("JavaScript", "Frontend", "fa-brands fa-js", 82, i++));
+            skillRepository.save(skill("Bootstrap", "Frontend", "fa-brands fa-bootstrap", 80, i++));
+            skillRepository.save(skill("Thymeleaf", "Frontend", "fa-solid fa-fire", 70, i++));
+            skillRepository.save(skill("MySQL", "Database", "fa-solid fa-database", 80, i++));
+            skillRepository.save(skill("MongoDB", "Database", "fa-solid fa-leaf", 75, i++));
+            skillRepository.save(skill("Git", "Tools", "fa-brands fa-git-alt", 85, i++));
+            skillRepository.save(skill("GitHub", "Tools", "fa-brands fa-github", 85, i++));
+            skillRepository.save(skill("VS Code", "Tools", "fa-solid fa-code", 90, i++));
+            skillRepository.save(skill("Postman", "Tools", "fa-solid fa-paper-plane", 78, i++));
+        }
+    }
+
+    private Skill skill(String name, String category, String icon, int proficiency, int order) {
+        Skill s = new Skill();
+        s.setName(name);
+        s.setCategory(category);
+        s.setIcon(icon);
+        s.setProficiency(proficiency);
+        s.setSortOrder(order);
+        return s;
+    }
+
+    private void seedExperience() {
+        if (experienceRepository.count() == 0) {
+            Experience e = new Experience();
+            e.setCompany("Codveda Technologies");
+            e.setRole("Full Stack Developer Intern");
+            e.setDuration("Jan 2026 - Feb 2026");
+            e.setDescription("ISO 9001:2015 Certified | MSME Registered | Remote | Credential ID: CV/A1/55948\n" +
+                    "- Built and shipped full-stack web features end-to-end using React.js, Node.js, Express.js, and MongoDB\n" +
+                    "- Designed and implemented RESTful APIs, integrating them with frontend interfaces for a seamless user experience\n" +
+                    "- Managed MySQL and MongoDB databases, handling data modeling, query optimization, and storage design");
+            e.setType("Internship");
+            e.setSortOrder(1);
+            experienceRepository.save(e);
+        }
+    }
+
+    private void seedProjects() {
+        if (projectRepository.count() == 0) {
+            Project p1 = new Project();
+            p1.setTitle("POS Billing System");
+            p1.setDescription("A full-stack Point of Sale application with invoice generation, cart management, " +
+                    "and automatic billing calculations.");
+            p1.setFeatures("Invoice generation\nCart management\nAutomatic billing calculations\nProduct catalog management");
+            p1.setTechStack("Node.js,Express.js,MongoDB,HTML,CSS,JavaScript");
+            p1.setGithubUrl("https://github.com/princegupt1234");
+            p1.setFeatured(true);
+            p1.setStatus("Completed");
+            p1.setTags("Full Stack,Node.js,MongoDB");
+            p1.setSortOrder(1);
+            projectRepository.save(p1);
+
+            Project p2 = new Project();
+            p2.setTitle("Travel Booking Website");
+            p2.setDescription("A full-stack travel platform enabling destination browsing and booking, with " +
+                    "MySQL-backed user management.");
+            p2.setFeatures("Destination browsing\nBooking flow\nUser authentication\nMySQL-backed data layer");
+            p2.setTechStack("HTML,CSS,JavaScript,PHP,MySQL");
+            p2.setGithubUrl("https://github.com/princegupt1234");
+            p2.setFeatured(true);
+            p2.setStatus("Completed");
+            p2.setTags("Full Stack,PHP,MySQL");
+            p2.setSortOrder(2);
+            projectRepository.save(p2);
+
+            Project p3 = new Project();
+            p3.setTitle("Personal Portfolio");
+            p3.setDescription("A responsive personal portfolio designed and deployed using Next.js and TypeScript, " +
+                    "publicly hosted on Netlify.");
+            p3.setFeatures("Responsive design\nServer-rendered pages\nDeployed on Netlify");
+            p3.setTechStack("Next.js,React,TypeScript");
+            p3.setLiveUrl("https://princesportfolio.netlify.app");
+            p3.setFeatured(false);
+            p3.setStatus("Live");
+            p3.setTags("Frontend,Next.js");
+            p3.setSortOrder(3);
+            projectRepository.save(p3);
+        }
+    }
+
+    private void seedCertificates() {
+        if (certificateRepository.count() == 0) {
+            Certificate c = new Certificate();
+            c.setTitle("Full Stack Development Internship");
+            c.setOrganization("Codveda Technologies");
+            c.setIssueDate(LocalDate.of(2026, 3, 1));
+            c.setCredentialId("CV/A1/55948");
+            c.setSortOrder(1);
+            certificateRepository.save(c);
+        }
+    }
+
+    private void seedServices() {
+        if (serviceItemRepository.count() == 0) {
+            List.of(
+                    svc("Java Development", "Robust, well-structured Java applications using OOP best practices.", "fa-solid fa-code", 1),
+                    svc("Spring Boot API", "RESTful backend services and APIs built with Spring Boot.", "fa-solid fa-server", 2),
+                    svc("Responsive Website", "Pixel-perfect, mobile-first websites that work on every device.", "fa-solid fa-mobile-screen", 3),
+                    svc("Database Design", "Efficient relational and document data models with MySQL and MongoDB.", "fa-solid fa-database", 4),
+                    svc("Backend Development", "End-to-end backend features, from data modeling to API delivery.", "fa-solid fa-gears", 5)
+            ).forEach(serviceItemRepository::save);
+        }
+    }
+
+    private ServiceItem svc(String title, String desc, String icon, int order) {
+        ServiceItem s = new ServiceItem();
+        s.setTitle(title);
+        s.setDescription(desc);
+        s.setIcon(icon);
+        s.setSortOrder(order);
+        return s;
+    }
+
+    private void seedTestimonials() {
+        if (testimonialRepository.count() == 0) {
+            Testimonial t = new Testimonial();
+            t.setName("Codveda Technologies");
+            t.setRole("Internship Supervisor");
+            t.setRating(5);
+            t.setComment("Prince shipped full-stack features end-to-end during his internship, from REST APIs " +
+                    "to database design, with strong ownership and attention to detail.");
+            t.setPublished(true);
+            testimonialRepository.save(t);
+        }
+    }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" /><title>Service Form | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='services')}"></div>
+    <div class="admin-main">
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Service', unread=0)}"></div>
+        <div class="admin-content">
+            <div class="page-header">
+                <h1 th:text="${service.id} != null ? 'Edit Service' : 'Add Service'">Add</h1>
+                <a th:href="@{/admin/services}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+            </div>
+            <div class="glass-card">
+                <form th:action="@{/admin/services/save}" th:object="${service}" method="post" class="form-grid">
+                    <input type="hidden" th:field="*{id}" />
+                    <div class="form-group"><label>Title</label><input class="glass-input" th:field="*{title}" required /></div>
+                    <div class="form-group">
+                        <label>Icon (Font Awesome class)</label>
+                        <input class="glass-input" th:field="*{icon}" placeholder="fa-solid fa-code" />
+                    </div>
+                    <div class="form-group full"><label>Description</label><textarea class="glass-textarea" th:field="*{description}" rows="4"></textarea></div>
+                    <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
+                    <div class="form-actions form-group full">
+                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Service</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>
