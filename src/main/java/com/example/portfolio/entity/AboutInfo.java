@@ -12,6 +12,18 @@ public class AboutInfo {
 
     private String fullName;
     private String title;
+    private String heroEyebrow;
+    private String heroPrimaryCtaLabel;
+    private String heroPrimaryCtaLink;
+    private String heroSecondaryCtaLabel;
+    private String heroSecondaryCtaLink;
+    private String heroBackground;
+    private Integer heroTypingSpeed;
+    private Integer heroDeletingSpeed;
+    private Integer heroPauseDuration;
+
+    @Column(length = 2000)
+    private String heroPhrases;
 
     @Column(length = 2000)
     private String bio;
@@ -38,6 +50,26 @@ public class AboutInfo {
     public void setFullName(String fullName) { this.fullName = fullName; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
+    public String getHeroEyebrow() { return heroEyebrow; }
+    public void setHeroEyebrow(String heroEyebrow) { this.heroEyebrow = heroEyebrow; }
+    public String getHeroPrimaryCtaLabel() { return heroPrimaryCtaLabel; }
+    public void setHeroPrimaryCtaLabel(String heroPrimaryCtaLabel) { this.heroPrimaryCtaLabel = heroPrimaryCtaLabel; }
+    public String getHeroPrimaryCtaLink() { return heroPrimaryCtaLink; }
+    public void setHeroPrimaryCtaLink(String heroPrimaryCtaLink) { this.heroPrimaryCtaLink = heroPrimaryCtaLink; }
+    public String getHeroSecondaryCtaLabel() { return heroSecondaryCtaLabel; }
+    public void setHeroSecondaryCtaLabel(String heroSecondaryCtaLabel) { this.heroSecondaryCtaLabel = heroSecondaryCtaLabel; }
+    public String getHeroSecondaryCtaLink() { return heroSecondaryCtaLink; }
+    public void setHeroSecondaryCtaLink(String heroSecondaryCtaLink) { this.heroSecondaryCtaLink = heroSecondaryCtaLink; }
+    public String getHeroBackground() { return heroBackground; }
+    public void setHeroBackground(String heroBackground) { this.heroBackground = heroBackground; }
+    public Integer getHeroTypingSpeed() { return heroTypingSpeed; }
+    public void setHeroTypingSpeed(Integer heroTypingSpeed) { this.heroTypingSpeed = heroTypingSpeed; }
+    public Integer getHeroDeletingSpeed() { return heroDeletingSpeed; }
+    public void setHeroDeletingSpeed(Integer heroDeletingSpeed) { this.heroDeletingSpeed = heroDeletingSpeed; }
+    public Integer getHeroPauseDuration() { return heroPauseDuration; }
+    public void setHeroPauseDuration(Integer heroPauseDuration) { this.heroPauseDuration = heroPauseDuration; }
+    public String getHeroPhrases() { return heroPhrases; }
+    public void setHeroPhrases(String heroPhrases) { this.heroPhrases = heroPhrases; }
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
     public String getCareerObjective() { return careerObjective; }

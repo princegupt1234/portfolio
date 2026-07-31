@@ -40,19 +40,23 @@
 </nav>
 
 <!-- ===================== HERO ===================== -->
-<section class="hero" id="home">
+<section class="hero" id="home" th:style="'background: ' + (about.heroBackground != null and about.heroBackground != '' ? about.heroBackground : 'linear-gradient(135deg, rgba(30,58,138,0.95), rgba(79,70,229,0.85))')">
     <div class="hero-grid">
         <div data-reveal>
-            <div class="hero-eyebrow">// Hello, I'm</div>
-            <h1 class="hero-name">Prince Gupt</h1>
-            <div class="hero-typed">
+            <div class="hero-eyebrow" th:text="${about.heroEyebrow} ?: '// Hello, I\'m'">// Hello, I'm</div>
+            <h1 class="hero-name" th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</h1>
+            <div class="hero-typed" role="status" aria-live="polite" aria-atomic="true">
                 <span class="typed-text"
-                      data-phrases="Full Stack Developer|Java + Spring Boot Enthusiast|React &amp; Next.js Developer|Final Year CSE Student"></span><span class="cursor"></span>
+                      th:attr="data-phrases=${#strings.isEmpty(about.heroPhrases) ? 'Full Stack Developer|Java + Spring Boot Enthusiast|React & Next.js Developer|Final Year CSE Student' : about.heroPhrases}, data-typing-speed=${about.heroTypingSpeed != null ? about.heroTypingSpeed : 75}, data-deleting-speed=${about.heroDeletingSpeed != null ? about.heroDeletingSpeed : 35}, data-pause-duration=${about.heroPauseDuration != null ? about.heroPauseDuration : 1600}"></span><span class="cursor" aria-hidden="true"></span>
             </div>
             <p class="hero-intro" th:text="${about.bio}">Bio</p>
             <div class="hero-ctas">
-                <a href="#projects" class="glass-btn primary"><i class="fa-solid fa-diagram-project"></i> View Projects</a>
-                <a href="#contact" class="glass-btn"><i class="fa-solid fa-paper-plane"></i> Contact Me</a>
+                <a class="glass-btn primary" th:href="${about.heroPrimaryCtaLink} ?: '#projects'" th:attr="aria-label=${about.heroPrimaryCtaLabel} ?: 'View Projects'">
+                    <i class="fa-solid fa-diagram-project"></i> <span th:text="${about.heroPrimaryCtaLabel} ?: 'View Projects'"></span>
+                </a>
+                <a class="glass-btn" th:href="${about.heroSecondaryCtaLink} ?: '#contact'" th:attr="aria-label=${about.heroSecondaryCtaLabel} ?: 'Contact Me'">
+                    <i class="fa-solid fa-paper-plane"></i> <span th:text="${about.heroSecondaryCtaLabel} ?: 'Contact Me'"></span>
+                </a>
             </div>
             <div class="hero-socials">
                 <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank"><i class="fa-brands fa-github"></i></a>

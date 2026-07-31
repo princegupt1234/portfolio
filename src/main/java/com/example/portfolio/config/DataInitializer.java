@@ -82,6 +82,16 @@ public class DataInitializer implements CommandLineRunner {
             AboutInfo info = new AboutInfo();
             info.setFullName("Prince Gupt");
             info.setTitle("Full Stack Developer | Final Year CSE Student");
+            info.setHeroEyebrow("// Hello, I'm");
+            info.setHeroPhrases("Full Stack Developer|Java + Spring Boot Enthusiast|React & Next.js Developer|Final Year CSE Student");
+            info.setHeroPrimaryCtaLabel("View Projects");
+            info.setHeroPrimaryCtaLink("#projects");
+            info.setHeroSecondaryCtaLabel("Contact Me");
+            info.setHeroSecondaryCtaLink("#contact");
+            info.setHeroBackground("linear-gradient(135deg, rgba(30,58,138,0.95), rgba(79,70,229,0.85))");
+            info.setHeroTypingSpeed(75);
+            info.setHeroDeletingSpeed(35);
+            info.setHeroPauseDuration(1600);
             info.setBio("Final-year B.Tech CSE student at BIET Lucknow (AKTU), currently pursuing Java Full " +
                     "Stack Development training. Comfortable across frontend, backend, and database layers, " +
                     "with a strong, self-driven foundation in data structures and algorithms.");
@@ -91,7 +101,7 @@ public class DataInitializer implements CommandLineRunner {
             info.setEmail("princegupt3052@gmail.com");
             info.setLocation("Lucknow, Uttar Pradesh");
             info.setGithubUrl("https://github.com/princegupt1234");
-            info.setLinkedinUrl("https://linkedin.com/in/princegupt");
+            info.setLinkedinUrl("https://linkedin.com/in/prince-gupt-175289322");
             info.setWhatsappUrl("https://wa.me/917275807576");
             info.setGithubUsername("princegupt1234");
             info.setLeetcodeUsername("princegupt1234");

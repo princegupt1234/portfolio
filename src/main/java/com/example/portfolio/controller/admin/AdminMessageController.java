@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.ContactMessage;
 import com.example.portfolio.repository.ContactMessageRepository;
+import com.example.portfolio.service.MailService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,11 @@ import java.util.List;
 public class AdminMessageController {
 
     private final ContactMessageRepository contactMessageRepository;
+    private final MailService mailService;
 
-    public AdminMessageController(ContactMessageRepository contactMessageRepository) {
+    public AdminMessageController(ContactMessageRepository contactMessageRepository, MailService mailService) {
         this.contactMessageRepository = contactMessageRepository;
+        this.mailService = mailService;
     }
 
     @GetMapping
@@ -51,11 +54,17 @@ public class AdminMessageController {
     }
 
     @PostMapping("/{id}/reply")
-    public String reply(@PathVariable("id") Long id, @RequestParam("replyText") String replyText) {
+    public String reply(@PathVariable("id") Long id,
+                        @RequestParam("replyText") String replyText) {
         ContactMessage msg = contactMessageRepository.findById(id).orElseThrow();
         msg.setReplyText(replyText);
         contactMessageRepository.save(msg);
-        return "redirect:/admin/messages/" + id;
+
+        String replySubject = "Re: " + (msg.getSubject() == null || msg.getSubject().isBlank() ? "Your message" : msg.getSubject());
+        String replyBody = replyText;
+        boolean sent = mailService.sendReply(msg.getEmail(), msg.getName(), replySubject, replyBody, msg.getMessage());
+
+        return "redirect:/admin/messages/" + id + "?sent=" + sent;
     }
 
     @PostMapping("/{id}/delete")

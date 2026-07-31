@@ -27,6 +27,21 @@
                     </div>
                     <div class="form-group"><label>Full Name</label><input class="glass-input" th:field="*{fullName}" /></div>
                     <div class="form-group"><label>Title</label><input class="glass-input" th:field="*{title}" /></div>
+                    <div class="form-group full"><label>Hero Eyebrow</label><input class="glass-input" th:field="*{heroEyebrow}" placeholder="// Hello, I'm" /></div>
+                    <div class="form-group full"><label>Hero Typed Phrases</label><textarea class="glass-textarea" id="heroPhrasesInput" th:field="*{heroPhrases}" rows="3" placeholder="Full Stack Developer|Java + Spring Boot Enthusiast|React & Next.js Developer|Final Year CSE Student"></textarea>
+                        <small style="color:var(--text-secondary); font-size:0.85rem;">Separate phrases with <code>|</code>. Each phrase should be under 60 characters and non-empty.</small>
+                        <div id="heroPhraseValidation" style="color:#f97316; font-size:0.85rem; margin-top:6px;"></div>
+                        <div id="heroPhraseList" style="margin-top:14px; display:grid; gap:10px;"></div>
+                        <div id="heroPreview" style="margin-top:14px; padding:12px; border:1px solid rgba(255,255,255,0.12); border-radius:14px; background:rgba(255,255,255,0.04); color:#e2e8f0; font-family:var(--font-mono); font-size:0.95rem;"></div>
+                    </div>
+                    <div class="form-group"><label>Hero Theme Background</label><input class="glass-input" th:field="*{heroBackground}" placeholder="linear-gradient(135deg, rgba(30,58,138,0.95), rgba(79,70,229,0.85))" /></div>
+                    <div class="form-group"><label>Typing Speed (ms per char)</label><input class="glass-input" type="number" min="10" max="200" th:field="*{heroTypingSpeed}" /></div>
+                    <div class="form-group"><label>Deleting Speed (ms per char)</label><input class="glass-input" type="number" min="10" max="200" th:field="*{heroDeletingSpeed}" /></div>
+                    <div class="form-group"><label>Pause Duration (ms)</label><input class="glass-input" type="number" min="200" max="5000" th:field="*{heroPauseDuration}" /></div>
+                    <div class="form-group"><label>Primary CTA Label</label><input class="glass-input" th:field="*{heroPrimaryCtaLabel}" placeholder="View Projects" /></div>
+                    <div class="form-group"><label>Primary CTA Link</label><input class="glass-input" th:field="*{heroPrimaryCtaLink}" placeholder="#projects" /></div>
+                    <div class="form-group"><label>Secondary CTA Label</label><input class="glass-input" th:field="*{heroSecondaryCtaLabel}" placeholder="Contact Me" /></div>
+                    <div class="form-group"><label>Secondary CTA Link</label><input class="glass-input" th:field="*{heroSecondaryCtaLink}" placeholder="#contact" /></div>
                     <div class="form-group full"><label>Bio</label><textarea class="glass-textarea" th:field="*{bio}" rows="3"></textarea></div>
                     <div class="form-group full"><label>Career Objective</label><textarea class="glass-textarea" th:field="*{careerObjective}" rows="3"></textarea></div>
                     <div class="form-group"><label>Phone</label><input class="glass-input" th:field="*{phone}" /></div>

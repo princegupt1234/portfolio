@@ -69,7 +69,16 @@ public class HomeController {
     }
 
     @GetMapping("/")
+    public String home(@RequestParam(value = "contactSuccess", required = false) Boolean contactSuccess,
+                       Model model) {
+        return renderHome(contactSuccess, model);
+    }
+
     public String home(Model model) {
+        return renderHome(null, model);
+    }
+
+    private String renderHome(Boolean contactSuccess, Model model) {
         analyticsService.recordPortfolioView();
 
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElse(new AboutInfo());
@@ -95,6 +104,9 @@ public class HomeController {
         if (!model.containsAttribute("contactForm")) {
             model.addAttribute("contactForm", new ContactForm());
         }
+        if (Boolean.TRUE.equals(contactSuccess)) {
+            model.addAttribute("contactSuccess", true);
+        }
 
         return "index";
     }
@@ -114,8 +126,7 @@ public class HomeController {
         analyticsService.recordMessageReceived();
         mailService.notifyNewMessage(form.getName(), form.getEmail(), form.getSubject(), form.getMessage());
 
-        model.addAttribute("contactSuccess", true);
-        return home(model);
+        return "redirect:/?contactSuccess=true";
     }
 
     @GetMapping("/project/{id}/click")

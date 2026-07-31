@@ -44,19 +44,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const typedEl = document.querySelector('.hero-typed .typed-text');
   if (typedEl) {
     const phrases = (typedEl.dataset.phrases || '').split('|').filter(Boolean);
+    const typingSpeed = Math.max(10, Math.min(200, Number(typedEl.dataset.typingSpeed) || 75));
+    const deletingSpeed = Math.max(10, Math.min(200, Number(typedEl.dataset.deletingSpeed) || 35));
+    const pauseDuration = Math.max(200, Math.min(5000, Number(typedEl.dataset.pauseDuration) || 1600));
     let phraseIdx = 0, charIdx = 0, deleting = false;
     function tick() {
       const phrase = phrases[phraseIdx] || '';
       if (!deleting) {
         charIdx++;
         typedEl.textContent = phrase.slice(0, charIdx);
-        if (charIdx === phrase.length) { deleting = true; setTimeout(tick, 1600); return; }
+        if (charIdx === phrase.length) { deleting = true; setTimeout(tick, pauseDuration); return; }
       } else {
         charIdx--;
         typedEl.textContent = phrase.slice(0, charIdx);
         if (charIdx === 0) { deleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; }
       }
-      setTimeout(tick, deleting ? 35 : 65);
+      setTimeout(tick, deleting ? deletingSpeed : typingSpeed);
     }
     if (phrases.length) tick();
   }
