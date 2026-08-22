@@ -50,8 +50,8 @@ body {
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.35;
+  filter: blur(110px);
+  opacity: 0.22;
   animation: float 18s ease-in-out infinite;
 }
 .aurora-blob.b1 { width: 480px; height: 480px; background: var(--primary); top: -120px; left: -80px; }

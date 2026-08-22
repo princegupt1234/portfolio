@@ -50,12 +50,15 @@
                       th:attr="data-phrases=${#strings.isEmpty(about.heroPhrases) ? 'Full Stack Developer|Java + Spring Boot Enthusiast|React & Next.js Developer|Final Year CSE Student' : about.heroPhrases}, data-typing-speed=${about.heroTypingSpeed != null ? about.heroTypingSpeed : 75}, data-deleting-speed=${about.heroDeletingSpeed != null ? about.heroDeletingSpeed : 35}, data-pause-duration=${about.heroPauseDuration != null ? about.heroPauseDuration : 1600}"></span><span class="cursor" aria-hidden="true"></span>
             </div>
             <p class="hero-intro" th:text="${about.bio}">Bio</p>
+            <div class="hero-tech-strip">
+                <span>Java</span><span>Spring Boot</span><span>REST APIs</span><span>MySQL</span><span>React</span>
+            </div>
             <div class="hero-ctas">
-                <a class="glass-btn primary" th:href="${about.heroPrimaryCtaLink} ?: '#projects'" th:attr="aria-label=${about.heroPrimaryCtaLabel} ?: 'View Projects'">
+                <a class="glass-btn primary" th:href="${about.heroPrimaryCtaLink} ?: '#projects'">
                     <i class="fa-solid fa-diagram-project"></i> <span th:text="${about.heroPrimaryCtaLabel} ?: 'View Projects'"></span>
                 </a>
-                <a class="glass-btn" th:href="${about.heroSecondaryCtaLink} ?: '#contact'" th:attr="aria-label=${about.heroSecondaryCtaLabel} ?: 'Contact Me'">
-                    <i class="fa-solid fa-paper-plane"></i> <span th:text="${about.heroSecondaryCtaLabel} ?: 'Contact Me'"></span>
+                <a class="glass-btn" th:href="@{/resume/download}">
+                    <i class="fa-solid fa-download"></i> Download Resume
                 </a>
             </div>
             <div class="hero-socials">
@@ -130,13 +133,12 @@
         <div class="skills-grid">
             <div class="glass-card skill-card" th:each="skill : ${skills}" th:attr="data-category=${skill.category}" data-reveal>
                 <div class="skill-head">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="skill-icon"><i th:class="${skill.icon}"></i></div>
+                    <div class="skill-icon"><i th:class="${skill.icon}"></i></div>
+                    <div>
                         <strong th:text="${skill.name}">Skill</strong>
+                        <div class="skill-category-label" th:text="${skill.category}">Category</div>
                     </div>
-                    <span style="color:var(--text-secondary); font-size:0.85rem;" th:text="${skill.proficiency} + '%'">80%</span>
                 </div>
-                <div class="progress-track"><div class="progress-fill" th:attr="data-value=${skill.proficiency}"></div></div>
             </div>
         </div>
     </div>
@@ -152,7 +154,13 @@
                 <div class="exp-type" th:text="${exp.type}">Internship</div>
                 <h3 th:text="${exp.role}">Role</h3>
                 <p style="color:var(--secondary); font-family:var(--font-mono); font-size:0.85rem; margin:4px 0 12px;" th:text="${exp.company} + ' · ' + ${exp.duration}">Company</p>
-                <p style="white-space:pre-line;" th:text="${exp.description}">Description</p>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">
+                    <li th:each="line : ${#strings.arraySplit(exp.description, '\n')}" th:if="${!#strings.isEmpty(line.trim())}"
+                        style="display:flex; align-items:flex-start; gap:8px; color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+                        <span style="color:var(--primary); flex-shrink:0; margin-top:2px;">&#9658;</span>
+                        <span th:text="${line.trim()}"></span>
+                    </li>
+                </ul>
             </div>
             <div class="glass-card" th:if="${#lists.isEmpty(experiences)}" data-reveal>
                 <p style="margin:0;">Experience entries will appear here.</p>
@@ -174,17 +182,17 @@
                     <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
                 </div>
                 <div class="project-body">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;">
                         <h3 th:text="${project.title}">Title</h3>
                         <span class="badge" th:if="${project.featured}">Featured</span>
                     </div>
-                    <p th:text="${project.description}">Description</p>
+                    <p class="project-desc" th:text="${project.description}">Description</p>
                     <div class="project-tech">
-                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech}">Tech</span>
+                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}">Tech</span>
                     </div>
                     <div class="project-links">
-                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}"><i class="fa-brands fa-github"></i> Code</a>
-                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" th:attr="data-track-project=${project.id}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo</a>
+                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo</a>
+                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}"><i class="fa-brands fa-github"></i> GitHub</a>
                     </div>
                 </div>
             </div>
@@ -212,45 +220,50 @@
                         <div class="stat-num" th:attr="data-counter=${github.following}">0</div>
                         <div class="stat-label">Following</div>
                     </div>
-                    <div class="stat-box">
-                        <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary" style="margin-top:8px;">
+                    <div class="stat-box" style="display:flex; align-items:center; justify-content:center;">
+                        <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary">
                             <i class="fa-brands fa-github"></i> View Profile
                         </a>
                     </div>
                 </div>
+                <p style="margin-top:18px; font-size:0.85rem; color:var(--text-secondary); text-align:center;">
+                    <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>Contribution graph and pinned repos available on the GitHub profile.
+                </p>
             </div>
-            <p th:unless="${github != null and github.available}" style="margin-top:16px; text-align:center;">Live GitHub stats load automatically once the site is deployed with internet access.</p>
+            <div th:unless="${github != null and github.available}" style="text-align:center; padding:20px 0;">
+                <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary" style="margin-bottom:14px;">
+                    <i class="fa-brands fa-github"></i> View GitHub Profile
+                </a>
+                <p style="margin:0; font-size:0.85rem;">Stats load automatically once deployed with internet access.</p>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- ===================== LEETCODE ===================== -->
-<section class="section" id="leetcode">
+<section class="section" id="leetcode" th:if="${leetcode != null and leetcode.available and leetcode.totalSolved > 0}">
     <div class="container">
         <div class="section-tag">LeetCode</div>
         <h2 class="section-title" data-reveal>Problem solving practice</h2>
         <div class="glass-card" data-reveal>
-            <div th:if="${leetcode != null and leetcode.available}">
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-num" th:attr="data-counter=${leetcode.totalSolved}">0</div>
-                        <div class="stat-label">Total Solved</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" style="color: var(--success);" th:attr="data-counter=${leetcode.easySolved}">0</div>
-                        <div class="stat-label">Easy</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" style="color: var(--warning);" th:attr="data-counter=${leetcode.mediumSolved}">0</div>
-                        <div class="stat-label">Medium</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" style="color: var(--danger);" th:attr="data-counter=${leetcode.hardSolved}">0</div>
-                        <div class="stat-label">Hard</div>
-                    </div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num" th:attr="data-counter=${leetcode.totalSolved}">0</div>
+                    <div class="stat-label">Total Solved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--success);" th:attr="data-counter=${leetcode.easySolved}">0</div>
+                    <div class="stat-label">Easy</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--warning);" th:attr="data-counter=${leetcode.mediumSolved}">0</div>
+                    <div class="stat-label">Medium</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color: var(--danger);" th:attr="data-counter=${leetcode.hardSolved}">0</div>
+                    <div class="stat-label">Hard</div>
                 </div>
             </div>
-            <p th:unless="${leetcode != null and leetcode.available}" style="margin-top:16px; text-align:center;">Live LeetCode stats load automatically once the site is deployed with internet access.</p>
         </div>
     </div>
 </section>
@@ -318,6 +331,34 @@
                     <div>
                         <strong th:text="${t.name}" style="display:block;">Name</strong>
                         <span style="color:var(--text-secondary); font-size:0.82rem;" th:text="${t.role}">Role</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CURRENTLY ===================== -->
+<section class="section" id="currently">
+    <div class="container">
+        <div class="section-tag">Currently</div>
+        <h2 class="section-title" data-reveal>What I'm working on</h2>
+        <div class="currently-grid" data-reveal>
+            <div class="glass-card">
+                <div class="currently-item">
+                    <div class="currently-icon"><i class="fa-solid fa-code"></i></div>
+                    <div>
+                        <h4>Building</h4>
+                        <p>Full-stack portfolio with Spring Boot admin panel, REST APIs, and Thymeleaf — deployed on Render with MySQL.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="currently-item">
+                    <div class="currently-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div>
+                        <h4>Learning</h4>
+                        <p>Advanced Spring Boot, System Design, DSA on LeetCode, and exploring React + Next.js for modern frontends.</p>
                     </div>
                 </div>
             </div>
