@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,7 @@ public class LeetCodeRepositoryStatsService {
             .defaultHeaders(headers -> {
                 headers.set("User-Agent", "portfolio-app");
                 headers.set("Accept", "application/json");
+                headers.set("Cache-Control", "no-cache");
             })
             .build();
 
@@ -33,7 +35,8 @@ public class LeetCodeRepositoryStatsService {
 
         try {
             String response = restClient.get()
-                    .uri("https://raw.githubusercontent.com/{username}/leetcode-dSA/main/stats.json", username)
+                    .uri("https://raw.githubusercontent.com/{username}/leetcode-dSA/main/stats.json?refresh={refresh}",
+                        username, Instant.now().toEpochMilli())
                     .retrieve()
                     .body(String.class);
             if (response == null || !response.contains("\"leetcode\"")) return unavailable();
