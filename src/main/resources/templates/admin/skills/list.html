@@ -30,7 +30,11 @@
                             <div class="progress-track"><div class="progress-fill" th:style="'width:' + ${skill.proficiency} + '%'"></div></div>
                         </td>
                         <td th:text="${skill.sortOrder}">0</td>
-                        <td><span class="status-pill" th:classappend="${skill.visible} ? 'on' : 'off'" th:text="${skill.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
+                        <td>
+                            <form th:action="@{'/admin/skills/' + ${skill.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                <button type="submit" class="status-pill" th:classappend="${skill.visible} ? 'on' : 'off'" th:text="${skill.visible} ? 'Visible' : 'Hidden'">Visible</button>
+                            </form>
+                        </td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/skills/' + ${skill.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

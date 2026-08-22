@@ -4,6 +4,7 @@ import com.example.portfolio.entity.AboutInfo;
 import com.example.portfolio.entity.EducationEntry;
 import com.example.portfolio.repository.AboutInfoRepository;
 import com.example.portfolio.repository.EducationEntryRepository;
+import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.FileStorageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,13 +18,16 @@ public class AdminAboutController {
     private final AboutInfoRepository aboutInfoRepository;
     private final EducationEntryRepository educationEntryRepository;
     private final FileStorageService fileStorageService;
+    private final DataVersionService dataVersionService;
 
     public AdminAboutController(AboutInfoRepository aboutInfoRepository,
                                  EducationEntryRepository educationEntryRepository,
-                                 FileStorageService fileStorageService) {
+                                 FileStorageService fileStorageService,
+                                 DataVersionService dataVersionService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.fileStorageService = fileStorageService;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -45,18 +49,21 @@ public class AdminAboutController {
                     .ifPresent(existing -> about.setProfileImage(existing.getProfileImage()));
         }
         aboutInfoRepository.save(about);
+        dataVersionService.bump();
         return "redirect:/admin/about";
     }
 
     @PostMapping("/education/save")
     public String saveEducation(@ModelAttribute EducationEntry educationEntry) {
         educationEntryRepository.save(educationEntry);
+        dataVersionService.bump();
         return "redirect:/admin/about";
     }
 
     @PostMapping("/education/{id}/delete")
     public String deleteEducation(@PathVariable("id") Long id) {
         educationEntryRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/about";
     }
 }

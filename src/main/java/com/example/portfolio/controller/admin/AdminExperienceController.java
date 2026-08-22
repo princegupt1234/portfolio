@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.Experience;
 import com.example.portfolio.repository.ExperienceRepository;
+import com.example.portfolio.service.DataVersionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminExperienceController {
 
     private final ExperienceRepository experienceRepository;
+    private final DataVersionService dataVersionService;
 
-    public AdminExperienceController(ExperienceRepository experienceRepository) {
+    public AdminExperienceController(ExperienceRepository experienceRepository, DataVersionService dataVersionService) {
         this.experienceRepository = experienceRepository;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -37,12 +40,24 @@ public class AdminExperienceController {
     @PostMapping("/save")
     public String save(@ModelAttribute Experience experience) {
         experienceRepository.save(experience);
+        dataVersionService.bump();
+        return "redirect:/admin/experience";
+    }
+
+    @PostMapping("/{id}/toggle-visible")
+    public String toggleVisible(@PathVariable("id") Long id) {
+        experienceRepository.findById(id).ifPresent(e -> {
+            e.setVisible(!Boolean.TRUE.equals(e.getVisible()));
+            experienceRepository.save(e);
+        });
+        dataVersionService.bump();
         return "redirect:/admin/experience";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         experienceRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/experience";
     }
 }

@@ -2,6 +2,8 @@ package com.example.portfolio.config;
 
 import com.example.portfolio.entity.*;
 import com.example.portfolio.repository.*;
+import com.example.portfolio.service.GithubStatsService;
+import com.example.portfolio.service.LeetCodeStatsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,8 @@ public class DataInitializer implements CommandLineRunner {
     private final CertificateRepository certificateRepository;
     private final ServiceItemRepository serviceItemRepository;
     private final TestimonialRepository testimonialRepository;
+    private final GithubStatsService githubStatsService;
+    private final LeetCodeStatsService leetCodeStatsService;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin.default-username}")
@@ -40,7 +44,9 @@ public class DataInitializer implements CommandLineRunner {
                             EducationEntryRepository educationEntryRepository, SkillRepository skillRepository,
                             ExperienceRepository experienceRepository, ProjectRepository projectRepository,
                             CertificateRepository certificateRepository, ServiceItemRepository serviceItemRepository,
-                            TestimonialRepository testimonialRepository, PasswordEncoder passwordEncoder) {
+                            TestimonialRepository testimonialRepository,
+                            GithubStatsService githubStatsService, LeetCodeStatsService leetCodeStatsService,
+                            PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
@@ -50,6 +56,8 @@ public class DataInitializer implements CommandLineRunner {
         this.certificateRepository = certificateRepository;
         this.serviceItemRepository = serviceItemRepository;
         this.testimonialRepository = testimonialRepository;
+        this.githubStatsService = githubStatsService;
+        this.leetCodeStatsService = leetCodeStatsService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -64,6 +72,11 @@ public class DataInitializer implements CommandLineRunner {
         seedCertificates();
         seedServices();
         seedTestimonials();
+        // Pre-warm external API caches asynchronously so first page load is fast
+        aboutInfoRepository.findAll().stream().findFirst().ifPresent(about -> {
+            if (about.getGithubUsername() != null) githubStatsService.fetchStats(about.getGithubUsername());
+            if (about.getLeetcodeUsername() != null) leetCodeStatsService.fetchStats(about.getLeetcodeUsername());
+        });
     }
 
     private void seedAdmin() {

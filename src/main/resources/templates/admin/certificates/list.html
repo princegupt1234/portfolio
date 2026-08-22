@@ -28,7 +28,11 @@
                         <td th:text="${c.organization}">Org</td>
                         <td th:text="${c.issueDate}">Date</td>
                         <td th:text="${c.credentialId}">ID</td>
-                        <td><span class="status-pill" th:classappend="${c.visible} ? 'on' : 'off'" th:text="${c.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
+                        <td>
+                            <form th:action="@{'/admin/certificates/' + ${c.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                <button type="submit" class="status-pill" th:classappend="${c.visible} ? 'on' : 'off'" th:text="${c.visible} ? 'Visible' : 'Hidden'">Visible</button>
+                            </form>
+                        </td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/certificates/' + ${c.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

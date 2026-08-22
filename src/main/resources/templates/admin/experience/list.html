@@ -27,7 +27,11 @@
                         <td th:text="${e.company}">Company</td>
                         <td th:text="${e.duration}">Jan-Feb</td>
                         <td><span class="badge" th:text="${e.type}">Internship</span></td>
-                        <td><span class="status-pill" th:classappend="${e.visible} ? 'on' : 'off'" th:text="${e.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
+                        <td>
+                            <form th:action="@{'/admin/experience/' + ${e.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                <button type="submit" class="status-pill" th:classappend="${e.visible} ? 'on' : 'off'" th:text="${e.visible} ? 'Visible' : 'Hidden'">Visible</button>
+                            </form>
+                        </td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/experience/' + ${e.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

@@ -4,6 +4,7 @@ import com.example.portfolio.dto.ContactForm;
 import com.example.portfolio.entity.*;
 import com.example.portfolio.repository.*;
 import com.example.portfolio.service.AnalyticsService;
+import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.GithubStatsService;
 import com.example.portfolio.service.LeetCodeStatsService;
 import com.example.portfolio.service.MailService;
@@ -41,6 +42,7 @@ public class HomeController {
     private final GithubStatsService githubStatsService;
     private final LeetCodeStatsService leetCodeStatsService;
     private final MailService mailService;
+    private final DataVersionService dataVersionService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -51,7 +53,8 @@ public class HomeController {
                            ServiceItemRepository serviceItemRepository, TestimonialRepository testimonialRepository,
                            ContactMessageRepository contactMessageRepository, ResumeRepository resumeRepository,
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
-                           LeetCodeStatsService leetCodeStatsService, MailService mailService) {
+                           LeetCodeStatsService leetCodeStatsService, MailService mailService,
+                           DataVersionService dataVersionService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.skillRepository = skillRepository;
@@ -66,11 +69,19 @@ public class HomeController {
         this.githubStatsService = githubStatsService;
         this.leetCodeStatsService = leetCodeStatsService;
         this.mailService = mailService;
+        this.dataVersionService = dataVersionService;
+    }
+
+    @GetMapping("/api/data-version")
+    @ResponseBody
+    public java.util.Map<String, Long> dataVersion() {
+        return java.util.Map.of("version", dataVersionService.getVersion());
     }
 
     @GetMapping("/")
     public String home(@RequestParam(value = "contactSuccess", required = false) Boolean contactSuccess,
-                       Model model) {
+                       Model model, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
         return renderHome(contactSuccess, model);
     }
 

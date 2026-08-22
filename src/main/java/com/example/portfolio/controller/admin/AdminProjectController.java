@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.Project;
 import com.example.portfolio.repository.ProjectRepository;
+import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.FileStorageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,10 +15,12 @@ public class AdminProjectController {
 
     private final ProjectRepository projectRepository;
     private final FileStorageService fileStorageService;
+    private final DataVersionService dataVersionService;
 
-    public AdminProjectController(ProjectRepository projectRepository, FileStorageService fileStorageService) {
+    public AdminProjectController(ProjectRepository projectRepository, FileStorageService fileStorageService, DataVersionService dataVersionService) {
         this.projectRepository = projectRepository;
         this.fileStorageService = fileStorageService;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -52,12 +55,24 @@ public class AdminProjectController {
             });
         }
         projectRepository.save(project);
+        dataVersionService.bump();
+        return "redirect:/admin/projects";
+    }
+
+    @PostMapping("/{id}/toggle-visible")
+    public String toggleVisible(@PathVariable("id") Long id) {
+        projectRepository.findById(id).ifPresent(p -> {
+            p.setVisible(!Boolean.TRUE.equals(p.getVisible()));
+            projectRepository.save(p);
+        });
+        dataVersionService.bump();
         return "redirect:/admin/projects";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         projectRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/projects";
     }
 }

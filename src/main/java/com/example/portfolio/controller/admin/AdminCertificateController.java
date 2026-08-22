@@ -2,8 +2,8 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.Certificate;
 import com.example.portfolio.repository.CertificateRepository;
+import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.FileStorageService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +15,12 @@ public class AdminCertificateController {
 
     private final CertificateRepository certificateRepository;
     private final FileStorageService fileStorageService;
+    private final DataVersionService dataVersionService;
 
-    public AdminCertificateController(CertificateRepository certificateRepository, FileStorageService fileStorageService) {
+    public AdminCertificateController(CertificateRepository certificateRepository, FileStorageService fileStorageService, DataVersionService dataVersionService) {
         this.certificateRepository = certificateRepository;
         this.fileStorageService = fileStorageService;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -57,12 +59,24 @@ public class AdminCertificateController {
             }
         }
         certificateRepository.save(certificate);
+        dataVersionService.bump();
+        return "redirect:/admin/certificates";
+    }
+
+    @PostMapping("/{id}/toggle-visible")
+    public String toggleVisible(@PathVariable("id") Long id) {
+        certificateRepository.findById(id).ifPresent(c -> {
+            c.setVisible(!Boolean.TRUE.equals(c.getVisible()));
+            certificateRepository.save(c);
+        });
+        dataVersionService.bump();
         return "redirect:/admin/certificates";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         certificateRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/certificates";
     }
 }

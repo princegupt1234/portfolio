@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.Testimonial;
 import com.example.portfolio.repository.TestimonialRepository;
+import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.FileStorageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,10 +15,12 @@ public class AdminTestimonialController {
 
     private final TestimonialRepository testimonialRepository;
     private final FileStorageService fileStorageService;
+    private final DataVersionService dataVersionService;
 
-    public AdminTestimonialController(TestimonialRepository testimonialRepository, FileStorageService fileStorageService) {
+    public AdminTestimonialController(TestimonialRepository testimonialRepository, FileStorageService fileStorageService, DataVersionService dataVersionService) {
         this.testimonialRepository = testimonialRepository;
         this.fileStorageService = fileStorageService;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -48,12 +51,14 @@ public class AdminTestimonialController {
                     .ifPresent(existing -> testimonial.setPhotoUrl(existing.getPhotoUrl()));
         }
         testimonialRepository.save(testimonial);
+        dataVersionService.bump();
         return "redirect:/admin/testimonials";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         testimonialRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/testimonials";
     }
 }

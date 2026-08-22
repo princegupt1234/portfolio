@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.ServiceItem;
 import com.example.portfolio.repository.ServiceItemRepository;
+import com.example.portfolio.service.DataVersionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminServiceItemController {
 
     private final ServiceItemRepository serviceItemRepository;
+    private final DataVersionService dataVersionService;
 
-    public AdminServiceItemController(ServiceItemRepository serviceItemRepository) {
+    public AdminServiceItemController(ServiceItemRepository serviceItemRepository, DataVersionService dataVersionService) {
         this.serviceItemRepository = serviceItemRepository;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -37,12 +40,14 @@ public class AdminServiceItemController {
     @PostMapping("/save")
     public String save(@ModelAttribute("service") ServiceItem service) {
         serviceItemRepository.save(service);
+        dataVersionService.bump();
         return "redirect:/admin/services";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         serviceItemRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/services";
     }
 }

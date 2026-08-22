@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.Skill;
 import com.example.portfolio.repository.SkillRepository;
+import com.example.portfolio.service.DataVersionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminSkillController {
 
     private final SkillRepository skillRepository;
+    private final DataVersionService dataVersionService;
 
-    public AdminSkillController(SkillRepository skillRepository) {
+    public AdminSkillController(SkillRepository skillRepository, DataVersionService dataVersionService) {
         this.skillRepository = skillRepository;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -37,12 +40,24 @@ public class AdminSkillController {
     @PostMapping("/save")
     public String save(@ModelAttribute Skill skill) {
         skillRepository.save(skill);
+        dataVersionService.bump();
+        return "redirect:/admin/skills";
+    }
+
+    @PostMapping("/{id}/toggle-visible")
+    public String toggleVisible(@PathVariable("id") Long id) {
+        skillRepository.findById(id).ifPresent(s -> {
+            s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
+            skillRepository.save(s);
+        });
+        dataVersionService.bump();
         return "redirect:/admin/skills";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         skillRepository.deleteById(id);
+        dataVersionService.bump();
         return "redirect:/admin/skills";
     }
 }

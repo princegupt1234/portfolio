@@ -6,8 +6,10 @@
     <title th:text="${about.fullName} + ' | ' + ${about.title}">Prince Gupt | Full Stack Developer</title>
     <meta name="description" th:content="${about.bio}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
 </head>
@@ -78,7 +80,7 @@
             <div class="floating-icon i4"><i class="fa-brands fa-github"></i></div>
             <div class="hero-photo-ring">
                 <div class="hero-photo">
-                    <img th:if="${about.profileImage}" th:src="@{${about.profileImage}}" alt="Prince Gupt" />
+                    <img th:if="${about.profileImage}" th:src="@{${about.profileImage}}" alt="Prince Gupt" loading="eager" />
                     <i th:unless="${about.profileImage}" class="fa-solid fa-user" style="font-size:5rem; color: var(--text-secondary);"></i>
                 </div>
             </div>
@@ -167,7 +169,7 @@
         <div class="projects-grid">
             <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
                 <div class="project-thumb">
-                    <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" />
+                <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
                     <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
                 </div>
                 <div class="project-body">
@@ -300,7 +302,7 @@
         <div class="cert-carousel" data-reveal>
             <div class="glass-card cert-card" th:each="cert : ${certificates}" th:attr="data-cert-preview=${cert.imageUrl}">
                 <div class="cert-thumb">
-                    <img th:if="${cert.imageUrl}" th:src="@{${cert.imageUrl}}" th:alt="${cert.title}" />
+                    <img th:if="${cert.imageUrl}" th:src="@{${cert.imageUrl}}" th:alt="${cert.title}" loading="lazy" />
                     <i th:unless="${cert.imageUrl}" class="fa-solid fa-certificate" style="font-size:2rem; color: var(--text-secondary);"></i>
                 </div>
                 <h4 th:text="${cert.title}">Title</h4>
@@ -518,6 +520,17 @@ document.querySelectorAll('.exp-desc').forEach(el => {
     }
 });
 </script>
-<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/main.js}" defer></script>
+<script>
+(function() {
+  var v = null;
+  setInterval(function() {
+    fetch('/api/data-version').then(function(r){ return r.json(); }).then(function(d) {
+      if (v === null) { v = d.version; return; }
+      if (d.version !== v) { location.reload(); }
+    }).catch(function(){});
+  }, 30000);
+})();
+</script>
 </body>
 </html>
