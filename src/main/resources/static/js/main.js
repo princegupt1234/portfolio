@@ -3,9 +3,25 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- Nav toggle (mobile) ---------- */
   const navToggle = document.querySelector('.nav-toggle');
   const navLinks = document.querySelector('.nav-links');
+  const navOverlay = document.createElement('div');
+  navOverlay.style.cssText = 'position:fixed;inset:0;z-index:98;background:rgba(0,0,0,0.5);display:none;';
+  document.body.appendChild(navOverlay);
+
+  function openNav() {
+    navLinks.classList.add('open');
+    navOverlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeNav() {
+    navLinks.classList.remove('open');
+    navOverlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
   if (navToggle && navLinks) {
-    navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
-    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+    navToggle.addEventListener('click', () => navLinks.classList.contains('open') ? closeNav() : openNav());
+    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+    navOverlay.addEventListener('click', closeNav);
   }
 
   /* ---------- Navbar shrink on scroll + back to top ---------- */
@@ -157,11 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Message sent — thanks for reaching out!');
   }
 
-  function showToast(text) {
+  function showToast(text, type = 'success') {
     const t = document.createElement('div');
-    t.className = 'toast';
-    t.textContent = text;
+    t.className = 'toast ' + type;
+    t.innerHTML = `<div class="toast-icon">${type === 'success' ? '✓' : '!'}</div><div class="toast-content"><div class="toast-text">${text}</div></div><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
     document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
+    setTimeout(() => t.remove(), 4000);
   }
 });

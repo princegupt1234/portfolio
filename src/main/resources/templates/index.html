@@ -40,7 +40,7 @@
 </nav>
 
 <!-- ===================== HERO ===================== -->
-<section class="hero" id="home" th:style="'background: ' + (about.heroBackground != null and about.heroBackground != '' ? about.heroBackground : 'linear-gradient(135deg, rgba(30,58,138,0.95), rgba(79,70,229,0.85))')">
+<section class="hero" id="home">
     <div class="hero-grid">
         <div data-reveal>
             <div class="hero-eyebrow" th:text="${about.heroEyebrow} ?: '// Hello, I\'m'">// Hello, I'm</div>
@@ -198,26 +198,28 @@
         <div class="section-tag">GitHub</div>
         <h2 class="section-title" data-reveal>Open source activity</h2>
         <div class="glass-card" data-reveal>
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-num" th:attr="data-counter=${github != null and github.available()} ? ${github.publicRepos()} : 0">0</div>
-                    <div class="stat-label">Public Repos</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-num" th:attr="data-counter=${github != null and github.available()} ? ${github.followers()} : 0">0</div>
-                    <div class="stat-label">Followers</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-num" th:attr="data-counter=${github != null and github.available()} ? ${github.following()} : 0">0</div>
-                    <div class="stat-label">Following</div>
-                </div>
-                <div class="stat-box">
-                    <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary" style="margin-top:8px;">
-                        <i class="fa-brands fa-github"></i> View Profile
-                    </a>
+            <div th:if="${github != null and github.available}">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-num" th:attr="data-counter=${github.publicRepos}">0</div>
+                        <div class="stat-label">Public Repos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" th:attr="data-counter=${github.followers}">0</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" th:attr="data-counter=${github.following}">0</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat-box">
+                        <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary" style="margin-top:8px;">
+                            <i class="fa-brands fa-github"></i> View Profile
+                        </a>
+                    </div>
                 </div>
             </div>
-            <p th:unless="${github != null and github.available()}" style="margin-top:16px; text-align:center;">Live GitHub stats load automatically once the site is deployed with internet access.</p>
+            <p th:unless="${github != null and github.available}" style="margin-top:16px; text-align:center;">Live GitHub stats load automatically once the site is deployed with internet access.</p>
         </div>
     </div>
 </section>
@@ -228,25 +230,27 @@
         <div class="section-tag">LeetCode</div>
         <h2 class="section-title" data-reveal>Problem solving practice</h2>
         <div class="glass-card" data-reveal>
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-num" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.totalSolved()} : 0">0</div>
-                    <div class="stat-label">Total Solved</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-num" style="color: var(--success);" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.easySolved()} : 0">0</div>
-                    <div class="stat-label">Easy</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-num" style="color: var(--warning);" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.mediumSolved()} : 0">0</div>
-                    <div class="stat-label">Medium</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-num" style="color: var(--danger);" th:attr="data-counter=${leetcode != null and leetcode.available()} ? ${leetcode.hardSolved()} : 0">0</div>
-                    <div class="stat-label">Hard</div>
+            <div th:if="${leetcode != null and leetcode.available}">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-num" th:attr="data-counter=${leetcode.totalSolved}">0</div>
+                        <div class="stat-label">Total Solved</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" style="color: var(--success);" th:attr="data-counter=${leetcode.easySolved}">0</div>
+                        <div class="stat-label">Easy</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" style="color: var(--warning);" th:attr="data-counter=${leetcode.mediumSolved}">0</div>
+                        <div class="stat-label">Medium</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" style="color: var(--danger);" th:attr="data-counter=${leetcode.hardSolved}">0</div>
+                        <div class="stat-label">Hard</div>
+                    </div>
                 </div>
             </div>
-            <p th:unless="${leetcode != null and leetcode.available()}" style="margin-top:16px; text-align:center;">Live LeetCode stats load automatically once the site is deployed with internet access.</p>
+            <p th:unless="${leetcode != null and leetcode.available}" style="margin-top:16px; text-align:center;">Live LeetCode stats load automatically once the site is deployed with internet access.</p>
         </div>
     </div>
 </section>
