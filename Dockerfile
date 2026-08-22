@@ -4,14 +4,11 @@ WORKDIR /app
 
 # Copy only files needed to resolve dependencies first (better layer caching)
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
-RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Now copy source and build
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # ---------- Run stage ----------
 FROM eclipse-temurin:21-jre
