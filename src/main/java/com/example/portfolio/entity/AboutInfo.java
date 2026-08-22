@@ -22,6 +22,18 @@ public class AboutInfo {
     private Integer heroDeletingSpeed;
     private Integer heroPauseDuration;
 
+    @Column(length = 255)
+    private String heroPrimaryCtaLabel;
+
+    @Column(length = 500)
+    private String heroPrimaryCtaLink;
+
+    @Column(length = 255)
+    private String heroSecondaryCtaLabel;
+
+    @Column(length = 500)
+    private String heroSecondaryCtaLink;
+
     @Column(length = 2000)
     private String heroPhrases;
 
@@ -55,6 +67,9 @@ public class AboutInfo {
     @Column(length = 500)
     private String buildingTechStack; // pipe-separated
 
+    @Column(length = 1000)
+    private String currentlyBuilding;
+
     private String buildingProjectUrl;
 
     private Integer buildingProgress; // 0-100
@@ -64,11 +79,17 @@ public class AboutInfo {
     @Column(length = 1000)
     private String currentlyLearning;
 
+    @Column(length = 1000)
+    private String learningPath;
+
     @Column(columnDefinition = "TEXT")
     private String learningCards;
 
     @Column(length = 500)
     private String contactMessage;
+
+    @Column(length = 500)
+    private String leetcodeUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -84,6 +105,14 @@ public class AboutInfo {
     public void setHeroDeletingSpeed(Integer heroDeletingSpeed) { this.heroDeletingSpeed = heroDeletingSpeed; }
     public Integer getHeroPauseDuration() { return heroPauseDuration; }
     public void setHeroPauseDuration(Integer heroPauseDuration) { this.heroPauseDuration = heroPauseDuration; }
+    public String getHeroPrimaryCtaLabel() { return heroPrimaryCtaLabel; }
+    public void setHeroPrimaryCtaLabel(String heroPrimaryCtaLabel) { this.heroPrimaryCtaLabel = heroPrimaryCtaLabel; }
+    public String getHeroPrimaryCtaLink() { return heroPrimaryCtaLink; }
+    public void setHeroPrimaryCtaLink(String heroPrimaryCtaLink) { this.heroPrimaryCtaLink = heroPrimaryCtaLink; }
+    public String getHeroSecondaryCtaLabel() { return heroSecondaryCtaLabel; }
+    public void setHeroSecondaryCtaLabel(String heroSecondaryCtaLabel) { this.heroSecondaryCtaLabel = heroSecondaryCtaLabel; }
+    public String getHeroSecondaryCtaLink() { return heroSecondaryCtaLink; }
+    public void setHeroSecondaryCtaLink(String heroSecondaryCtaLink) { this.heroSecondaryCtaLink = heroSecondaryCtaLink; }
     public String getHeroPhrases() { return heroPhrases; }
     public void setHeroPhrases(String heroPhrases) { this.heroPhrases = heroPhrases; }
     public String getBio() { return bio; }
@@ -118,6 +147,8 @@ public class AboutInfo {
     public void setBuildingProjectDesc(String buildingProjectDesc) { this.buildingProjectDesc = buildingProjectDesc; }
     public String getBuildingTechStack() { return buildingTechStack; }
     public void setBuildingTechStack(String buildingTechStack) { this.buildingTechStack = buildingTechStack; }
+    public String getCurrentlyBuilding() { return currentlyBuilding; }
+    public void setCurrentlyBuilding(String currentlyBuilding) { this.currentlyBuilding = currentlyBuilding; }
     public String getBuildingProjectUrl() { return buildingProjectUrl; }
     public void setBuildingProjectUrl(String buildingProjectUrl) { this.buildingProjectUrl = buildingProjectUrl; }
     public Integer getBuildingProgress() { return buildingProgress; }
@@ -126,8 +157,12 @@ public class AboutInfo {
     public void setBuildingStatus(String buildingStatus) { this.buildingStatus = buildingStatus; }
     public String getCurrentlyLearning() { return currentlyLearning; }
     public void setCurrentlyLearning(String currentlyLearning) { this.currentlyLearning = currentlyLearning; }
+    public String getLearningPath() { return learningPath; }
+    public void setLearningPath(String learningPath) { this.learningPath = learningPath; }
     public String getLearningCards() { return learningCards; }
     public void setLearningCards(String learningCards) { this.learningCards = learningCards; }
     public String getContactMessage() { return contactMessage; }
     public void setContactMessage(String contactMessage) { this.contactMessage = contactMessage; }
+    public String getLeetcodeUrl() { return leetcodeUrl; }
+    public void setLeetcodeUrl(String leetcodeUrl) { this.leetcodeUrl = leetcodeUrl; }
 }
