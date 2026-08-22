@@ -9,7 +9,6 @@ import com.example.portfolio.repository.ResumeRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.service.AnalyticsService;
 import com.example.portfolio.service.GithubStatsService;
-import com.example.portfolio.service.LeetCodeStatsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +28,12 @@ public class AdminDashboardController {
     private final AboutInfoRepository aboutInfoRepository;
     private final AnalyticsService analyticsService;
     private final GithubStatsService githubStatsService;
-    private final LeetCodeStatsService leetCodeStatsService;
 
     public AdminDashboardController(ProjectRepository projectRepository, SkillRepository skillRepository,
                                      CertificateRepository certificateRepository,
                                      ContactMessageRepository contactMessageRepository,
                                      ResumeRepository resumeRepository, AboutInfoRepository aboutInfoRepository,
-                                     AnalyticsService analyticsService, GithubStatsService githubStatsService,
-                                     LeetCodeStatsService leetCodeStatsService) {
+                                     AnalyticsService analyticsService, GithubStatsService githubStatsService) {
         this.projectRepository = projectRepository;
         this.skillRepository = skillRepository;
         this.certificateRepository = certificateRepository;
@@ -45,7 +42,6 @@ public class AdminDashboardController {
         this.aboutInfoRepository = aboutInfoRepository;
         this.analyticsService = analyticsService;
         this.githubStatsService = githubStatsService;
-        this.leetCodeStatsService = leetCodeStatsService;
     }
 
     @GetMapping({"", "/", "/dashboard"})
@@ -89,7 +85,6 @@ public class AdminDashboardController {
         model.addAttribute("profileCompletion", (int) (100.0 * completed / total));
 
         model.addAttribute("github", about == null ? null : githubStatsService.fetchStats(about.getGithubUsername()));
-        model.addAttribute("leetcode", about == null ? null : leetCodeStatsService.fetchStats(about.getLeetcodeUsername()));
 
         return "admin/dashboard";
     }

@@ -238,55 +238,41 @@
                 </div>
             </div>
 
-            <!-- LeetCode Card -->
+            <!-- LeetCode Profile Card, backed by the GitHub solutions repository -->
             <div class="glass-card coding-profile-card leetcode-card">
                 <div class="cp-header">
-                    <div class="cp-platform-icon lc-icon"><i class="fa-solid fa-code"></i></div>
+                    <div class="cp-platform-icon leetcode-icon"><i class="fa-solid fa-code"></i></div>
                     <div class="cp-platform-info">
-                        <div class="cp-platform-name" style="color:#ffa116;">LeetCode</div>
-                        <div class="cp-username" th:text="'@' + (${about.leetcodeUsername} ?: 'username')">@username</div>
+                        <div class="cp-platform-name leetcode-name">LeetCode</div>
+                        <div class="cp-username" th:text="'@' + (${about.githubUsername} ?: 'princegupt1234')">@princegupt1234</div>
                     </div>
-                    <a th:if="${about.leetcodeUsername}" th:href="'https://leetcode.com/' + ${about.leetcodeUsername}" target="_blank" class="glass-btn lc-btn cp-profile-btn">
+                    <a th:href="'https://leetcode.com/' + (${about.githubUsername} ?: 'princegupt1234')" target="_blank" rel="noopener" class="glass-btn leetcode-btn cp-profile-btn">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Profile
                     </a>
                 </div>
-                <div th:if="${leetcode != null and leetcode.available}">
-                    <div class="lc-hero">
-                        <div class="lc-donut-wrap">
-                            <svg class="lc-donut" viewBox="0 0 80 80">
-                                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
-                                <circle cx="40" cy="40" r="32" fill="none" stroke="#ffa116" stroke-width="8"
-                                        stroke-dasharray="201"
-                                        th:attr="stroke-dashoffset=${201 - (leetcode.totalSolved * 201 / 500)}"
-                                        stroke-linecap="round"
-                                        style="transform:rotate(-90deg); transform-origin:center;"/>
-                            </svg>
-                            <div class="lc-donut-center">
-                                <span class="lc-total" th:attr="data-counter=${leetcode.totalSolved}">0</span>
-                                <span class="lc-total-lbl">Solved</span>
-                            </div>
-                        </div>
-                        <div class="lc-difficulty-bars">
-                            <div class="lc-diff-row">
-                                <span class="lc-diff-label easy">Easy</span>
-                                <div class="lc-bar-track"><div class="lc-bar-fill easy-fill" th:attr="data-value=${leetcode.easySolved * 100 / (leetcode.totalSolved > 0 ? leetcode.totalSolved : 1)}"></div></div>
-                                <span class="lc-diff-count easy" th:attr="data-counter=${leetcode.easySolved}">0</span>
-                            </div>
-                            <div class="lc-diff-row">
-                                <span class="lc-diff-label medium">Med</span>
-                                <div class="lc-bar-track"><div class="lc-bar-fill medium-fill" th:attr="data-value=${leetcode.mediumSolved * 100 / (leetcode.totalSolved > 0 ? leetcode.totalSolved : 1)}"></div></div>
-                                <span class="lc-diff-count medium" th:attr="data-counter=${leetcode.mediumSolved}">0</span>
-                            </div>
-                            <div class="lc-diff-row">
-                                <span class="lc-diff-label hard">Hard</span>
-                                <div class="lc-bar-track"><div class="lc-bar-fill hard-fill" th:attr="data-value=${leetcode.hardSolved * 100 / (leetcode.totalSolved > 0 ? leetcode.totalSolved : 1)}"></div></div>
-                                <span class="lc-diff-count hard" th:attr="data-counter=${leetcode.hardSolved}">0</span>
-                            </div>
-                        </div>
+                <div th:if="${leetcodeRepo != null and leetcodeRepo.available}" class="cp-stats-row">
+                    <div class="cp-stat">
+                        <div class="cp-stat-val" th:attr="data-counter=${leetcodeRepo.solved}">0</div>
+                        <div class="cp-stat-lbl">Solved</div>
+                    </div>
+                    <div class="cp-stat-divider"></div>
+                    <div class="cp-stat">
+                        <div class="cp-stat-val" th:attr="data-counter=${leetcodeRepo.easy}">0</div>
+                        <div class="cp-stat-lbl">Easy</div>
+                    </div>
+                    <div class="cp-stat-divider"></div>
+                    <div class="cp-stat">
+                        <div class="cp-stat-val" th:attr="data-counter=${leetcodeRepo.medium}">0</div>
+                        <div class="cp-stat-lbl">Medium</div>
+                    </div>
+                    <div class="cp-stat-divider"></div>
+                    <div class="cp-stat">
+                        <div class="cp-stat-val" th:attr="data-counter=${leetcodeRepo.hard}">0</div>
+                        <div class="cp-stat-lbl">Hard</div>
                     </div>
                 </div>
-                <div th:unless="${leetcode != null and leetcode.available}" class="cp-offline-note">
-                    <i class="fa-solid fa-circle-info"></i> Set your LeetCode username in Admin &rarr; About to display stats.
+                <div th:unless="${leetcodeRepo != null and leetcodeRepo.available}" class="cp-offline-note">
+                    <i class="fa-solid fa-circle-info"></i> Solution statistics are available from the GitHub repository.
                 </div>
             </div>
 
@@ -355,46 +341,46 @@
                 <div class="learning-cards-row">
                     <!-- Admin-controlled cards via learningCards field -->
                     <th:block th:if="${about.learningCards != null and !#strings.isEmpty(about.learningCards)}">
-                        <div class="lc-mini-card" th:each="card : ${#strings.arraySplit(about.learningCards, '|')}">
+                        <div class="learning-mini-card" th:each="card : ${#strings.arraySplit(about.learningCards, '|')}">
                             <th:block th:with="parts=${#strings.arraySplit(card, '::')}">
-                                <div class="lc-mini-icon"><i th:class="${parts[1].trim()}"></i></div>
-                                <div class="lc-mini-category" th:text="${parts[2].trim()}">Category</div>
-                                <div class="lc-mini-title" th:text="${parts[0].trim()}">Topic</div>
-                                <div class="lc-mini-desc" th:text="${parts.length > 3 ? parts[3].trim() : ''}">Description</div>
+                                <div class="learning-mini-icon"><i th:class="${parts[1].trim()}"></i></div>
+                                <div class="learning-mini-category" th:text="${parts[2].trim()}">Category</div>
+                                <div class="learning-mini-title" th:text="${parts[0].trim()}">Topic</div>
+                                <div class="learning-mini-desc" th:text="${parts.length > 3 ? parts[3].trim() : ''}">Description</div>
                             </th:block>
                         </div>
                     </th:block>
                     <!-- Default cards shown when no admin data set -->
                     <th:block th:unless="${about.learningCards != null and !#strings.isEmpty(about.learningCards)}">
-                        <div class="lc-mini-card">
-                            <div class="lc-mini-icon"><i class="fa-solid fa-leaf"></i></div>
-                            <div class="lc-mini-category">Backend</div>
-                            <div class="lc-mini-title">Spring Boot Advanced</div>
-                            <div class="lc-mini-desc">Security, microservices &amp; JPA</div>
+                        <div class="learning-mini-card">
+                            <div class="learning-mini-icon"><i class="fa-solid fa-leaf"></i></div>
+                            <div class="learning-mini-category">Backend</div>
+                            <div class="learning-mini-title">Spring Boot Advanced</div>
+                            <div class="learning-mini-desc">Security, microservices &amp; JPA</div>
                         </div>
-                        <div class="lc-mini-card">
-                            <div class="lc-mini-icon"><i class="fa-solid fa-code"></i></div>
-                            <div class="lc-mini-category">Algorithms</div>
-                            <div class="lc-mini-title">DSA &amp; LeetCode</div>
-                            <div class="lc-mini-desc">Daily problem solving practice</div>
+                        <div class="learning-mini-card">
+                            <div class="learning-mini-icon"><i class="fa-solid fa-code"></i></div>
+                            <div class="learning-mini-category">Algorithms</div>
+                            <div class="learning-mini-title">DSA Practice</div>
+                            <div class="learning-mini-desc">Daily problem solving practice</div>
                         </div>
-                        <div class="lc-mini-card">
-                            <div class="lc-mini-icon"><i class="fa-solid fa-sitemap"></i></div>
-                            <div class="lc-mini-category">Architecture</div>
-                            <div class="lc-mini-title">System Design</div>
-                            <div class="lc-mini-desc">Scalable distributed systems</div>
+                        <div class="learning-mini-card">
+                            <div class="learning-mini-icon"><i class="fa-solid fa-sitemap"></i></div>
+                            <div class="learning-mini-category">Architecture</div>
+                            <div class="learning-mini-title">System Design</div>
+                            <div class="learning-mini-desc">Scalable distributed systems</div>
                         </div>
-                        <div class="lc-mini-card">
-                            <div class="lc-mini-icon"><i class="fa-brands fa-react"></i></div>
-                            <div class="lc-mini-category">Frontend</div>
-                            <div class="lc-mini-title">React + Next.js</div>
-                            <div class="lc-mini-desc">Modern full-stack web apps</div>
+                        <div class="learning-mini-card">
+                            <div class="learning-mini-icon"><i class="fa-brands fa-react"></i></div>
+                            <div class="learning-mini-category">Frontend</div>
+                            <div class="learning-mini-title">React + Next.js</div>
+                            <div class="learning-mini-desc">Modern full-stack web apps</div>
                         </div>
-                        <div class="lc-mini-card">
-                            <div class="lc-mini-icon"><i class="fa-brands fa-aws"></i></div>
-                            <div class="lc-mini-category">DevOps</div>
-                            <div class="lc-mini-title">Cloud &amp; DevOps</div>
-                            <div class="lc-mini-desc">AWS, Docker &amp; CI/CD pipelines</div>
+                        <div class="learning-mini-card">
+                            <div class="learning-mini-icon"><i class="fa-brands fa-aws"></i></div>
+                            <div class="learning-mini-category">DevOps</div>
+                            <div class="learning-mini-title">Cloud &amp; DevOps</div>
+                            <div class="learning-mini-desc">AWS, Docker &amp; CI/CD pipelines</div>
                         </div>
                     </th:block>
                 </div>

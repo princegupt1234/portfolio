@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------- Skill progress bars ---------- */
-  document.querySelectorAll('.progress-fill, .lc-bar-fill').forEach(bar => {
+  document.querySelectorAll('.progress-fill').forEach(bar => {
     const val = bar.dataset.value || 0;
     const barObs = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -115,22 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }, { threshold: 0.3 });
     barObs.observe(bar);
-  });
-
-  /* ---------- LeetCode donut animate on scroll ---------- */
-  document.querySelectorAll('.lc-donut circle[stroke-dashoffset]').forEach(circle => {
-    const target = circle.getAttribute('stroke-dashoffset');
-    circle.setAttribute('stroke-dashoffset', '201');
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          circle.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1)';
-          circle.setAttribute('stroke-dashoffset', target);
-          obs.unobserve(circle);
-        }
-      });
-    }, { threshold: 0.4 });
-    obs.observe(circle);
   });
 
   /* ---------- Skills category filter ---------- */

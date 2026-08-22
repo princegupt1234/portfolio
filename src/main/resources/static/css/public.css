@@ -219,13 +219,14 @@
 .cp-header { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
 .cp-platform-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
 .github-icon { background: rgba(255,255,255,0.1); color: #fff; }
-.lc-icon { background: rgba(255,161,22,0.15); color: #ffa116; }
+.leetcode-icon { background: rgba(255,161,22,0.15); color: #ffa116; }
 .cp-platform-info { flex: 1; }
 .cp-platform-name { font-size: 1.2rem; font-weight: 700; font-family: var(--font-heading); }
 .cp-username { font-size: 0.82rem; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 2px; }
 .cp-profile-btn { font-size: 0.85rem; padding: 9px 20px; white-space: nowrap; }
-.lc-btn { background: rgba(255,161,22,0.15); border-color: rgba(255,161,22,0.4); color: #ffa116; }
-.lc-btn:hover { background: rgba(255,161,22,0.2); border-color: #ffa116; box-shadow: 0 0 14px rgba(255,161,22,0.15); }
+.leetcode-name { color: #ffa116; }
+.leetcode-btn { background: rgba(255,161,22,0.15); border-color: rgba(255,161,22,0.4); color: #ffa116; }
+.leetcode-btn:hover { background: rgba(255,161,22,0.2); border-color: #ffa116; box-shadow: 0 0 14px rgba(255,161,22,0.15); }
 
 /* GitHub stats row */
 .cp-stats-row { display: flex; align-items: center; gap: 0; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; margin-bottom: 0; }
@@ -236,29 +237,6 @@
 
 /* GitHub contribution graph — removed */
 
-/* LeetCode donut + bars */
-.lc-hero { display: flex; align-items: center; gap: 28px; }
-.lc-donut-wrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
-.lc-donut { width: 100%; height: 100%; }
-.lc-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.lc-total { font-size: 1.5rem; font-weight: 700; font-family: var(--font-heading); color: #ffa116; }
-.lc-total-lbl { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
-.lc-difficulty-bars { flex: 1; display: flex; flex-direction: column; gap: 12px; }
-.lc-diff-row { display: flex; align-items: center; gap: 10px; }
-.lc-diff-label { font-size: 0.75rem; font-weight: 600; width: 32px; flex-shrink: 0; font-family: var(--font-mono); }
-.lc-diff-label.easy { color: var(--success); }
-.lc-diff-label.medium { color: var(--warning); }
-.lc-diff-label.hard { color: var(--danger); }
-.lc-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
-.lc-bar-fill { height: 100%; border-radius: 999px; width: 0; transition: width 1.4s cubic-bezier(.16,1,.3,1); }
-.easy-fill { background: var(--success); }
-.medium-fill { background: var(--warning); }
-.hard-fill { background: var(--danger); }
-.lc-diff-count { font-size: 0.8rem; font-weight: 600; width: 28px; text-align: right; flex-shrink: 0; font-family: var(--font-mono); }
-.lc-diff-count.easy { color: var(--success); }
-.lc-diff-count.medium { color: var(--warning); }
-.lc-diff-count.hard { color: var(--danger); }
-
 .cp-offline-note { font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; padding: 14px 18px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid var(--glass-border); }
 
 @media (max-width: 600px) {
@@ -266,8 +244,6 @@
   .cp-header { gap: 12px; }
   .cp-profile-btn { width: 100%; justify-content: center; }
   .cp-stat-val { font-size: 1.4rem; }
-  .lc-hero { flex-direction: column; align-items: flex-start; gap: 20px; }
-  .lc-donut-wrap { width: 80px; height: 80px; }
 }
 
 /* Currently — Building + Learning panels */
@@ -290,28 +266,28 @@
 .learning-panel { padding: 32px; }
 .learning-summary { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 28px; }
 .learning-cards-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-.lc-mini-card {
+.learning-mini-card {
   display: flex; flex-direction: column; align-items: flex-start;
   padding: 22px 18px; border-radius: 16px;
   background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   cursor: default;
 }
-.lc-mini-card:hover {
+.learning-mini-card:hover {
   transform: translateY(-4px);
   border-color: rgba(59,130,246,0.3);
   box-shadow: 0 8px 24px rgba(59,130,246,0.09);
 }
-.lc-mini-icon {
+.learning-mini-icon {
   width: 38px; height: 38px; border-radius: 10px;
   background: rgba(59,130,246,0.10);
   border: 1px solid rgba(59,130,246,0.15);
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem; color: var(--primary); margin-bottom: 14px; flex-shrink: 0;
 }
-.lc-mini-category { font-size: 0.68rem; font-family: var(--font-mono); color: var(--secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-.lc-mini-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
-.lc-mini-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+.learning-mini-category { font-size: 0.68rem; font-family: var(--font-mono); color: var(--secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.learning-mini-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+.learning-mini-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
 @media (max-width: 900px) { .learning-cards-row { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 600px) { .learning-cards-row { grid-template-columns: repeat(2, 1fr); } .learning-panel { padding: 22px 18px; } }
 @media (max-width: 380px) { .learning-cards-row { grid-template-columns: 1fr; } }

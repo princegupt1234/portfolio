@@ -67,14 +67,6 @@
                     <div class="progress-track" style="margin-bottom:22px;">
                         <div class="progress-fill" th:style="'width:' + ${profileCompletion} + '%'" style="width:0"></div>
                     </div>
-                    <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--text-secondary);">LeetCode</h4>
-                    <p th:if="${leetcode != null and leetcode.available}" style="margin:0;">
-                        <span th:text="${leetcode.totalSolved}">0</span> solved ·
-                        <span th:text="${leetcode.easySolved}">0</span> easy /
-                        <span th:text="${leetcode.mediumSolved}">0</span> med /
-                        <span th:text="${leetcode.hardSolved}">0</span> hard
-                    </p>
-                    <p th:unless="${leetcode != null and leetcode.available}" style="margin:0;">Not connected yet — set your LeetCode username in About.</p>
                 </div>
             </div>
 

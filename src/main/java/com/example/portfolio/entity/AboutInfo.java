@@ -25,22 +25,22 @@ public class AboutInfo {
     @Column(length = 255)
     private String heroPrimaryCtaLabel;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String heroPrimaryCtaLink;
 
     @Column(length = 255)
     private String heroSecondaryCtaLabel;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String heroSecondaryCtaLink;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String heroPhrases;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String careerObjective;
 
     private String profileImage;
@@ -52,22 +52,21 @@ public class AboutInfo {
     private String githubUrl;
     private String linkedinUrl;
     private String whatsappUrl;
-    private String leetcodeUsername;
     private String githubUsername;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String heroTechStack; // pipe-separated e.g. Java|Spring Boot|REST APIs|MySQL|React
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String buildingProjectTitle;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String buildingProjectDesc;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String buildingTechStack; // pipe-separated
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String currentlyBuilding;
 
     private String buildingProjectUrl;
@@ -76,20 +75,17 @@ public class AboutInfo {
 
     private String buildingStatus; // e.g. "In Progress", "Beta", "Live"
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String currentlyLearning;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String learningPath;
 
     @Column(columnDefinition = "TEXT")
     private String learningCards;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String contactMessage;
-
-    @Column(length = 500)
-    private String leetcodeUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -135,8 +131,6 @@ public class AboutInfo {
     public void setLinkedinUrl(String linkedinUrl) { this.linkedinUrl = linkedinUrl; }
     public String getWhatsappUrl() { return whatsappUrl; }
     public void setWhatsappUrl(String whatsappUrl) { this.whatsappUrl = whatsappUrl; }
-    public String getLeetcodeUsername() { return leetcodeUsername; }
-    public void setLeetcodeUsername(String leetcodeUsername) { this.leetcodeUsername = leetcodeUsername; }
     public String getGithubUsername() { return githubUsername; }
     public void setGithubUsername(String githubUsername) { this.githubUsername = githubUsername; }
     public String getHeroTechStack() { return heroTechStack; }
@@ -163,6 +157,4 @@ public class AboutInfo {
     public void setLearningCards(String learningCards) { this.learningCards = learningCards; }
     public String getContactMessage() { return contactMessage; }
     public void setContactMessage(String contactMessage) { this.contactMessage = contactMessage; }
-    public String getLeetcodeUrl() { return leetcodeUrl; }
-    public void setLeetcodeUrl(String leetcodeUrl) { this.leetcodeUrl = leetcodeUrl; }
 }

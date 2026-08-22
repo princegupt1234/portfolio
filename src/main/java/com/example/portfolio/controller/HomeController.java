@@ -24,7 +24,7 @@ import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.AnalyticsService;
 import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.GithubStatsService;
-import com.example.portfolio.service.LeetCodeStatsService;
+import com.example.portfolio.service.LeetCodeRepositoryStatsService;
 import com.example.portfolio.service.MailService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -60,7 +60,7 @@ public class HomeController {
     private final ResumeRepository resumeRepository;
     private final AnalyticsService analyticsService;
     private final GithubStatsService githubStatsService;
-    private final LeetCodeStatsService leetCodeStatsService;
+    private final LeetCodeRepositoryStatsService leetCodeRepositoryStatsService;
     private final MailService mailService;
     private final DataVersionService dataVersionService;
 
@@ -73,8 +73,8 @@ public class HomeController {
                            ServiceItemRepository serviceItemRepository, TestimonialRepository testimonialRepository,
                            ContactMessageRepository contactMessageRepository, ResumeRepository resumeRepository,
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
-                           LeetCodeStatsService leetCodeStatsService, MailService mailService,
-                           DataVersionService dataVersionService) {
+                           LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
+                           MailService mailService, DataVersionService dataVersionService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.skillRepository = skillRepository;
@@ -87,7 +87,7 @@ public class HomeController {
         this.resumeRepository = resumeRepository;
         this.analyticsService = analyticsService;
         this.githubStatsService = githubStatsService;
-        this.leetCodeStatsService = leetCodeStatsService;
+        this.leetCodeRepositoryStatsService = leetCodeRepositoryStatsService;
         this.mailService = mailService;
         this.dataVersionService = dataVersionService;
     }
@@ -128,7 +128,7 @@ public class HomeController {
         model.addAttribute("services", services);
         model.addAttribute("testimonials", testimonials);
         model.addAttribute("github", githubStatsService.fetchStats(about.getGithubUsername()));
-        model.addAttribute("leetcode", leetCodeStatsService.fetchStats(about.getLeetcodeUsername()));
+        model.addAttribute("leetcodeRepo", leetCodeRepositoryStatsService.fetchStats(about.getGithubUsername()));
 
         if (!model.containsAttribute("contactForm")) {
             model.addAttribute("contactForm", new ContactForm());

@@ -19,7 +19,6 @@ import com.example.portfolio.repository.ServiceItemRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.GithubStatsService;
-import com.example.portfolio.service.LeetCodeStatsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +45,6 @@ public class DataInitializer implements CommandLineRunner {
     private final ServiceItemRepository serviceItemRepository;
     private final TestimonialRepository testimonialRepository;
     private final GithubStatsService githubStatsService;
-    private final LeetCodeStatsService leetCodeStatsService;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin.default-username}")
@@ -61,8 +59,7 @@ public class DataInitializer implements CommandLineRunner {
                             ExperienceRepository experienceRepository, ProjectRepository projectRepository,
                             CertificateRepository certificateRepository, ServiceItemRepository serviceItemRepository,
                             TestimonialRepository testimonialRepository,
-                            GithubStatsService githubStatsService, LeetCodeStatsService leetCodeStatsService,
-                            PasswordEncoder passwordEncoder) {
+                            GithubStatsService githubStatsService, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
@@ -73,7 +70,6 @@ public class DataInitializer implements CommandLineRunner {
         this.serviceItemRepository = serviceItemRepository;
         this.testimonialRepository = testimonialRepository;
         this.githubStatsService = githubStatsService;
-        this.leetCodeStatsService = leetCodeStatsService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -91,7 +87,6 @@ public class DataInitializer implements CommandLineRunner {
         // Pre-warm external API caches asynchronously so first page load is fast
         aboutInfoRepository.findAll().stream().findFirst().ifPresent(about -> {
             if (about.getGithubUsername() != null) githubStatsService.fetchStats(about.getGithubUsername());
-            if (about.getLeetcodeUsername() != null) leetCodeStatsService.fetchStats(about.getLeetcodeUsername());
         });
     }
 
@@ -128,9 +123,8 @@ public class DataInitializer implements CommandLineRunner {
             info.setLinkedinUrl("https://linkedin.com/in/prince-gupt-175289322");
             info.setWhatsappUrl("https://wa.me/917275807576");
             info.setGithubUsername("princegupt1234");
-            info.setLeetcodeUsername("princegupt1234");
             info.setHeroTechStack("Java|Spring Boot|REST APIs|MySQL|React");
-            info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA on LeetCode, and exploring React + Next.js for modern frontends.");
+            info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA problem solving, and exploring React + Next.js for modern frontends.");
             aboutInfoRepository.save(info);
         }
     }
