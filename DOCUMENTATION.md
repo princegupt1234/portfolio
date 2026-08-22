@@ -92,9 +92,9 @@ portfolio/
 **Create `.env.local` file in project root:**
 ```env
 EMAIL_SERVICE=gmail
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-16-char-app-password
-ADMIN_EMAIL=princegupt3052@gmail.com
+ADMIN_EMAIL=admin@example.com
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
@@ -134,9 +134,9 @@ Should show: `"status": "✓ System Ready"`
 Create `.env.local` in project root with:
 ```env
 EMAIL_SERVICE=gmail
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
-ADMIN_EMAIL=princegupt3052@gmail.com
+ADMIN_EMAIL=admin@example.com
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
@@ -265,9 +265,9 @@ Success message shown
 **Configuration:**
 ```env
 EMAIL_SERVICE=gmail                    # Service provider
-EMAIL_USER=princegupt3052@gmail.com        # Sender email
+EMAIL_USER=your-email@gmail.com        # Sender email
 EMAIL_PASSWORD=app-password            # App password
-ADMIN_EMAIL=princegupt3052@gmail.com       # Admin inbox
+ADMIN_EMAIL=admin@example.com       # Admin inbox
 ```
 
 ---
@@ -533,14 +533,14 @@ Access: `.data/resume_requests.json`
 **Outlook/Office365:**
 ```env
 EMAIL_SERVICE=outlook
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@outlook.com
 EMAIL_PASSWORD=your-password
 ```
 
 **Yahoo:**
 ```env
 EMAIL_SERVICE=yahoo
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@yahoo.com
 EMAIL_PASSWORD=your-app-password
 ```
 
@@ -577,9 +577,9 @@ Or manually copy file to `public/resume.pdf`
 | Variable | Required | Value | Example |
 |----------|----------|-------|---------|
 | EMAIL_SERVICE | Yes | Email provider | `gmail` |
-| EMAIL_USER | Yes | Sender email | `princegupt3052@gmail.com` |
+| EMAIL_USER | Yes | Sender email | `your-email@gmail.com` |
 | EMAIL_PASSWORD | Yes | App password | `abcd efgh ijkl mnop` |
-| ADMIN_EMAIL | Yes | Approval inbox | `princegupt3052@gmail.com` |
+| ADMIN_EMAIL | Yes | Approval inbox | `admin@example.com` |
 | NEXT_PUBLIC_BASE_URL | Yes | Site URL | `http://localhost:3000` |
 
 ### Email Providers
@@ -587,21 +587,21 @@ Or manually copy file to `public/resume.pdf`
 **Gmail (Recommended):**
 ```env
 EMAIL_SERVICE=gmail
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-16-char-app-password
 ```
 
 **Outlook:**
 ```env
 EMAIL_SERVICE=outlook
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@outlook.com
 EMAIL_PASSWORD=your-password
 ```
 
 **Yahoo:**
 ```env
 EMAIL_SERVICE=yahoo
-EMAIL_USER=princegupt3052@gmail.com
+EMAIL_USER=your-email@yahoo.com
 EMAIL_PASSWORD=your-app-password
 ```
 
@@ -771,11 +771,10 @@ Works with any platform supporting Next.js:
 
 ## Contact & Support
 
-**Prince Gupt**
-- Email: princegupt3052@gmail.com
-- Phone: +91 7084315271
-- LinkedIn: [Prince Gupt](https://www.linkedin.com/in/prince-gupt-175289322)
-- Location: Lucknow, Uttar Pradesh, India
+**Project Contact**
+- Email: your-email@example.com
+- LinkedIn: [Your Name](https://www.linkedin.com)
+- Location: Your City, Country
 
 ---
 

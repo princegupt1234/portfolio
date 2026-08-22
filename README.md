@@ -58,12 +58,12 @@ The schema and tables are created automatically on first boot (`ddl-auto=update`
 |---|---|---|
 | `SPRING_DATASOURCE_URL` | Full JDBC URL to your MySQL | `jdbc:mysql://host:3306/portfolio_db?useSSL=true&serverTimezone=UTC` |
 | `SPRING_DATASOURCE_USERNAME` | MySQL username | `root` |
-| `SPRING_DATASOURCE_PASSWORD` | MySQL password | `yourpassword` |
+| `SPRING_DATASOURCE_PASSWORD` | MySQL password | `your-db-password` |
 | `ADMIN_USERNAME` | Admin login username | `admin` |
 | `ADMIN_PASSWORD` | Admin login password | |
 | `ADMIN_EMAIL` | Admin email | `you@example.com` |
 | `MAIL_USERNAME` | *(optional)* Gmail address for contact email notifications | `you@gmail.com` |
-| `MAIL_PASSWORD` | *(optional)* Gmail App Password (no spaces) | `abcdefghijklmnop` |
+| `MAIL_PASSWORD` | *(optional)* Gmail App Password (no spaces) | `your-app-password` |
 | `PORT` | Port (Render injects this automatically) | `8080` |
 
 > `PORT` is already read from the environment in `application.properties` — Render sets it automatically, you don't need to add it manually.
@@ -75,12 +75,9 @@ The schema and tables are created automatically on first boot (`ddl-auto=update`
 
 ### Default admin login
 
-```
-Username: admin
-Password: Prince@Admin123
-```
+Use the default admin account defined in your environment or your deployment settings.
 
-**Change this immediately** from Admin → Profile after first login, or set `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars before deploying.
+**Change the password immediately** from Admin → Profile after first login, or set `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars before deploying.
 
 ---
 
@@ -123,16 +120,16 @@ If the server can't reach these URLs, the sections show a friendly fallback mess
 ```env
 # Required — already configured in Render
 SPRING_DATASOURCE_URL=jdbc:mysql://host:3306/portfolio_db?useSSL=true&serverTimezone=UTC
-SPRING_DATASOURCE_USERNAME=root
-SPRING_DATASOURCE_PASSWORD=yourpassword
+SPRING_DATASOURCE_USERNAME=your-db-user
+SPRING_DATASOURCE_PASSWORD=your-db-password
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=
+ADMIN_PASSWORD=your-strong-admin-password
 ADMIN_EMAIL=you@example.com
 JAVA_TOOL_OPTIONS=-Xmx256m
 
 # Optional — only needed for contact form email notifications
-MAIL_USERNAME=you@gmail.com
-MAIL_PASSWORD=abcdefghijklmnop
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
 ```
 
 ---
