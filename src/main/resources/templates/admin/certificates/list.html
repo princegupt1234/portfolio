@@ -20,7 +20,7 @@
             </div>
             <div class="glass-card glass-table-wrap">
                 <table class="glass-table">
-                    <thead><tr><th>Image</th><th>Title</th><th>Organization</th><th>Date</th><th>Credential ID</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Image</th><th>Title</th><th>Organization</th><th>Date</th><th>Credential ID</th><th>Visible</th><th>Actions</th></tr></thead>
                     <tbody>
                     <tr th:each="c : ${certificates}">
                         <td><img class="row-thumb" th:if="${c.imageUrl}" th:src="@{${c.imageUrl}}" alt="" /><span th:unless="${c.imageUrl}">—</span></td>
@@ -28,6 +28,7 @@
                         <td th:text="${c.organization}">Org</td>
                         <td th:text="${c.issueDate}">Date</td>
                         <td th:text="${c.credentialId}">ID</td>
+                        <td><span class="status-pill" th:classappend="${c.visible} ? 'on' : 'off'" th:text="${c.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/certificates/' + ${c.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

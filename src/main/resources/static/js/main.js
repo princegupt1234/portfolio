@@ -24,13 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
     navOverlay.addEventListener('click', closeNav);
   }
 
-  /* ---------- Navbar shrink on scroll + back to top ---------- */
+  /* ---------- Navbar scroll shadow + back to top ---------- */
   const navbar = document.querySelector('.navbar');
   const backToTop = document.querySelector('.back-to-top');
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
-    if (navbar) navbar.style.padding = y > 40 ? '10px 6vw' : '16px 6vw';
-    if (backToTop) backToTop.classList.toggle('visible', y > 500);
+    if (navbar) navbar.style.boxShadow = y > 40
+      ? '0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.1) inset'
+      : '0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(59,130,246,0.06) inset';
+    if (backToTop) backToTop.classList.toggle('visible', y > 450);
   });
   if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
@@ -102,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------- Skill progress bars ---------- */
-  document.querySelectorAll('.progress-fill').forEach(bar => {
+  document.querySelectorAll('.progress-fill, .lc-bar-fill').forEach(bar => {
     const val = bar.dataset.value || 0;
     const barObs = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -113,6 +115,22 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }, { threshold: 0.3 });
     barObs.observe(bar);
+  });
+
+  /* ---------- LeetCode donut animate on scroll ---------- */
+  document.querySelectorAll('.lc-donut circle[stroke-dashoffset]').forEach(circle => {
+    const target = circle.getAttribute('stroke-dashoffset');
+    circle.setAttribute('stroke-dashoffset', '201');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          circle.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1)';
+          circle.setAttribute('stroke-dashoffset', target);
+          obs.unobserve(circle);
+        }
+      });
+    }, { threshold: 0.4 });
+    obs.observe(circle);
   });
 
   /* ---------- Skills category filter ---------- */

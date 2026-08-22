@@ -2,8 +2,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const sidebar = document.querySelector('.admin-sidebar');
   const toggle = document.querySelector('.sidebar-toggle');
+  const sidebarOverlay = document.createElement('div');
+  sidebarOverlay.style.cssText = 'position:fixed;inset:0;z-index:49;background:rgba(0,0,0,0.6);display:none;';
+  document.body.appendChild(sidebarOverlay);
+
+  function openSidebar() {
+    if (sidebar) sidebar.classList.add('open');
+    sidebarOverlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove('open');
+    sidebarOverlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
   if (toggle && sidebar) {
-    toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    toggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+    sidebarOverlay.addEventListener('click', closeSidebar);
+    sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      if (window.innerWidth <= 1000) closeSidebar();
+    }));
   }
 
   /* Confirm before delete */

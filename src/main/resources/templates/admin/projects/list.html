@@ -20,7 +20,7 @@
             </div>
             <div class="glass-card glass-table-wrap">
                 <table class="glass-table">
-                    <thead><tr><th>Image</th><th>Title</th><th>Tech</th><th>Featured</th><th>Status</th><th>Views</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Image</th><th>Title</th><th>Tech</th><th>Featured</th><th>Status</th><th>Visible</th><th>Actions</th></tr></thead>
                     <tbody>
                     <tr th:each="p : ${projects}">
                         <td><img class="row-thumb" th:if="${p.imageUrl}" th:src="@{${p.imageUrl}}" alt="" /><span th:unless="${p.imageUrl}">—</span></td>
@@ -28,7 +28,7 @@
                         <td th:text="${p.techStack}">Tech</td>
                         <td><span class="status-pill" th:classappend="${p.featured} ? 'on' : 'off'" th:text="${p.featured} ? 'Featured' : 'No'">No</span></td>
                         <td><span class="badge" th:text="${p.status}">Live</span></td>
-                        <td th:text="${p.viewCount}">0</td>
+                        <td><span class="status-pill" th:classappend="${p.visible} ? 'on' : 'off'" th:text="${p.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/projects/' + ${p.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

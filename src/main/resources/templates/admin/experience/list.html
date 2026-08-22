@@ -20,13 +20,14 @@
             </div>
             <div class="glass-card glass-table-wrap">
                 <table class="glass-table">
-                    <thead><tr><th>Role</th><th>Company</th><th>Duration</th><th>Type</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Role</th><th>Company</th><th>Duration</th><th>Type</th><th>Visible</th><th>Actions</th></tr></thead>
                     <tbody>
                     <tr th:each="e : ${experiences}">
                         <td th:text="${e.role}">Intern</td>
                         <td th:text="${e.company}">Company</td>
                         <td th:text="${e.duration}">Jan-Feb</td>
                         <td><span class="badge" th:text="${e.type}">Internship</span></td>
+                        <td><span class="status-pill" th:classappend="${e.visible} ? 'on' : 'off'" th:text="${e.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/experience/' + ${e.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

@@ -25,17 +25,16 @@
                     <div class="form-group"><label>Skill Name</label><input class="glass-input" th:field="*{name}" required /></div>
                     <div class="form-group">
                         <label>Category</label>
-                        <select class="glass-input" th:field="*{category}">
-                            <option value="Programming">Programming</option>
-                            <option value="Backend">Backend</option>
-                            <option value="Frontend">Frontend</option>
-                            <option value="Database">Database</option>
-                            <option value="Tools">Tools</option>
-                        </select>
+                        <input class="glass-input" th:field="*{category}" placeholder="e.g. Programming, Backend, Frontend, Database, Tools" required />
+                        <small style="color:var(--text-secondary); font-size:0.82rem;">This value appears as a filter tab on the portfolio. Use consistent casing.</small>
                     </div>
                     <div class="form-group"><label>Icon (Font Awesome class)</label><input class="glass-input" th:field="*{icon}" placeholder="fa-brands fa-java" /></div>
                     <div class="form-group"><label>Proficiency (0-100)</label><input class="glass-input" type="number" min="0" max="100" th:field="*{proficiency}" /></div>
                     <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
+                    <div class="form-group full" style="flex-direction:row; align-items:center; gap:12px;">
+                        <label class="toggle-switch"><input type="checkbox" th:field="*{visible}" /><span class="toggle-slider"></span></label>
+                        <label style="margin:0;">Visible on portfolio</label>
+                    </div>
                     <div class="form-actions form-group full">
                         <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Skill</button>
                     </div>

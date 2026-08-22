@@ -30,8 +30,8 @@ public class Project {
     private String tags; // comma separated
 
     private Long viewCount = 0L;
-
     private Integer sortOrder = 0;
+    private Boolean visible = true;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -59,4 +59,6 @@ public class Project {
     public void setViewCount(Long viewCount) { this.viewCount = viewCount; }
     public Integer getSortOrder() { return sortOrder; }
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
+    public Boolean getVisible() { return visible; }
+    public void setVisible(Boolean visible) { this.visible = visible; }
 }

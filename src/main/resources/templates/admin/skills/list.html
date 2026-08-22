@@ -21,7 +21,7 @@
             </div>
             <div class="glass-card glass-table-wrap">
                 <table class="glass-table">
-                    <thead><tr><th>Name</th><th>Category</th><th>Proficiency</th><th>Order</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Category</th><th>Proficiency</th><th>Order</th><th>Visible</th><th>Actions</th></tr></thead>
                     <tbody>
                     <tr th:each="skill : ${skills}">
                         <td th:text="${skill.name}">Java</td>
@@ -30,6 +30,7 @@
                             <div class="progress-track"><div class="progress-fill" th:style="'width:' + ${skill.proficiency} + '%'"></div></div>
                         </td>
                         <td th:text="${skill.sortOrder}">0</td>
+                        <td><span class="status-pill" th:classappend="${skill.visible} ? 'on' : 'off'" th:text="${skill.visible} ? 'Visible' : 'Hidden'">Visible</span></td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/skills/' + ${skill.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

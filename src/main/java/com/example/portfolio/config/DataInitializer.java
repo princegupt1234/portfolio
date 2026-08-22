@@ -105,6 +105,9 @@ public class DataInitializer implements CommandLineRunner {
             info.setWhatsappUrl("https://wa.me/917275807576");
             info.setGithubUsername("princegupt1234");
             info.setLeetcodeUsername("princegupt1234");
+            info.setHeroTechStack("Java|Spring Boot|REST APIs|MySQL|React");
+            info.setCurrentlyBuilding("Full-stack portfolio with Spring Boot admin panel, REST APIs, and Thymeleaf — deployed on Render with MySQL.");
+            info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA on LeetCode, and exploring React + Next.js for modern frontends.");
             aboutInfoRepository.save(info);
         }
     }
@@ -173,10 +176,10 @@ public class DataInitializer implements CommandLineRunner {
             e.setCompany("Codveda Technologies");
             e.setRole("Full Stack Developer Intern");
             e.setDuration("Jan 2026 - Feb 2026");
-            e.setDescription("ISO 9001:2015 Certified | MSME Registered | Remote | Credential ID: CV/A1/55948\n" +
-                    "- Built and shipped full-stack web features end-to-end using React.js, Node.js, Express.js, and MongoDB\n" +
-                    "- Designed and implemented RESTful APIs, integrating them with frontend interfaces for a seamless user experience\n" +
-                    "- Managed MySQL and MongoDB databases, handling data modeling, query optimization, and storage design");
+            e.setDescription(
+                    "Built and shipped full-stack web features end-to-end using React.js, Node.js, Express.js, and MongoDB\n" +
+                    "Designed and implemented RESTful APIs, integrating them with frontend interfaces for a seamless user experience\n" +
+                    "Managed MySQL and MongoDB databases, handling data modeling, query optimization, and storage design");
             e.setType("Internship");
             e.setSortOrder(1);
             experienceRepository.save(e);

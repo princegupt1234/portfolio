@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ExperienceRepository extends JpaRepository<Experience, Long> {
     List<Experience> findAllByOrderBySortOrderAsc();
+    List<Experience> findByVisibleTrueOrderBySortOrderAsc();
 }

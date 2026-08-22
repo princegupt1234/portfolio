@@ -83,16 +83,18 @@ public class HomeController {
 
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElse(new AboutInfo());
         List<EducationEntry> education = educationEntryRepository.findAllByOrderBySortOrderAsc();
-        List<Skill> skills = skillRepository.findAllByOrderByCategoryAscSortOrderAsc();
-        List<Experience> experiences = experienceRepository.findAllByOrderBySortOrderAsc();
-        List<Project> projects = projectRepository.findAllByOrderBySortOrderAsc();
-        List<Certificate> certificates = certificateRepository.findAllByOrderBySortOrderAsc();
+        List<Skill> skills = skillRepository.findByVisibleTrueOrderByCategoryAscSortOrderAsc();
+        List<String> skillCategories = skillRepository.findDistinctVisibleCategories();
+        List<Experience> experiences = experienceRepository.findByVisibleTrueOrderBySortOrderAsc();
+        List<Project> projects = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
+        List<Certificate> certificates = certificateRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<ServiceItem> services = serviceItemRepository.findAllByOrderBySortOrderAsc();
         List<Testimonial> testimonials = testimonialRepository.findByPublishedTrue();
 
         model.addAttribute("about", about);
         model.addAttribute("education", education);
         model.addAttribute("skills", skills);
+        model.addAttribute("skillCategories", skillCategories);
         model.addAttribute("experiences", experiences);
         model.addAttribute("projects", projects);
         model.addAttribute("certificates", certificates);

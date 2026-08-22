@@ -44,6 +44,41 @@ public class AboutInfo {
     private String leetcodeUsername;
     private String githubUsername;
 
+    @Column(length = 500)
+    private String heroTechStack; // pipe-separated e.g. Java|Spring Boot|REST APIs|MySQL|React
+
+    @Column(length = 1000)
+    private String currentlyBuilding;
+
+    @Column(length = 500)
+    private String buildingProjectTitle;
+
+    @Column(length = 500)
+    private String buildingProjectDesc;
+
+    @Column(length = 500)
+    private String buildingTechStack; // pipe-separated
+
+    private String buildingProjectUrl;
+
+    private Integer buildingProgress; // 0-100
+
+    private String buildingStatus; // e.g. "In Progress", "Beta", "Live"
+
+    @Column(length = 1000)
+    private String currentlyLearning;
+
+    @Column(length = 1000)
+    private String learningPath; // pipe-separated items e.g. Spring Boot|DSA|System Design|React
+
+    @Column(columnDefinition = "TEXT")
+    private String learningCards; // pipe-separated cards: Title::fa-icon-class::Category::One-line desc
+
+    private String leetcodeUrl;
+
+    @Column(length = 500)
+    private String contactMessage;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getFullName() { return fullName; }
@@ -94,4 +129,30 @@ public class AboutInfo {
     public void setLeetcodeUsername(String leetcodeUsername) { this.leetcodeUsername = leetcodeUsername; }
     public String getGithubUsername() { return githubUsername; }
     public void setGithubUsername(String githubUsername) { this.githubUsername = githubUsername; }
+    public String getHeroTechStack() { return heroTechStack; }
+    public void setHeroTechStack(String heroTechStack) { this.heroTechStack = heroTechStack; }
+    public String getCurrentlyBuilding() { return currentlyBuilding; }
+    public void setCurrentlyBuilding(String currentlyBuilding) { this.currentlyBuilding = currentlyBuilding; }
+    public String getBuildingProjectTitle() { return buildingProjectTitle; }
+    public void setBuildingProjectTitle(String buildingProjectTitle) { this.buildingProjectTitle = buildingProjectTitle; }
+    public String getBuildingProjectDesc() { return buildingProjectDesc; }
+    public void setBuildingProjectDesc(String buildingProjectDesc) { this.buildingProjectDesc = buildingProjectDesc; }
+    public String getBuildingTechStack() { return buildingTechStack; }
+    public void setBuildingTechStack(String buildingTechStack) { this.buildingTechStack = buildingTechStack; }
+    public String getBuildingProjectUrl() { return buildingProjectUrl; }
+    public void setBuildingProjectUrl(String buildingProjectUrl) { this.buildingProjectUrl = buildingProjectUrl; }
+    public Integer getBuildingProgress() { return buildingProgress; }
+    public void setBuildingProgress(Integer buildingProgress) { this.buildingProgress = buildingProgress; }
+    public String getBuildingStatus() { return buildingStatus; }
+    public void setBuildingStatus(String buildingStatus) { this.buildingStatus = buildingStatus; }
+    public String getCurrentlyLearning() { return currentlyLearning; }
+    public void setCurrentlyLearning(String currentlyLearning) { this.currentlyLearning = currentlyLearning; }
+    public String getLearningPath() { return learningPath; }
+    public void setLearningPath(String learningPath) { this.learningPath = learningPath; }
+    public String getLearningCards() { return learningCards; }
+    public void setLearningCards(String learningCards) { this.learningCards = learningCards; }
+    public String getLeetcodeUrl() { return leetcodeUrl; }
+    public void setLeetcodeUrl(String leetcodeUrl) { this.leetcodeUrl = leetcodeUrl; }
+    public String getContactMessage() { return contactMessage; }
+    public void setContactMessage(String contactMessage) { this.contactMessage = contactMessage; }
 }
