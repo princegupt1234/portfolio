@@ -60,7 +60,7 @@ The schema and tables are created automatically on first boot (`ddl-auto=update`
 | `SPRING_DATASOURCE_USERNAME` | MySQL username | `root` |
 | `SPRING_DATASOURCE_PASSWORD` | MySQL password | `yourpassword` |
 | `ADMIN_USERNAME` | Admin login username | `admin` |
-| `ADMIN_PASSWORD` | Admin login password | `Prince@Admin123` |
+| `ADMIN_PASSWORD` | Admin login password | |
 | `ADMIN_EMAIL` | Admin email | `you@example.com` |
 | `MAIL_USERNAME` | *(optional)* Gmail address for contact email notifications | `you@gmail.com` |
 | `MAIL_PASSWORD` | *(optional)* Gmail App Password (no spaces) | `abcdefghijklmnop` |
@@ -126,7 +126,7 @@ SPRING_DATASOURCE_URL=jdbc:mysql://host:3306/portfolio_db?useSSL=true&serverTime
 SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=yourpassword
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=Prince@Admin123
+ADMIN_PASSWORD=
 ADMIN_EMAIL=you@example.com
 JAVA_TOOL_OPTIONS=-Xmx256m
 
