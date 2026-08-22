@@ -142,7 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       const cat = tab.dataset.category;
       skillCards.forEach(card => {
-        card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
+        const show = (cat === 'all' || card.dataset.category === cat);
+        card.style.display = show ? '' : 'none';
+        if (show) card.classList.add('revealed');
       });
     });
   });

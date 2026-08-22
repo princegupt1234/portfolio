@@ -1,6 +1,11 @@
 package com.example.portfolio.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "about_info")
@@ -13,11 +18,6 @@ public class AboutInfo {
     private String fullName;
     private String title;
     private String heroEyebrow;
-    private String heroPrimaryCtaLabel;
-    private String heroPrimaryCtaLink;
-    private String heroSecondaryCtaLabel;
-    private String heroSecondaryCtaLink;
-    private String heroBackground;
     private Integer heroTypingSpeed;
     private Integer heroDeletingSpeed;
     private Integer heroPauseDuration;
@@ -33,7 +33,6 @@ public class AboutInfo {
 
     private String profileImage;
     private String resumeUrl;
-
     private String phone;
     private String email;
     private String location;
@@ -46,9 +45,6 @@ public class AboutInfo {
 
     @Column(length = 500)
     private String heroTechStack; // pipe-separated e.g. Java|Spring Boot|REST APIs|MySQL|React
-
-    @Column(length = 1000)
-    private String currentlyBuilding;
 
     @Column(length = 500)
     private String buildingProjectTitle;
@@ -68,13 +64,8 @@ public class AboutInfo {
     @Column(length = 1000)
     private String currentlyLearning;
 
-    @Column(length = 1000)
-    private String learningPath; // pipe-separated items e.g. Spring Boot|DSA|System Design|React
-
     @Column(columnDefinition = "TEXT")
-    private String learningCards; // pipe-separated cards: Title::fa-icon-class::Category::One-line desc
-
-    private String leetcodeUrl;
+    private String learningCards;
 
     @Column(length = 500)
     private String contactMessage;
@@ -87,16 +78,6 @@ public class AboutInfo {
     public void setTitle(String title) { this.title = title; }
     public String getHeroEyebrow() { return heroEyebrow; }
     public void setHeroEyebrow(String heroEyebrow) { this.heroEyebrow = heroEyebrow; }
-    public String getHeroPrimaryCtaLabel() { return heroPrimaryCtaLabel; }
-    public void setHeroPrimaryCtaLabel(String heroPrimaryCtaLabel) { this.heroPrimaryCtaLabel = heroPrimaryCtaLabel; }
-    public String getHeroPrimaryCtaLink() { return heroPrimaryCtaLink; }
-    public void setHeroPrimaryCtaLink(String heroPrimaryCtaLink) { this.heroPrimaryCtaLink = heroPrimaryCtaLink; }
-    public String getHeroSecondaryCtaLabel() { return heroSecondaryCtaLabel; }
-    public void setHeroSecondaryCtaLabel(String heroSecondaryCtaLabel) { this.heroSecondaryCtaLabel = heroSecondaryCtaLabel; }
-    public String getHeroSecondaryCtaLink() { return heroSecondaryCtaLink; }
-    public void setHeroSecondaryCtaLink(String heroSecondaryCtaLink) { this.heroSecondaryCtaLink = heroSecondaryCtaLink; }
-    public String getHeroBackground() { return heroBackground; }
-    public void setHeroBackground(String heroBackground) { this.heroBackground = heroBackground; }
     public Integer getHeroTypingSpeed() { return heroTypingSpeed; }
     public void setHeroTypingSpeed(Integer heroTypingSpeed) { this.heroTypingSpeed = heroTypingSpeed; }
     public Integer getHeroDeletingSpeed() { return heroDeletingSpeed; }
@@ -131,8 +112,6 @@ public class AboutInfo {
     public void setGithubUsername(String githubUsername) { this.githubUsername = githubUsername; }
     public String getHeroTechStack() { return heroTechStack; }
     public void setHeroTechStack(String heroTechStack) { this.heroTechStack = heroTechStack; }
-    public String getCurrentlyBuilding() { return currentlyBuilding; }
-    public void setCurrentlyBuilding(String currentlyBuilding) { this.currentlyBuilding = currentlyBuilding; }
     public String getBuildingProjectTitle() { return buildingProjectTitle; }
     public void setBuildingProjectTitle(String buildingProjectTitle) { this.buildingProjectTitle = buildingProjectTitle; }
     public String getBuildingProjectDesc() { return buildingProjectDesc; }
@@ -147,12 +126,8 @@ public class AboutInfo {
     public void setBuildingStatus(String buildingStatus) { this.buildingStatus = buildingStatus; }
     public String getCurrentlyLearning() { return currentlyLearning; }
     public void setCurrentlyLearning(String currentlyLearning) { this.currentlyLearning = currentlyLearning; }
-    public String getLearningPath() { return learningPath; }
-    public void setLearningPath(String learningPath) { this.learningPath = learningPath; }
     public String getLearningCards() { return learningCards; }
     public void setLearningCards(String learningCards) { this.learningCards = learningCards; }
-    public String getLeetcodeUrl() { return leetcodeUrl; }
-    public void setLeetcodeUrl(String leetcodeUrl) { this.leetcodeUrl = leetcodeUrl; }
     public String getContactMessage() { return contactMessage; }
     public void setContactMessage(String contactMessage) { this.contactMessage = contactMessage; }
 }

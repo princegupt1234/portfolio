@@ -10,10 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-/**
- * Stores uploaded files (images, PDFs) under the local uploads/<subfolder> directory
- * and returns a public URL path served by WebConfig at /uploads/**.
- */
 @Service
 public class FileStorageService {
 

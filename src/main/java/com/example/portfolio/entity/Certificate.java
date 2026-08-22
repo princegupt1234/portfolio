@@ -1,6 +1,11 @@
 package com.example.portfolio.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
@@ -22,6 +27,7 @@ public class Certificate {
     private String pdfUrl;
 
     private Integer sortOrder = 0;
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean visible = true;
 
     public Long getId() { return id; }

@@ -1,8 +1,26 @@
 package com.example.portfolio.controller;
 
 import com.example.portfolio.dto.ContactForm;
-import com.example.portfolio.entity.*;
-import com.example.portfolio.repository.*;
+import com.example.portfolio.entity.AboutInfo;
+import com.example.portfolio.entity.Certificate;
+import com.example.portfolio.entity.ContactMessage;
+import com.example.portfolio.entity.EducationEntry;
+import com.example.portfolio.entity.Experience;
+import com.example.portfolio.entity.Project;
+import com.example.portfolio.entity.Resume;
+import com.example.portfolio.entity.ServiceItem;
+import com.example.portfolio.entity.Skill;
+import com.example.portfolio.entity.Testimonial;
+import com.example.portfolio.repository.AboutInfoRepository;
+import com.example.portfolio.repository.CertificateRepository;
+import com.example.portfolio.repository.ContactMessageRepository;
+import com.example.portfolio.repository.EducationEntryRepository;
+import com.example.portfolio.repository.ExperienceRepository;
+import com.example.portfolio.repository.ProjectRepository;
+import com.example.portfolio.repository.ResumeRepository;
+import com.example.portfolio.repository.ServiceItemRepository;
+import com.example.portfolio.repository.SkillRepository;
+import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.AnalyticsService;
 import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.GithubStatsService;
@@ -14,7 +32,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,9 +45,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Serves the single-page public portfolio and handles the contact form / resume download.
- */
 @Controller
 public class HomeController {
 
@@ -85,10 +105,6 @@ public class HomeController {
         return renderHome(contactSuccess, model);
     }
 
-    public String home(Model model) {
-        return renderHome(null, model);
-    }
-
     private String renderHome(Boolean contactSuccess, Model model) {
         analyticsService.recordPortfolioView();
 
@@ -128,7 +144,7 @@ public class HomeController {
     public String submitContact(@Valid @ModelAttribute("contactForm") ContactForm form,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
-            return home(model);
+            return renderHome(null, model);
         }
         ContactMessage msg = new ContactMessage();
         msg.setName(form.getName());

@@ -7,10 +7,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Increments daily counters used by the admin analytics dashboard.
- * A new SiteStat row is created automatically the first time a given day is touched.
- */
 @Service
 public class AnalyticsService {
 

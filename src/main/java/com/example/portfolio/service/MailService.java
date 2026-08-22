@@ -11,11 +11,6 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-/**
- * Sends a notification email when a new contact form message arrives.
- * Disabled by default (app.mail.enabled=false) since it needs real SMTP
- * credentials in application.properties / environment variables to work.
- */
 @Service
 public class MailService {
 

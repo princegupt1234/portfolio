@@ -5,10 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 
-/**
- * Renders the admin login page. Spring Security handles the actual
- * authentication POST to /admin/login (see SecurityConfig).
- */
 @Controller
 public class AdminLoginController {
 

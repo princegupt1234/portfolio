@@ -1,7 +1,23 @@
 package com.example.portfolio.config;
 
-import com.example.portfolio.entity.*;
-import com.example.portfolio.repository.*;
+import com.example.portfolio.entity.AboutInfo;
+import com.example.portfolio.entity.Admin;
+import com.example.portfolio.entity.Certificate;
+import com.example.portfolio.entity.EducationEntry;
+import com.example.portfolio.entity.Experience;
+import com.example.portfolio.entity.Project;
+import com.example.portfolio.entity.ServiceItem;
+import com.example.portfolio.entity.Skill;
+import com.example.portfolio.entity.Testimonial;
+import com.example.portfolio.repository.AboutInfoRepository;
+import com.example.portfolio.repository.AdminRepository;
+import com.example.portfolio.repository.CertificateRepository;
+import com.example.portfolio.repository.EducationEntryRepository;
+import com.example.portfolio.repository.ExperienceRepository;
+import com.example.portfolio.repository.ProjectRepository;
+import com.example.portfolio.repository.ServiceItemRepository;
+import com.example.portfolio.repository.SkillRepository;
+import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.GithubStatsService;
 import com.example.portfolio.service.LeetCodeStatsService;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,11 +113,6 @@ public class DataInitializer implements CommandLineRunner {
             info.setTitle("Full Stack Developer | Final Year CSE Student");
             info.setHeroEyebrow("// Hello, I'm");
             info.setHeroPhrases("Full Stack Developer|Java + Spring Boot Enthusiast|React & Next.js Developer|Final Year CSE Student");
-            info.setHeroPrimaryCtaLabel("View Projects");
-            info.setHeroPrimaryCtaLink("#projects");
-            info.setHeroSecondaryCtaLabel("Contact Me");
-            info.setHeroSecondaryCtaLink("#contact");
-            info.setHeroBackground("linear-gradient(135deg, rgba(30,58,138,0.95), rgba(79,70,229,0.85))");
             info.setHeroTypingSpeed(75);
             info.setHeroDeletingSpeed(35);
             info.setHeroPauseDuration(1600);
@@ -119,7 +130,6 @@ public class DataInitializer implements CommandLineRunner {
             info.setGithubUsername("princegupt1234");
             info.setLeetcodeUsername("princegupt1234");
             info.setHeroTechStack("Java|Spring Boot|REST APIs|MySQL|React");
-            info.setCurrentlyBuilding("Full-stack portfolio with Spring Boot admin panel, REST APIs, and Thymeleaf — deployed on Render with MySQL.");
             info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA on LeetCode, and exploring React + Next.js for modern frontends.");
             aboutInfoRepository.save(info);
         }
@@ -180,6 +190,7 @@ public class DataInitializer implements CommandLineRunner {
         s.setIcon(icon);
         s.setProficiency(proficiency);
         s.setSortOrder(order);
+        s.setVisible(true);
         return s;
     }
 
@@ -195,6 +206,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Managed MySQL and MongoDB databases, handling data modeling, query optimization, and storage design");
             e.setType("Internship");
             e.setSortOrder(1);
+            e.setVisible(true);
             experienceRepository.save(e);
         }
     }
@@ -212,6 +224,7 @@ public class DataInitializer implements CommandLineRunner {
             p1.setStatus("Completed");
             p1.setTags("Full Stack,Node.js,MongoDB");
             p1.setSortOrder(1);
+            p1.setVisible(true);
             projectRepository.save(p1);
 
             Project p2 = new Project();
@@ -225,6 +238,7 @@ public class DataInitializer implements CommandLineRunner {
             p2.setStatus("Completed");
             p2.setTags("Full Stack,PHP,MySQL");
             p2.setSortOrder(2);
+            p2.setVisible(true);
             projectRepository.save(p2);
 
             Project p3 = new Project();
@@ -238,6 +252,7 @@ public class DataInitializer implements CommandLineRunner {
             p3.setStatus("Live");
             p3.setTags("Frontend,Next.js");
             p3.setSortOrder(3);
+            p3.setVisible(true);
             projectRepository.save(p3);
         }
     }
@@ -250,6 +265,7 @@ public class DataInitializer implements CommandLineRunner {
             c.setIssueDate(LocalDate.of(2026, 3, 1));
             c.setCredentialId("CV/A1/55948");
             c.setSortOrder(1);
+            c.setVisible(true);
             certificateRepository.save(c);
         }
     }

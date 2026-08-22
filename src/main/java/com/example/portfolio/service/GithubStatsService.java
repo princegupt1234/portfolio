@@ -18,14 +18,14 @@ public class GithubStatsService {
             })
             .build();
 
-    public record GithubStats(int publicRepos, int followers, int following, String avatarUrl, boolean available) {}
+    public record GithubStats(int publicRepos, int followers, int following, boolean available) {}
 
     private volatile String cachedUsername = "";
-    private final AtomicReference<GithubStats> cache = new AtomicReference<>(new GithubStats(0, 0, 0, null, false));
+    private final AtomicReference<GithubStats> cache = new AtomicReference<>(new GithubStats(0, 0, 0, false));
 
     /** Returns cached value immediately — never blocks the request thread. */
     public GithubStats fetchStats(String username) {
-        if (username == null || username.isBlank()) return new GithubStats(0, 0, 0, null, false);
+        if (username == null || username.isBlank()) return new GithubStats(0, 0, 0, false);
         if (!username.equals(cachedUsername)) {
             cachedUsername = username;
             refreshAsync(username);   // fire-and-forget
@@ -49,14 +49,14 @@ public class GithubStatsService {
             Map<String, Object> body = restClient.get()
                     .uri("https://api.github.com/users/{username}", username)
                     .retrieve().body(Map.class);
-            if (body == null) return new GithubStats(0, 0, 0, null, false);
+            if (body == null) return new GithubStats(0, 0, 0, false);
             return new GithubStats(
                     ((Number) body.getOrDefault("public_repos", 0)).intValue(),
                     ((Number) body.getOrDefault("followers", 0)).intValue(),
                     ((Number) body.getOrDefault("following", 0)).intValue(),
-                    (String) body.get("avatar_url"), true);
+                    true);
         } catch (Exception e) {
-            return new GithubStats(0, 0, 0, null, false);
+            return new GithubStats(0, 0, 0, false);
         }
     }
 }

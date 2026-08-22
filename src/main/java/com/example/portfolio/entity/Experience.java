@@ -1,6 +1,11 @@
 package com.example.portfolio.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "experiences")
@@ -23,6 +28,7 @@ public class Experience {
 
     private String type = "Internship"; // Internship, Training, Achievement
     private Integer sortOrder = 0;
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean visible = true;
 
     public Long getId() { return id; }
