@@ -5,6 +5,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -13,10 +15,12 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class LeetCodeStatsService {
 
+    private static final Logger log = LoggerFactory.getLogger(LeetCodeStatsService.class);
     private final RestClient restClient = RestClient.builder()
             .defaultHeaders(headers -> {
-                headers.set("User-Agent", "Mozilla/5.0 (compatible; PortfolioStats/1.0)");
+                headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36");
                 headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+                headers.set("Accept-Language", "en-US,en;q=0.9");
             })
             .build();
     private static final String GRAPHQL_URL = "https://leetcode.com/graphql";
@@ -83,6 +87,7 @@ public class LeetCodeStatsService {
             int ranking = profile.get("ranking") == null ? 0 : ((Number) profile.get("ranking")).intValue();
             return new LeetCodeStats(total, easy, medium, hard, ranking, true);
         } catch (Exception e) {
+            log.warn("Unable to load LeetCode stats for username '{}': {}", username, e.getMessage());
             return new LeetCodeStats(0, 0, 0, 0, 0, false);
         }
     }
