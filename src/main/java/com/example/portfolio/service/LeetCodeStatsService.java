@@ -13,7 +13,12 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class LeetCodeStatsService {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient restClient = RestClient.builder()
+            .defaultHeaders(headers -> {
+                headers.set("User-Agent", "Mozilla/5.0 (compatible; PortfolioStats/1.0)");
+                headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+            })
+            .build();
     private static final String GRAPHQL_URL = "https://leetcode.com/graphql";
     private static final String QUERY = """
             {"query":"query getUserProfile($username: String!) { matchedUser(username: $username) { submitStats { acSubmissionNum { difficulty count } } profile { ranking } } }","variables":{"username":"%s"}}
@@ -52,14 +57,18 @@ public class LeetCodeStatsService {
                     .uri(GRAPHQL_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Referer", "https://leetcode.com")
+                        .header("Origin", "https://leetcode.com")
                     .body(QUERY.formatted(username).strip())
                     .retrieve().body(Map.class);
             if (response == null) return new LeetCodeStats(0, 0, 0, 0, 0, false);
             Map<String, Object> data = (Map<String, Object>) response.get("data");
+                    if (data == null) return new LeetCodeStats(0, 0, 0, 0, 0, false);
             Map<String, Object> matchedUser = (Map<String, Object>) data.get("matchedUser");
             if (matchedUser == null) return new LeetCodeStats(0, 0, 0, 0, 0, false);
             Map<String, Object> submitStats = (Map<String, Object>) matchedUser.get("submitStats");
+                    if (submitStats == null) return new LeetCodeStats(0, 0, 0, 0, 0, false);
             List<Map<String, Object>> acList = (List<Map<String, Object>>) submitStats.get("acSubmissionNum");
+                    if (acList == null) return new LeetCodeStats(0, 0, 0, 0, 0, false);
             int total = 0, easy = 0, medium = 0, hard = 0;
             for (Map<String, Object> entry : acList) {
                 int count = ((Number) entry.get("count")).intValue();
