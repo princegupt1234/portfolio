@@ -378,60 +378,80 @@
                 <div class="ab-card-icon"><i class="fa-solid fa-hammer"></i></div>
                 <div>
                   <div class="ab-card-title">Currently Building</div>
-                  <div class="ab-card-subtitle">Active project shown in the "What I'm working on" section</div>
+                  <div class="ab-card-subtitle">Active projects shown in the "What I'm working on" section</div>
                 </div>
               </div>
               <i class="fa-solid fa-chevron-down ab-chevron"></i>
             </div>
             <div class="ab-card-body">
-              <p class="sec-desc">Displayed in the "Currently" section of your portfolio. Fill in as much detail as you like — all fields are optional.</p>
-              <div class="form-grid">
-                <div class="form-group full">
-                  <div class="field-label-row">
-                    <label for="currentlyBuilding">Summary</label>
-                    <span class="char-counter" id="cc-currentlyBuilding"></span>
-                  </div>
-                  <textarea class="glass-textarea" id="currentlyBuilding" th:field="*{currentlyBuilding}" rows="2" maxlength="200"
-                    placeholder="Short note shown above the building panel..."></textarea>
-                  <span class="field-hint">One or two sentences. Max 200 characters.</span>
-                </div>
+              <p class="sec-desc">Each project appears as a separate panel. Add as many as you like — all fields are optional.</p>
+              <!-- Existing projects list -->
+              <div class="glass-table-wrap" style="margin-bottom:22px;">
+                <table class="glass-table">
+                  <thead><tr><th>Title</th><th>Status</th><th>Progress</th><th>Sort</th><th></th></tr></thead>
+                  <tbody>
+                  <tr th:each="bp : ${buildingProjects}">
+                    <td th:text="${bp.title}">Title</td>
+                    <td th:text="${bp.status}">Status</td>
+                    <td th:text="${bp.progress != null ? bp.progress + '%' : ''}">Progress</td>
+                    <td th:text="${bp.sortOrder}">0</td>
+                    <td style="display:flex;gap:8px;">
+                      <a th:href="@{'/admin/about/building/' + ${bp.id} + '/edit'}" class="action-icons" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);text-decoration:none;">
+                        <i class="fa-solid fa-pen"></i>
+                      </a>
+                      <form th:action="@{'/admin/about/building/' + ${bp.id} + '/delete'}" method="post" data-confirm="Delete this project?" style="margin:0;">
+                        <button type="submit" class="action-icons danger" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.isEmpty(buildingProjects)}">
+                    <td colspan="5" style="color:var(--text-secondary);text-align:center;padding:20px;">No projects yet.</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Add / Edit form -->
+              <h4 style="margin-bottom:14px;font-size:.92rem;" th:text="${editingBuildingProject != null and editingBuildingProject.id != null} ? 'Edit Project' : 'Add Project'">Add Project</h4>
+              <form th:action="@{/admin/about/building/save}" th:object="${editingBuildingProject}" method="post" class="form-grid">
+                <input type="hidden" th:field="*{id}"/>
+                <div class="form-group"><label>Project Title</label><input class="glass-input" th:field="*{title}" placeholder="Portfolio Admin System"/></div>
                 <div class="form-group">
-                  <div class="field-label-row"><label for="buildingProjectTitle">Project Title</label></div>
-                  <input class="glass-input" id="buildingProjectTitle" th:field="*{buildingProjectTitle}" placeholder="Portfolio Admin System"/>
-                </div>
-                <div class="form-group">
-                  <div class="field-label-row"><label for="buildingStatus">Status</label></div>
-                  <input class="glass-input" id="buildingStatus" th:field="*{buildingStatus}" placeholder="In Progress"/>
+                  <label>Status</label>
+                  <input class="glass-input" th:field="*{status}" placeholder="In Progress"/>
                   <span class="field-hint">e.g. In Progress, Beta, Live, Paused</span>
                 </div>
                 <div class="form-group">
-                  <div class="field-label-row">
-                    <label for="buildingProgress">Progress %</label>
-                    <span class="char-counter" id="cc-buildingProgress"></span>
-                  </div>
-                  <input class="glass-input" id="buildingProgress" type="number" min="0" max="100" th:field="*{buildingProgress}" placeholder="65"/>
-                  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div></div>
-                  <span class="field-error" id="err-buildingProgress">Value must be between 0 and 100.</span>
+                  <label>Progress %</label>
+                  <input class="glass-input" type="number" min="0" max="100" th:field="*{progress}" placeholder="65"/>
                 </div>
                 <div class="form-group">
-                  <div class="field-label-row"><label for="buildingProjectUrl">Project URL</label></div>
-                  <input class="glass-input url-input" id="buildingProjectUrl" type="url" th:field="*{buildingProjectUrl}" placeholder="https://github.com/you/project"/>
-                  <span class="field-error" id="err-buildingProjectUrl">Must be a valid URL starting with https://</span>
+                  <label>Sort Order</label>
+                  <input class="glass-input" type="number" th:field="*{sortOrder}" placeholder="1"/>
+                </div>
+                <div class="form-group">
+                  <label>Project URL</label>
+                  <input class="glass-input" type="url" th:field="*{projectUrl}" placeholder="https://github.com/you/project"/>
                 </div>
                 <div class="form-group full">
-                  <div class="field-label-row">
-                    <label for="buildingProjectDesc">Short Description</label>
-                    <span class="char-counter" id="cc-buildingProjectDesc"></span>
-                  </div>
-                  <textarea class="glass-textarea" id="buildingProjectDesc" th:field="*{buildingProjectDesc}" rows="2" maxlength="300"
-                    placeholder="Full-stack portfolio with Spring Boot admin panel, REST APIs, Thymeleaf templates, and MySQL — deployed on Render."></textarea>
+                  <label>Short Description</label>
+                  <textarea class="glass-textarea" th:field="*{description}" rows="2" maxlength="300" placeholder="Full-stack portfolio with Spring Boot admin panel..."></textarea>
                 </div>
                 <div class="form-group full">
-                  <div class="field-label-row"><label for="buildingTechStack">Tech Stack</label></div>
-                  <input class="glass-input" id="buildingTechStack" th:field="*{buildingTechStack}" placeholder="Spring Boot|MySQL|Thymeleaf|REST API"/>
+                  <label>Summary (shown above panel)</label>
+                  <textarea class="glass-textarea" th:field="*{summary}" rows="2" maxlength="200" placeholder="One or two sentences..."></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Tech Stack</label>
+                  <input class="glass-input" th:field="*{techStack}" placeholder="Spring Boot|MySQL|Thymeleaf|REST API"/>
                   <span class="field-hint">Pipe-separated. Shown as chips on the building panel.</span>
                 </div>
-              </div>
+                <div class="form-actions form-group full">
+                  <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Project</button>
+                  <a th:if="${editingBuildingProject != null and editingBuildingProject.id != null}" th:href="@{/admin/about#sec-building}" class="glass-btn">Cancel</a>
+                </div>
+              </form>
             </div>
           </div>
 
@@ -669,8 +689,6 @@ initCharCounter('title', 'cc-title', 100);
 initCharCounter('heroEyebrow', 'cc-heroEyebrow', 60);
 initCharCounter('bio', 'cc-bio', 400);
 initCharCounter('careerObjective', 'cc-careerObjective', 500);
-initCharCounter('currentlyBuilding', 'cc-currentlyBuilding', 200);
-initCharCounter('buildingProjectDesc', 'cc-buildingProjectDesc', 300);
 initCharCounter('currentlyLearning', 'cc-currentlyLearning', 300);
 initCharCounter('contactMessage', 'cc-contactMessage', 300);
 initCharCounter('footerTagline', 'cc-footerTagline', 80);
@@ -748,24 +766,6 @@ initCharCounter('footerSub', 'cc-footerSub', 120);
     preview.innerHTML = chips.length
       ? chips.map(function(c){ return '<span class="chip-preview">' + escHtml(c) + '</span>'; }).join('')
       : '<span style="font-size:.78rem;color:var(--text-secondary);">No chips yet — enter technologies above.</span>';
-  }
-  inp.addEventListener('input', render);
-  render();
-})();
-
-/* ── Progress bar ── */
-(function() {
-  var inp = document.getElementById('buildingProgress');
-  var bar = document.getElementById('progressBarFill');
-  var err = document.getElementById('err-buildingProgress');
-  var cc  = document.getElementById('cc-buildingProgress');
-  if (!inp) return;
-  function render() {
-    var v = parseInt(inp.value, 10);
-    var valid = !isNaN(v) && v >= 0 && v <= 100;
-    if (bar) bar.style.width = (valid ? v : 0) + '%';
-    if (err) err.className = 'field-error' + (!valid && inp.value !== '' ? ' show' : '');
-    if (cc)  cc.textContent = valid ? v + '%' : '';
   }
   inp.addEventListener('input', render);
   render();

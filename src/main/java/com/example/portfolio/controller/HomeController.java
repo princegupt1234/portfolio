@@ -8,14 +8,18 @@ import com.example.portfolio.entity.EducationEntry;
 import com.example.portfolio.entity.Experience;
 import com.example.portfolio.entity.Project;
 import com.example.portfolio.entity.Resume;
+import com.example.portfolio.entity.BuildingProject;
+import com.example.portfolio.entity.LearningProject;
 import com.example.portfolio.entity.ServiceItem;
 import com.example.portfolio.entity.Skill;
 import com.example.portfolio.entity.Testimonial;
 import com.example.portfolio.repository.AboutInfoRepository;
+import com.example.portfolio.repository.BuildingProjectRepository;
 import com.example.portfolio.repository.CertificateRepository;
 import com.example.portfolio.repository.ContactMessageRepository;
 import com.example.portfolio.repository.EducationEntryRepository;
 import com.example.portfolio.repository.ExperienceRepository;
+import com.example.portfolio.repository.LearningProjectRepository;
 import com.example.portfolio.repository.ProjectRepository;
 import com.example.portfolio.repository.ResumeRepository;
 import com.example.portfolio.repository.ServiceItemRepository;
@@ -56,6 +60,8 @@ public class HomeController {
     private final CertificateRepository certificateRepository;
     private final ServiceItemRepository serviceItemRepository;
     private final TestimonialRepository testimonialRepository;
+    private final BuildingProjectRepository buildingProjectRepository;
+    private final LearningProjectRepository learningProjectRepository;
     private final ContactMessageRepository contactMessageRepository;
     private final ResumeRepository resumeRepository;
     private final AnalyticsService analyticsService;
@@ -71,6 +77,8 @@ public class HomeController {
                            SkillRepository skillRepository, ExperienceRepository experienceRepository,
                            ProjectRepository projectRepository, CertificateRepository certificateRepository,
                            ServiceItemRepository serviceItemRepository, TestimonialRepository testimonialRepository,
+                           BuildingProjectRepository buildingProjectRepository,
+                           LearningProjectRepository learningProjectRepository,
                            ContactMessageRepository contactMessageRepository, ResumeRepository resumeRepository,
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
                            LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
@@ -83,6 +91,8 @@ public class HomeController {
         this.certificateRepository = certificateRepository;
         this.serviceItemRepository = serviceItemRepository;
         this.testimonialRepository = testimonialRepository;
+        this.buildingProjectRepository = buildingProjectRepository;
+        this.learningProjectRepository = learningProjectRepository;
         this.contactMessageRepository = contactMessageRepository;
         this.resumeRepository = resumeRepository;
         this.analyticsService = analyticsService;
@@ -117,6 +127,8 @@ public class HomeController {
         List<Certificate> certificates = certificateRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<ServiceItem> services = serviceItemRepository.findAllByOrderBySortOrderAsc();
         List<Testimonial> testimonials = testimonialRepository.findByPublishedTrue();
+        List<BuildingProject> buildingProjects = buildingProjectRepository.findAllByOrderBySortOrderAsc();
+        List<LearningProject> learningProjects = learningProjectRepository.findAllByOrderBySortOrderAsc();
 
         model.addAttribute("about", about);
         model.addAttribute("education", education);
@@ -127,6 +139,8 @@ public class HomeController {
         model.addAttribute("certificates", certificates);
         model.addAttribute("services", services);
         model.addAttribute("testimonials", testimonials);
+        model.addAttribute("buildingProjects", buildingProjects);
+        model.addAttribute("learningProjects", learningProjects);
         model.addAttribute("github", githubStatsService.fetchStats(about.getGithubUsername()));
         model.addAttribute("leetcodeRepo", leetCodeRepositoryStatsService.fetchStats(about.getGithubUsername()));
 

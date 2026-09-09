@@ -1,9 +1,13 @@
 package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.AboutInfo;
+import com.example.portfolio.entity.BuildingProject;
 import com.example.portfolio.entity.EducationEntry;
+import com.example.portfolio.entity.LearningProject;
 import com.example.portfolio.repository.AboutInfoRepository;
+import com.example.portfolio.repository.BuildingProjectRepository;
 import com.example.portfolio.repository.EducationEntryRepository;
+import com.example.portfolio.repository.LearningProjectRepository;
 import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.FileStorageService;
 import jakarta.persistence.EntityManager;
@@ -26,6 +30,8 @@ public class AdminAboutController {
 
     private final AboutInfoRepository aboutInfoRepository;
     private final EducationEntryRepository educationEntryRepository;
+    private final BuildingProjectRepository buildingProjectRepository;
+    private final LearningProjectRepository learningProjectRepository;
     private final FileStorageService fileStorageService;
     private final DataVersionService dataVersionService;
 
@@ -34,10 +40,14 @@ public class AdminAboutController {
 
     public AdminAboutController(AboutInfoRepository aboutInfoRepository,
                                  EducationEntryRepository educationEntryRepository,
+                                 BuildingProjectRepository buildingProjectRepository,
+                                 LearningProjectRepository learningProjectRepository,
                                  FileStorageService fileStorageService,
                                  DataVersionService dataVersionService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
+        this.buildingProjectRepository = buildingProjectRepository;
+        this.learningProjectRepository = learningProjectRepository;
         this.fileStorageService = fileStorageService;
         this.dataVersionService = dataVersionService;
     }
@@ -51,7 +61,20 @@ public class AdminAboutController {
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS availability_visible BIT(1) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS footer_tagline VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS footer_sub TEXT NULL").executeUpdate();
-            return "Migration OK — columns added. You can now remove this endpoint.";
+            em.createNativeQuery(
+                "CREATE TABLE IF NOT EXISTS building_project (" +
+                "  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                "  title VARCHAR(255)," +
+                "  summary TEXT," +
+                "  description TEXT," +
+                "  tech_stack TEXT," +
+                "  project_url VARCHAR(255)," +
+                "  status VARCHAR(255)," +
+                "  progress INT," +
+                "  sort_order INT" +
+                ")"
+            ).executeUpdate();
+            return "Migration OK — all columns and tables created. You can now remove this endpoint.";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
@@ -63,6 +86,10 @@ public class AdminAboutController {
         model.addAttribute("about", about);
         model.addAttribute("education", educationEntryRepository.findAllByOrderBySortOrderAsc());
         model.addAttribute("newEducation", new EducationEntry());
+        model.addAttribute("buildingProjects", buildingProjectRepository.findAllByOrderBySortOrderAsc());
+        model.addAttribute("editingBuildingProject", new BuildingProject());
+        model.addAttribute("learningProjects", learningProjectRepository.findAllByOrderBySortOrderAsc());
+        model.addAttribute("newLearningProject", new LearningProject());
         return "admin/about/edit";
     }
 
@@ -92,5 +119,65 @@ public class AdminAboutController {
         educationEntryRepository.deleteById(id);
         dataVersionService.bump();
         return "redirect:/admin/about";
+    }
+
+    @GetMapping("/building/{id}/edit")
+    public String editBuildingProjectForm(@PathVariable("id") Long id, Model model) {
+        AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
+        model.addAttribute("about", about);
+        model.addAttribute("education", educationEntryRepository.findAllByOrderBySortOrderAsc());
+        model.addAttribute("newEducation", new EducationEntry());
+        model.addAttribute("buildingProjects", buildingProjectRepository.findAllByOrderBySortOrderAsc());
+        model.addAttribute("editingBuildingProject", buildingProjectRepository.findById(id).orElseThrow());
+        model.addAttribute("learningProjects", learningProjectRepository.findAllByOrderBySortOrderAsc());
+        model.addAttribute("newLearningProject", new LearningProject());
+        return "admin/about/edit";
+    }
+
+    @PostMapping("/building/save")
+    public String saveBuildingProject(@ModelAttribute BuildingProject project) {
+        buildingProjectRepository.save(project);
+        dataVersionService.bump();
+        return "redirect:/admin/about#sec-building";
+    }
+
+    @PostMapping("/building/{id}/delete")
+    public String deleteBuildingProject(@PathVariable("id") Long id) {
+        buildingProjectRepository.deleteById(id);
+        dataVersionService.bump();
+        return "redirect:/admin/about#sec-building";
+    }
+
+    @PostMapping("/learning/save")
+    public String saveLearningProject(@ModelAttribute LearningProject project) {
+        learningProjectRepository.save(project);
+        dataVersionService.bump();
+        return "redirect:/admin/about#sec-learning";
+    }
+
+    @PostMapping("/learning/{id}/delete")
+    public String deleteLearningProject(@PathVariable("id") Long id) {
+        learningProjectRepository.deleteById(id);
+        dataVersionService.bump();
+        return "redirect:/admin/about#sec-learning";
+    }
+
+    @PostMapping("/learning/{id}/move")
+    public String moveLearningProject(@PathVariable("id") Long id, @RequestParam("dir") int dir) {
+        var all = learningProjectRepository.findAllByOrderBySortOrderAsc();
+        int idx = -1;
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getId().equals(id)) { idx = i; break; }
+        }
+        int target = idx + dir;
+        if (idx >= 0 && target >= 0 && target < all.size()) {
+            int tmp = all.get(idx).getSortOrder() != null ? all.get(idx).getSortOrder() : idx;
+            int tgt = all.get(target).getSortOrder() != null ? all.get(target).getSortOrder() : target;
+            all.get(idx).setSortOrder(tgt);
+            all.get(target).setSortOrder(tmp);
+            learningProjectRepository.saveAll(all);
+            dataVersionService.bump();
+        }
+        return "redirect:/admin/about#sec-learning";
     }
 }

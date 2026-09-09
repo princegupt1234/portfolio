@@ -55,6 +55,7 @@ public class AdminTestimonialController {
             testimonialRepository.findById(testimonial.getId())
                     .ifPresent(existing -> testimonial.setPhotoUrl(existing.getPhotoUrl()));
         }
+        if (testimonial.getPublished() == null) testimonial.setPublished(false);
         testimonialRepository.save(testimonial);
         dataVersionService.bump();
         return "redirect:/admin/testimonials";

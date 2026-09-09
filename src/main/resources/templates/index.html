@@ -371,21 +371,36 @@ document.addEventListener('keydown', function(e) {
         <h2 class="section-title" data-reveal>What I'm working on</h2>
         <div class="currently-stack">
 
-            <!-- BUILDING panel -->
+            <!-- BUILDING panels -->
+            <th:block th:each="bp : ${buildingProjects}">
             <div class="glass-card building-panel" data-reveal>
                 <div class="panel-eyebrow"><span class="panel-dot building-dot"></span> BUILDING</div>
-                <h3 class="building-title" th:text="${about.buildingProjectTitle} ?: 'Portfolio Admin System'"></h3>
-                <p class="building-desc" th:text="${about.buildingProjectDesc} ?: 'Full-stack portfolio with Spring Boot admin panel, REST APIs, Thymeleaf templates, and MySQL — deployed on Render.'"></p>
-                <div class="building-tech">
-                    <span class="tech-chip" th:each="t : ${#strings.arraySplit((about.buildingTechStack ?: 'Spring Boot|MySQL|Thymeleaf|REST API'), '|')}" th:text="${t.trim()}"></span>
+                <h3 class="building-title" th:text="${bp.title}"></h3>
+                <p class="building-desc" th:if="${bp.description}" th:text="${bp.description}"></p>
+                <div class="building-tech" th:if="${bp.techStack}">
+                    <span class="tech-chip" th:each="t : ${#strings.arraySplit(bp.techStack, '|')}" th:text="${t.trim()}"></span>
                 </div>
                 <div class="building-actions">
-                    <a th:if="${about.buildingProjectUrl}" th:href="@{${about.buildingProjectUrl}}" target="_blank" class="glass-btn primary" style="font-size:0.85rem; padding:9px 20px;">
+                    <a th:if="${bp.projectUrl}" th:href="@{${bp.projectUrl}}" target="_blank" class="glass-btn primary" style="font-size:0.85rem; padding:9px 20px;">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Project
                     </a>
-                    <span class="building-status-chip" th:text="${about.buildingStatus} ?: 'In Progress'"></span>
+                    <span class="building-status-chip" th:text="${bp.status} ?: 'In Progress'"></span>
                 </div>
             </div>
+            </th:block>
+            <th:block th:if="${buildingProjects == null or buildingProjects.isEmpty()}">
+            <div class="glass-card building-panel" data-reveal>
+                <div class="panel-eyebrow"><span class="panel-dot building-dot"></span> BUILDING</div>
+                <h3 class="building-title">Portfolio Admin System</h3>
+                <p class="building-desc">Full-stack portfolio with Spring Boot admin panel, REST APIs, Thymeleaf templates, and MySQL.</p>
+                <div class="building-tech">
+                    <span class="tech-chip">Spring Boot</span><span class="tech-chip">MySQL</span><span class="tech-chip">Thymeleaf</span><span class="tech-chip">REST API</span>
+                </div>
+                <div class="building-actions">
+                    <span class="building-status-chip">In Progress</span>
+                </div>
+            </div>
+            </th:block>
 
             <!-- LEARNING panel -->
             <div class="glass-card learning-panel" data-reveal>

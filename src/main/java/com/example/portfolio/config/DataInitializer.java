@@ -2,7 +2,9 @@ package com.example.portfolio.config;
 
 import com.example.portfolio.entity.AboutInfo;
 import com.example.portfolio.entity.Admin;
+import com.example.portfolio.entity.BuildingProject;
 import com.example.portfolio.entity.Certificate;
+import com.example.portfolio.entity.LearningProject;
 import com.example.portfolio.entity.EducationEntry;
 import com.example.portfolio.entity.Experience;
 import com.example.portfolio.entity.Project;
@@ -11,7 +13,9 @@ import com.example.portfolio.entity.Skill;
 import com.example.portfolio.entity.Testimonial;
 import com.example.portfolio.repository.AboutInfoRepository;
 import com.example.portfolio.repository.AdminRepository;
+import com.example.portfolio.repository.BuildingProjectRepository;
 import com.example.portfolio.repository.CertificateRepository;
+import com.example.portfolio.repository.LearningProjectRepository;
 import com.example.portfolio.repository.EducationEntryRepository;
 import com.example.portfolio.repository.ExperienceRepository;
 import com.example.portfolio.repository.ProjectRepository;
@@ -44,6 +48,8 @@ public class DataInitializer implements CommandLineRunner {
     private final CertificateRepository certificateRepository;
     private final ServiceItemRepository serviceItemRepository;
     private final TestimonialRepository testimonialRepository;
+    private final BuildingProjectRepository buildingProjectRepository;
+    private final LearningProjectRepository learningProjectRepository;
     private final GithubStatsService githubStatsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -59,6 +65,8 @@ public class DataInitializer implements CommandLineRunner {
                             ExperienceRepository experienceRepository, ProjectRepository projectRepository,
                             CertificateRepository certificateRepository, ServiceItemRepository serviceItemRepository,
                             TestimonialRepository testimonialRepository,
+                            BuildingProjectRepository buildingProjectRepository,
+                            LearningProjectRepository learningProjectRepository,
                             GithubStatsService githubStatsService, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.aboutInfoRepository = aboutInfoRepository;
@@ -69,6 +77,8 @@ public class DataInitializer implements CommandLineRunner {
         this.certificateRepository = certificateRepository;
         this.serviceItemRepository = serviceItemRepository;
         this.testimonialRepository = testimonialRepository;
+        this.buildingProjectRepository = buildingProjectRepository;
+        this.learningProjectRepository = learningProjectRepository;
         this.githubStatsService = githubStatsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -78,6 +88,8 @@ public class DataInitializer implements CommandLineRunner {
         seedAdmin();
         seedAbout();
         seedEducation();
+        seedBuildingProjects();
+        seedLearningProjects();
         seedSkills();
         seedExperience();
         seedProjects();
@@ -130,6 +142,47 @@ public class DataInitializer implements CommandLineRunner {
             info.setFooterTagline("Full Stack Developer");
             info.setFooterSub("Building clean, scalable software with Java & Spring Boot.");
             aboutInfoRepository.save(info);
+        }
+    }
+
+    private void seedLearningProjects() {
+        if (learningProjectRepository.count() == 0) {
+            // Migrate existing currentlyLearning text from AboutInfo if present
+            String existingSummary = aboutInfoRepository.findAll().stream().findFirst()
+                    .map(a -> a.getCurrentlyLearning()).orElse(null);
+            String existingPath = aboutInfoRepository.findAll().stream().findFirst()
+                    .map(a -> a.getLearningPath()).orElse(null);
+            String existingCards = aboutInfoRepository.findAll().stream().findFirst()
+                    .map(a -> a.getLearningCards()).orElse(null);
+
+            LearningProject lp1 = new LearningProject();
+            lp1.setTitle("Spring Boot Advanced");
+            lp1.setSummary(existingSummary != null ? existingSummary : "Deepening backend expertise with advanced Spring Boot patterns, security, and microservices.");
+            lp1.setLearningPath(existingPath != null ? existingPath : "Spring Boot Advanced|Security|Microservices|JPA");
+            lp1.setLearningCards(existingCards != null ? existingCards :
+                "Spring Boot Advanced::fa-solid fa-leaf::Backend::Security, microservices & JPA|" +
+                "DSA Practice::fa-solid fa-code::Algorithms::Daily problem solving|" +
+                "System Design::fa-solid fa-sitemap::Architecture::Scalable distributed systems|" +
+                "React + Next.js::fa-brands fa-react::Frontend::Modern full-stack web apps|" +
+                "Cloud & DevOps::fa-brands fa-aws::DevOps::AWS, Docker & CI/CD pipelines");
+            lp1.setStatus("In Progress");
+            lp1.setSortOrder(1);
+            learningProjectRepository.save(lp1);
+        }
+    }
+
+    private void seedBuildingProjects() {
+        if (buildingProjectRepository.count() == 0) {
+            BuildingProject bp = new BuildingProject();
+            bp.setTitle("Portfolio Admin System");
+            bp.setSummary("Building a full-stack portfolio management system with a Spring Boot backend, admin panel, CRUD operations, and database integration.");
+            bp.setDescription("Full-stack portfolio management system with a Spring Boot admin panel for managing profile, skills, projects, experience, education, and other portfolio content.");
+            bp.setTechStack("Java|Spring Boot|Spring MVC|MySQL|Thymeleaf|REST API");
+            bp.setProjectUrl("https://github.com/princegupt1234");
+            bp.setStatus("In Progress");
+            bp.setProgress(65);
+            bp.setSortOrder(1);
+            buildingProjectRepository.save(bp);
         }
     }
 
