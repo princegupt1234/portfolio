@@ -29,4 +29,4 @@ COPY --from=build /app/target/*.jar app.jar
 EXPOSE 10000
 
 # Start Spring Boot
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xms64m", "-Xmx256m", "-XX:+UseSerialGC", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
