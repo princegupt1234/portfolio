@@ -458,6 +458,49 @@ document.addEventListener('keydown', function(e) {
     </div>
 </section>
 
+<!-- ===================== SERVICES ===================== -->
+<section class="section" id="services">
+    <div class="container">
+        <div class="section-tag">Services</div>
+        <h2 class="section-title" data-reveal>What I can do for you</h2>
+        <div class="services-grid" th:if="${services != null and !services.isEmpty()}">
+            <div class="service-card glass-card" data-reveal th:each="svc : ${services}">
+                <div class="service-icon"><i th:class="${svc.icon} ?: 'fa-solid fa-code'"></i></div>
+                <h3 class="service-title" th:text="${svc.title}"></h3>
+                <p class="service-desc" th:text="${svc.description}"></p>
+            </div>
+        </div>
+        <div th:unless="${services != null and !services.isEmpty()}" class="empty-state">No services added yet.</div>
+    </div>
+</section>
+
+<!-- ===================== TESTIMONIALS ===================== -->
+<section class="section" id="testimonials">
+    <div class="container">
+        <div class="section-tag">Testimonials</div>
+        <h2 class="section-title" data-reveal>What people say</h2>
+        <div class="testimonials-grid" th:if="${testimonials != null and !testimonials.isEmpty()}">
+            <div class="testimonial-card glass-card" data-reveal th:each="t : ${testimonials}">
+                <div class="testimonial-stars">
+                    <th:block th:each="i : ${#numbers.sequence(1, t.rating ?: 5)}">
+                        <i class="fa-solid fa-star"></i>
+                    </th:block>
+                </div>
+                <p class="testimonial-comment" th:text="${t.comment}"></p>
+                <div class="testimonial-author">
+                    <img th:if="${t.photoUrl}" th:src="${t.photoUrl}" class="testimonial-photo" alt="photo" />
+                    <div class="testimonial-author-initials" th:unless="${t.photoUrl}" th:text="${#strings.substring(t.name,0,1)}"></div>
+                    <div>
+                        <div class="testimonial-name" th:text="${t.name}"></div>
+                        <div class="testimonial-role" th:text="${t.role}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:unless="${testimonials != null and !testimonials.isEmpty()}" class="empty-state">No testimonials yet.</div>
+    </div>
+</section>
+
 <!-- ===================== CONTACT ===================== -->
 <section class="section" id="contact">
     <div class="container">
