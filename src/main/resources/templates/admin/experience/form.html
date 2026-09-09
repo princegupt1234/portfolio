@@ -35,7 +35,8 @@
                     <div class="form-group full"><label>Description (one achievement per line — no bullet prefix needed)</label><textarea class="glass-textarea" th:field="*{description}" rows="6" placeholder="Built REST APIs using Spring Boot&#10;Implemented CRUD operations with MySQL&#10;Integrated frontend with backend APIs"></textarea><small style="color:var(--text-secondary); font-size:0.82rem;">Each line becomes a bullet point. Do not include company certifications or credential IDs here.</small></div>
                     <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
                     <div class="form-group full" style="flex-direction:row; align-items:center; gap:12px;">
-                        <label class="toggle-switch"><input type="checkbox" th:field="*{visible}" /><span class="toggle-slider"></span></label>
+                        <input type="hidden" name="visible" value="false"/>
+                        <label class="toggle-switch"><input type="checkbox" name="visible" value="true" th:checked="*{visible}"/><span class="toggle-slider"></span></label>
                         <label style="margin:0;">Visible on portfolio</label>
                     </div>
                     <div class="form-actions form-group full">

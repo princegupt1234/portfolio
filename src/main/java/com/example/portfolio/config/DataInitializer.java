@@ -125,6 +125,10 @@ public class DataInitializer implements CommandLineRunner {
             info.setGithubUsername("princegupt1234");
             info.setHeroTechStack("Java|Spring Boot|REST APIs|MySQL|React");
             info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA problem solving, and exploring React + Next.js for modern frontends.");
+            info.setAvailabilityText("Open to opportunities");
+            info.setAvailabilityVisible(true);
+            info.setFooterTagline("Full Stack Developer");
+            info.setFooterSub("Building clean, scalable software with Java & Spring Boot.");
             aboutInfoRepository.save(info);
         }
     }

@@ -33,7 +33,8 @@
                         <div class="file-drop"><input type="file" name="photoFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload photo</div></div>
                     </div>
                     <div class="form-group" style="flex-direction:row; align-items:center; gap:12px;">
-                        <label class="toggle-switch"><input type="checkbox" th:field="*{published}" /><span class="toggle-slider"></span></label>
+                        <input type="hidden" name="published" value="false"/>
+                        <label class="toggle-switch"><input type="checkbox" name="published" value="true" th:checked="*{published}"/><span class="toggle-slider"></span></label>
                         <label style="margin:0;">Published (visible on site)</label>
                     </div>
                     <div class="form-actions form-group full">

@@ -87,6 +87,15 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String contactMessage;
 
+    private String availabilityText;
+    private Boolean availabilityVisible;
+
+    @Column(length = 255)
+    private String footerTagline;
+
+    @Column(columnDefinition = "TEXT")
+    private String footerSub;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getFullName() { return fullName; }
@@ -157,4 +166,12 @@ public class AboutInfo {
     public void setLearningCards(String learningCards) { this.learningCards = learningCards; }
     public String getContactMessage() { return contactMessage; }
     public void setContactMessage(String contactMessage) { this.contactMessage = contactMessage; }
+    public String getAvailabilityText() { return availabilityText; }
+    public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
+    public Boolean getAvailabilityVisible() { return availabilityVisible; }
+    public void setAvailabilityVisible(Boolean availabilityVisible) { this.availabilityVisible = availabilityVisible; }
+    public String getFooterTagline() { return footerTagline; }
+    public void setFooterTagline(String footerTagline) { this.footerTagline = footerTagline; }
+    public String getFooterSub() { return footerSub; }
+    public void setFooterSub(String footerSub) { this.footerSub = footerSub; }
 }

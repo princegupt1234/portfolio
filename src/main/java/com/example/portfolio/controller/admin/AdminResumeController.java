@@ -1,6 +1,6 @@
 package com.example.portfolio.controller.admin;
 
-import com.example.portfolio.entity.AboutInfo;
+
 import com.example.portfolio.entity.Resume;
 import com.example.portfolio.repository.AboutInfoRepository;
 import com.example.portfolio.repository.ResumeRepository;

@@ -100,7 +100,7 @@
                 <div class="info-grid" style="margin-top:24px;">
                     <div th:if="${about.email}"><div class="label">Email</div><div class="value" th:text="${about.email}"></div></div>
                     <div th:if="${about.location}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
-                    <div><div class="label">Availability</div><div class="value" style="color:var(--success);">Open to opportunities</div></div>
+                    <div th:if="${about.availabilityVisible == null or about.availabilityVisible}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
                     <div th:if="${about.phone}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
                 </div>
             </div>
@@ -286,7 +286,7 @@
         <div class="section-tag">Certifications</div>
         <h2 class="section-title" data-reveal>Certifications &amp; achievements</h2>
         <div class="cert-carousel" data-reveal>
-            <div class="glass-card cert-card" th:each="cert : ${certificates}" th:attr="data-cert-preview=${cert.imageUrl}">
+            <div class="glass-card cert-card" th:each="cert : ${certificates}" th:attr="data-cert-preview=${cert.imageUrl}" style="cursor:pointer;" onclick="openCertModal(this)">
                 <div class="cert-thumb">
                     <img th:if="${cert.imageUrl}" th:src="@{${cert.imageUrl}}" th:alt="${cert.title}" loading="lazy" />
                     <i th:unless="${cert.imageUrl}" class="fa-solid fa-certificate" style="font-size:2rem; color: var(--text-secondary);"></i>
@@ -303,13 +303,66 @@
     </div>
 </section>
 
-<div id="certModal" style="position:fixed; inset:0; background:rgba(3,7,18,0.85); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; z-index:200;">
-    <style>#certModal.open{display:flex;}</style>
-    <div style="position:relative; max-width:90vw; max-height:85vh;">
-        <button class="modal-close glass-btn" style="position:absolute; top:-46px; right:0;"><i class="fa-solid fa-xmark"></i></button>
-        <img id="certModalImg" src="" alt="Certificate preview" style="max-width:90vw; max-height:85vh; border-radius:16px; border:1px solid var(--glass-border);" />
+<div id="certModal" style="position:fixed; inset:0; background:rgba(3,7,18,0.92); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; z-index:200;" onclick="if(event.target===this)closeCertModal()">
+    <style>#certModal.open{display:flex;} #certModal img{transition:transform .2s;}</style>
+    <div style="position:relative; max-width:92vw; max-height:90vh; display:flex; flex-direction:column; align-items:center; gap:12px;">
+        <div style="display:flex; justify-content:flex-end; width:100%; gap:10px;">
+            <button class="glass-btn" onclick="zoomCert(-1)" title="Zoom out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+            <button class="glass-btn" onclick="zoomCert(1)" title="Zoom in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+            <button class="glass-btn" onclick="closeCertModal()" title="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="overflow:auto; max-width:92vw; max-height:80vh; border-radius:16px;">
+            <img id="certModalImg" src="" alt="Certificate preview" style="display:block; max-width:100%; border-radius:16px; border:1px solid var(--glass-border); transform-origin:top left;" />
+        </div>
+        <div id="certModalNav" style="display:flex; gap:12px; align-items:center;">
+            <button class="glass-btn" onclick="navCert(-1)"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+            <span id="certModalCounter" style="font-size:0.85rem; color:var(--text-secondary);"></span>
+            <button class="glass-btn" onclick="navCert(1)">Next <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
     </div>
 </div>
+<script>
+var _certScale = 1, _certIdx = 0, _certCards = [];
+function openCertModal(card) {
+    _certCards = Array.from(document.querySelectorAll('.cert-card[data-cert-preview]'));
+    _certIdx = _certCards.indexOf(card);
+    _certScale = 1;
+    _showCert();
+    document.getElementById('certModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function _showCert() {
+    var src = _certCards[_certIdx] ? _certCards[_certIdx].getAttribute('data-cert-preview') : '';
+    var img = document.getElementById('certModalImg');
+    img.src = src || '';
+    img.style.transform = 'scale(1)';
+    _certScale = 1;
+    document.getElementById('certModalCounter').textContent = (_certIdx + 1) + ' / ' + _certCards.length;
+    var hasImg = !!src;
+    document.getElementById('certModalNav').style.display = _certCards.length > 1 ? 'flex' : 'none';
+    img.style.display = hasImg ? 'block' : 'none';
+}
+function closeCertModal() {
+    document.getElementById('certModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+function zoomCert(dir) {
+    _certScale = Math.min(3, Math.max(0.5, _certScale + dir * 0.25));
+    document.getElementById('certModalImg').style.transform = 'scale(' + _certScale + ')';
+}
+function navCert(dir) {
+    _certIdx = (_certIdx + dir + _certCards.length) % _certCards.length;
+    _showCert();
+}
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('certModal').classList.contains('open')) return;
+    if (e.key === 'Escape') closeCertModal();
+    if (e.key === 'ArrowRight') navCert(1);
+    if (e.key === 'ArrowLeft') navCert(-1);
+    if (e.key === '+') zoomCert(1);
+    if (e.key === '-') zoomCert(-1);
+});
+</script>
 
 <!-- ===================== CURRENTLY BUILDING ===================== -->
 <section class="section" id="currently">
@@ -399,9 +452,9 @@
 
             <!-- Left: Let's Connect panel -->
             <div class="glass-card contact-connect-panel" data-reveal>
-                <div class="connect-availability">
+                <div class="connect-availability" th:if="${about.availabilityVisible == null or about.availabilityVisible}">
                     <span class="avail-dot"></span>
-                    <span class="avail-text">Available for opportunities</span>
+                    <span class="avail-text" th:text="${about.availabilityText} ?: 'Available for opportunities'">Available for opportunities</span>
                 </div>
                 <h3 class="connect-heading">Let's Connect</h3>
                 <p class="connect-msg" th:text="${about.contactMessage} ?: 'I\'m open to full-time roles, freelance projects, and interesting collaborations. Drop a message and I\'ll get back to you within 24 hours.'"></p>
@@ -476,8 +529,8 @@
     <div class="footer-inner">
         <div class="footer-brand">
             <a href="#home" class="logo">Prince<span class="gradient-text">.</span></a>
-            <p class="footer-tagline" th:text="${about.title} ?: 'Full Stack Developer'"></p>
-            <p class="footer-sub">Building clean, scalable software with Java &amp; Spring Boot.</p>
+            <p class="footer-tagline" th:text="${about.footerTagline} ?: (${about.title} ?: 'Full Stack Developer')"></p>
+            <p class="footer-sub" th:text="${about.footerSub} ?: 'Building clean, scalable software with Java &amp; Spring Boot.'">Building clean, scalable software with Java &amp; Spring Boot.</p>
         </div>
         <div class="footer-copy">
             <p>&copy; <span id="year"></span> Prince Gupt</p>

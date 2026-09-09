@@ -1,112 +1,887 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>About | Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+  <meta charset="UTF-8"/><title>About Management | Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+  <style>
+    /* ── About-page extras ── */
+    .about-sections { display:flex; flex-direction:column; gap:22px; }
+
+    .ab-card { border-radius:18px; background:var(--glass-surface); border:1px solid var(--glass-border); backdrop-filter:var(--blur); overflow:hidden; }
+    .ab-card-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 24px; cursor:pointer; user-select:none;
+      border-bottom:1px solid var(--glass-border);
+      transition:background .2s;
+    }
+    .ab-card-header:hover { background:rgba(255,255,255,.03); }
+    .ab-card-header-left { display:flex; align-items:center; gap:14px; }
+    .ab-card-icon {
+      width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+      font-size:.95rem; flex-shrink:0;
+      background:linear-gradient(135deg,rgba(59,130,246,.22),rgba(6,182,212,.14));
+      color:var(--primary); border:1px solid rgba(59,130,246,.25);
+    }
+    .ab-card-title { font-size:1rem; font-weight:600; color:var(--text); }
+    .ab-card-subtitle { font-size:.78rem; color:var(--text-secondary); margin-top:2px; }
+    .ab-chevron { color:var(--text-secondary); transition:transform .3s; font-size:.85rem; }
+    .ab-card.collapsed .ab-chevron { transform:rotate(-90deg); }
+    .ab-card-body { padding:24px; }
+    .ab-card.collapsed .ab-card-body { display:none; }
+
+    /* section description */
+    .sec-desc { font-size:.82rem; color:var(--text-secondary); margin-bottom:18px; padding:10px 14px; background:rgba(255,255,255,.03); border-radius:10px; border-left:3px solid rgba(59,130,246,.4); line-height:1.6; }
+
+    /* field label row */
+    .field-label-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; }
+    .field-label-row label { font-size:.84rem; color:var(--text-secondary); font-weight:500; }
+    .char-counter { font-size:.75rem; color:var(--text-secondary); font-family:var(--font-mono); }
+    .char-counter.warn { color:#f97316; }
+    .char-counter.over { color:var(--danger); }
+
+    /* input hint */
+    .field-hint { font-size:.76rem; color:var(--text-secondary); margin-top:5px; line-height:1.5; }
+    .field-hint code { background:rgba(255,255,255,.08); padding:1px 5px; border-radius:4px; font-size:.75rem; }
+    .field-error { font-size:.76rem; color:var(--danger); margin-top:4px; display:none; }
+    .field-error.show { display:block; }
+
+    /* photo preview */
+    .photo-preview-wrap { display:flex; align-items:center; gap:20px; margin-top:14px; flex-wrap:wrap; }
+    .photo-circle {
+      width:88px; height:88px; border-radius:50%; object-fit:cover;
+      border:2px solid var(--glass-border); background:rgba(255,255,255,.06);
+      display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:2rem; flex-shrink:0;
+    }
+    .photo-circle img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+    .photo-info { font-size:.8rem; color:var(--text-secondary); line-height:1.7; }
+
+    /* phrase list */
+    .phrase-item {
+      display:flex; align-items:center; gap:8px; padding:9px 12px;
+      border-radius:11px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+    }
+    .phrase-item-text { flex:1; font-family:var(--font-mono); font-size:.88rem; color:#f1f5f9; }
+    .phrase-item-len { font-size:.72rem; color:var(--text-secondary); font-family:var(--font-mono); white-space:nowrap; }
+    .phrase-item-len.warn { color:#f97316; }
+    .phrase-btn { border:none; border-radius:8px; padding:5px 9px; cursor:pointer; font-size:.78rem; line-height:1; }
+    .phrase-btn.up, .phrase-btn.dn { background:rgba(255,255,255,.08); color:#cbd5e1; }
+    .phrase-btn.rm { background:rgba(251,113,133,.14); color:#fca5a5; }
+    .phrase-btn:hover { opacity:.8; }
+
+    /* tech chip preview */
+    .chip-preview-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; min-height:32px; }
+    .chip-preview { padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:500; background:rgba(59,130,246,.15); color:#93c5fd; border:1px solid rgba(59,130,246,.3); }
+
+    /* progress bar */
+    .progress-bar-wrap { height:6px; border-radius:999px; background:rgba(255,255,255,.08); margin-top:8px; overflow:hidden; }
+    .progress-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--primary),var(--secondary)); transition:width .3s; }
+
+    /* learning card preview */
+    .lc-preview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:12px; }
+    .lc-preview-card {
+      padding:14px; border-radius:13px; background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.09); display:flex; flex-direction:column; gap:6px;
+    }
+    .lc-preview-icon { font-size:1.1rem; color:var(--primary); }
+    .lc-preview-cat { font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:var(--text-secondary); }
+    .lc-preview-title { font-size:.85rem; font-weight:600; color:var(--text); }
+    .lc-preview-desc { font-size:.75rem; color:var(--text-secondary); line-height:1.5; }
+    .lc-preview-empty { font-size:.82rem; color:var(--text-secondary); padding:10px 0; }
+
+    /* availability toggle row */
+    .avail-row { display:flex; align-items:center; gap:12px; padding:12px 0; }
+    .avail-row label { font-size:.88rem; color:var(--text); cursor:pointer; }
+
+    /* save bar */
+    .save-bar {
+      position:sticky; bottom:0; z-index:30;
+      background:rgba(3,7,18,.88); backdrop-filter:blur(12px);
+      border-top:1px solid var(--glass-border);
+      padding:14px 28px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    }
+    .save-bar-msg { font-size:.83rem; color:var(--text-secondary); }
+    .save-bar-msg.saved { color:var(--success); }
+    .save-bar-msg.error { color:var(--danger); }
+
+    @media(max-width:700px){
+      .ab-card-body { padding:16px; }
+      .save-bar { padding:12px 14px; }
+    }
+  </style>
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
 <div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(active='about')}"></div>
-    <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='About', unread=0)}"></div>
-        <div class="admin-content">
-            <div class="page-header"><h1>About Management</h1></div>
+  <div th:replace="~{admin/fragments/sidebar :: sidebar(active='about')}"></div>
+  <div class="admin-main">
+    <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='About Management', unread=0)}"></div>
+    <div class="admin-content">
 
-            <div class="glass-card" style="margin-bottom:24px;">
-                <h3 style="margin-bottom:18px;">Profile</h3>
-                <form th:action="@{/admin/about/save}" th:object="${about}" method="post" enctype="multipart/form-data" class="form-grid">
-                    <input type="hidden" th:field="*{id}" />
-                    <div class="form-group full">
-                        <label>Profile Photo</label>
-                        <div class="file-drop"><input type="file" name="photoFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload / replace photo</div></div>
-                        <img th:if="*{profileImage}" th:src="@{*{profileImage}}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-top:10px;" />
-                    </div>
-                    <div class="form-group"><label>Full Name</label><input class="glass-input" th:field="*{fullName}" /></div>
-                    <div class="form-group"><label>Title</label><input class="glass-input" th:field="*{title}" /></div>
-                    <div class="form-group full"><label>Hero Eyebrow</label><input class="glass-input" th:field="*{heroEyebrow}" placeholder="// Hello, I'm" /></div>
-                    <div class="form-group full"><label>Hero Typed Phrases</label><textarea class="glass-textarea" id="heroPhrasesInput" th:field="*{heroPhrases}" rows="3" placeholder="Full Stack Developer|Java + Spring Boot Enthusiast|React & Next.js Developer|Final Year CSE Student"></textarea>
-                        <small style="color:var(--text-secondary); font-size:0.85rem;">Separate phrases with <code>|</code>. Each phrase should be under 60 characters and non-empty.</small>
-                        <div id="heroPhraseValidation" style="color:#f97316; font-size:0.85rem; margin-top:6px;"></div>
-                        <div id="heroPhraseList" style="margin-top:14px; display:grid; gap:10px;"></div>
-                        <div id="heroPreview" style="margin-top:14px; padding:12px; border:1px solid rgba(255,255,255,0.12); border-radius:14px; background:rgba(255,255,255,0.04); color:#e2e8f0; font-family:var(--font-mono); font-size:0.95rem;"></div>
-                    </div>
-                    <div class="form-group"><label>Typing Speed (ms per char)</label><input class="glass-input" type="number" min="10" max="200" th:field="*{heroTypingSpeed}" /></div>
-                    <div class="form-group"><label>Deleting Speed (ms per char)</label><input class="glass-input" type="number" min="10" max="200" th:field="*{heroDeletingSpeed}" /></div>
-                    <div class="form-group"><label>Pause Duration (ms)</label><input class="glass-input" type="number" min="200" max="5000" th:field="*{heroPauseDuration}" /></div>
-                    <div class="form-group"><label>Primary CTA Label</label><input class="glass-input" th:field="*{heroPrimaryCtaLabel}" placeholder="View Projects" /></div>
-                    <div class="form-group"><label>Primary CTA Link</label><input class="glass-input" th:field="*{heroPrimaryCtaLink}" placeholder="#projects" /></div>
-                    <div class="form-group"><label>Secondary CTA Label</label><input class="glass-input" th:field="*{heroSecondaryCtaLabel}" placeholder="Contact Me" /></div>
-                    <div class="form-group"><label>Secondary CTA Link</label><input class="glass-input" th:field="*{heroSecondaryCtaLink}" placeholder="#contact" /></div>
-                    <div class="form-group full"><label>Bio</label><textarea class="glass-textarea" th:field="*{bio}" rows="3"></textarea></div>
-                    <div class="form-group full"><label>Career Objective</label><textarea class="glass-textarea" th:field="*{careerObjective}" rows="3"></textarea></div>
-                    <div class="form-group"><label>Phone</label><input class="glass-input" th:field="*{phone}" /></div>
-                    <div class="form-group"><label>Email</label><input class="glass-input" th:field="*{email}" /></div>
-                    <div class="form-group"><label>Location</label><input class="glass-input" th:field="*{location}" /></div>
-                    <div class="form-group"><label>GitHub URL</label><input class="glass-input" th:field="*{githubUrl}" /></div>
-                    <div class="form-group"><label>LinkedIn URL</label><input class="glass-input" th:field="*{linkedinUrl}" /></div>
-                    <div class="form-group"><label>WhatsApp Link</label><input class="glass-input" th:field="*{whatsappUrl}" /></div>
-                    <div class="form-group"><label>GitHub Username (for stats)</label><input class="glass-input" th:field="*{githubUsername}" /></div>
-                    <div class="form-group full"><label>Hero Tech Stack</label><input class="glass-input" th:field="*{heroTechStack}" placeholder="Java|Spring Boot|REST APIs|MySQL|React" /><small style="color:var(--text-secondary); font-size:0.82rem;">Pipe-separated. Shown as chips below your bio.</small></div>
-                    <div class="form-group full"><label>Currently Building — Summary</label><textarea class="glass-textarea" th:field="*{currentlyBuilding}" rows="2" placeholder="Short note shown above the building panel..."></textarea></div>
-                    <div class="form-group"><label>Building — Project Title</label><input class="glass-input" th:field="*{buildingProjectTitle}" placeholder="Portfolio Admin System" /></div>
-                    <div class="form-group"><label>Building — Status</label><input class="glass-input" th:field="*{buildingStatus}" placeholder="In Progress" /></div>
-                    <div class="form-group"><label>Building — Progress %</label><input class="glass-input" type="number" min="0" max="100" th:field="*{buildingProgress}" placeholder="65" /></div>
-                    <div class="form-group"><label>Building — Project URL</label><input class="glass-input" th:field="*{buildingProjectUrl}" placeholder="https://..." /></div>
-                    <div class="form-group full"><label>Building — Short Description</label><textarea class="glass-textarea" th:field="*{buildingProjectDesc}" rows="2" placeholder="Full-stack portfolio with Spring Boot admin panel..."></textarea></div>
-                    <div class="form-group full"><label>Building — Tech Stack</label><input class="glass-input" th:field="*{buildingTechStack}" placeholder="Spring Boot|MySQL|Thymeleaf|REST API" /><small style="color:var(--text-secondary); font-size:0.82rem;">Pipe-separated.</small></div>
-                    <div class="form-group full"><label>Currently Learning — Summary</label><textarea class="glass-textarea" th:field="*{currentlyLearning}" rows="2" placeholder="Deepening backend expertise and problem-solving skills..."></textarea></div>
-                    <div class="form-group full"><label>Learning Path</label><input class="glass-input" th:field="*{learningPath}" placeholder="Spring Boot Advanced|DSA Practice|System Design|React + Next.js|Cloud &amp; DevOps" /><small style="color:var(--text-secondary); font-size:0.82rem;">Pipe-separated steps (legacy field, kept for reference).</small></div>
-                    <div class="form-group full">
-                        <label>Learning Cards</label>
-                        <textarea class="glass-textarea" th:field="*{learningCards}" rows="5" placeholder="Spring Boot Advanced::fa-solid fa-leaf::Backend::Security, microservices &amp; JPA|DSA Practice::fa-solid fa-code::Algorithms::Daily problem solving practice|System Design::fa-solid fa-sitemap::Architecture::Scalable distributed systems|React + Next.js::fa-brands fa-react::Frontend::Modern full-stack web apps|Cloud &amp; DevOps::fa-brands fa-aws::DevOps::AWS, Docker &amp; CI/CD pipelines"></textarea>
-                        <small style="color:var(--text-secondary); font-size:0.82rem;">Pipe <code>|</code> separates cards. Each card: <code>Title::fa-icon-class::Category::One-line desc</code>. Up to 5 cards recommended.</small>
-                    </div>
-                    <div class="form-group full"><label>Contact Panel Message</label><textarea class="glass-textarea" th:field="*{contactMessage}" rows="2" placeholder="I'm open to full-time roles, freelance projects, and interesting collaborations..."></textarea><small style="color:var(--text-secondary); font-size:0.82rem;">Shown in the Let's Connect panel on the Contact section.</small></div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save About</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="glass-card">
-                <h3 style="margin-bottom:18px;">Education Timeline</h3>
-                <div class="glass-table-wrap" style="margin-bottom:22px;">
-                    <table class="glass-table">
-                        <thead><tr><th>Degree</th><th>Institution</th><th>Duration</th><th>Score</th><th>Actions</th></tr></thead>
-                        <tbody>
-                        <tr th:each="edu : ${education}">
-                            <td th:text="${edu.degree}">Degree</td>
-                            <td th:text="${edu.institution}">Institution</td>
-                            <td th:text="${edu.duration}">Duration</td>
-                            <td th:text="${edu.scoreLabel}">Score</td>
-                            <td>
-                                <form th:action="@{'/admin/about/education/' + ${edu.id} + '/delete'}" method="post" data-confirm="Delete this entry?" style="margin:0;">
-                                    <button type="submit" class="action-icons danger" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <h4 style="margin-bottom:14px;">Add Education Entry</h4>
-                <form th:action="@{/admin/about/education/save}" th:object="${newEducation}" method="post" class="form-grid">
-                    <div class="form-group"><label>Degree</label><input class="glass-input" th:field="*{degree}" /></div>
-                    <div class="form-group"><label>Institution</label><input class="glass-input" th:field="*{institution}" /></div>
-                    <div class="form-group"><label>Duration</label><input class="glass-input" th:field="*{duration}" /></div>
-                    <div class="form-group"><label>Score</label><input class="glass-input" th:field="*{scoreLabel}" /></div>
-                    <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Entry</button>
-                    </div>
-                </form>
-            </div>
+      <div class="page-header">
+        <div>
+          <h1>About Management</h1>
+          <p style="font-size:.82rem;color:var(--text-secondary);margin-top:4px;">Edit every section of your public portfolio from one place.</p>
         </div>
-    </div>
-</div>
+        <a href="#" onclick="document.getElementById('aboutForm').requestSubmit();return false;" class="glass-btn primary">
+          <i class="fa-solid fa-floppy-disk"></i> Save All
+        </a>
+      </div>
+
+      <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:field="*{id}"/>
+        <div class="about-sections">
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 1 · PROFILE & HERO
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-profile">
+            <div class="ab-card-header" onclick="toggleSection('sec-profile')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-solid fa-user"></i></div>
+                <div>
+                  <div class="ab-card-title">Profile &amp; Hero</div>
+                  <div class="ab-card-subtitle">Photo, name, typed phrases, CTA buttons</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">This section controls the hero banner — the very first thing visitors see. Keep the typed phrases punchy and under 60 characters each.</p>
+
+              <!-- Photo -->
+              <div class="form-group" style="margin-bottom:20px;">
+                <div class="field-label-row"><label>Profile Photo</label></div>
+                <div class="file-drop" style="cursor:pointer;">
+                  <input type="file" id="photoFileInput" name="photoFile" accept="image/*" style="display:none"/>
+                  <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Click to upload or replace photo</div>
+                </div>
+                <div class="photo-preview-wrap">
+                  <div class="photo-circle" id="photoCircle">
+                    <img th:if="*{profileImage}" th:src="@{*{profileImage}}" id="photoPreviewImg" alt="Profile"/>
+                    <i th:unless="*{profileImage}" class="fa-solid fa-user" id="photoPreviewIcon"></i>
+                  </div>
+                  <div class="photo-info">
+                    Recommended: square image, at least 300×300 px.<br>
+                    Accepted formats: JPG, PNG, WebP.<br>
+                    <span id="photoFileName" style="color:var(--primary);"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <!-- Full Name -->
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="fullName">Full Name</label>
+                    <span class="char-counter" id="cc-fullName"></span>
+                  </div>
+                  <input class="glass-input" id="fullName" th:field="*{fullName}" placeholder="e.g. Prince Gupt" maxlength="80"/>
+                </div>
+                <!-- Title -->
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="title">Title / Role</label>
+                    <span class="char-counter" id="cc-title"></span>
+                  </div>
+                  <input class="glass-input" id="title" th:field="*{title}" placeholder="e.g. Full Stack Developer | Final Year CSE" maxlength="100"/>
+                </div>
+                <!-- Hero Eyebrow -->
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="heroEyebrow">Hero Eyebrow Text</label>
+                    <span class="char-counter" id="cc-heroEyebrow"></span>
+                  </div>
+                  <input class="glass-input" id="heroEyebrow" th:field="*{heroEyebrow}" placeholder="// Hello, I'm" maxlength="60"/>
+                  <span class="field-hint">Small line shown above your name in the hero section.</span>
+                </div>
+
+                <!-- Typed Phrases -->
+                <div class="form-group full">
+                  <div class="field-label-row"><label for="heroPhrasesInput">Hero Typed Phrases</label></div>
+                  <textarea class="glass-textarea" id="heroPhrasesInput" th:field="*{heroPhrases}" rows="2"
+                    placeholder="Full Stack Developer|Java + Spring Boot Enthusiast|React Developer|Final Year CSE Student"></textarea>
+                  <span class="field-hint">Separate phrases with <code>|</code>. Each phrase must be non-empty and ≤ 60 characters. They cycle in the hero typing animation.</span>
+                  <div id="heroPhraseValidation" class="field-error"></div>
+                  <div id="heroPhraseList" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
+                  <div id="heroPreview" style="margin-top:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03);font-family:var(--font-mono);font-size:.88rem;color:#94a3b8;"></div>
+                </div>
+
+                <!-- Typing speeds -->
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroTypingSpeed">Typing Speed <span style="font-size:.72rem;">(ms / char)</span></label></div>
+                  <input class="glass-input" id="heroTypingSpeed" type="number" min="10" max="200" th:field="*{heroTypingSpeed}" placeholder="75"/>
+                  <span class="field-hint">Lower = faster typing. Recommended: 60–90.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroDeletingSpeed">Deleting Speed <span style="font-size:.72rem;">(ms / char)</span></label></div>
+                  <input class="glass-input" id="heroDeletingSpeed" type="number" min="10" max="200" th:field="*{heroDeletingSpeed}" placeholder="35"/>
+                  <span class="field-hint">Lower = faster deletion. Recommended: 25–45.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroPauseDuration">Pause Duration <span style="font-size:.72rem;">(ms)</span></label></div>
+                  <input class="glass-input" id="heroPauseDuration" type="number" min="200" max="5000" th:field="*{heroPauseDuration}" placeholder="1600"/>
+                  <span class="field-hint">How long the phrase stays before deleting. Recommended: 1200–2000.</span>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroPrimaryCtaLabel">Primary CTA Label</label></div>
+                  <input class="glass-input" id="heroPrimaryCtaLabel" th:field="*{heroPrimaryCtaLabel}" placeholder="View Projects"/>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroPrimaryCtaLink">Primary CTA Link</label></div>
+                  <input class="glass-input" id="heroPrimaryCtaLink" th:field="*{heroPrimaryCtaLink}" placeholder="#projects"/>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroSecondaryCtaLabel">Secondary CTA Label</label></div>
+                  <input class="glass-input" id="heroSecondaryCtaLabel" th:field="*{heroSecondaryCtaLabel}" placeholder="Download Resume"/>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="heroSecondaryCtaLink">Secondary CTA Link</label></div>
+                  <input class="glass-input" id="heroSecondaryCtaLink" th:field="*{heroSecondaryCtaLink}" placeholder="/resume/download"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 2 · PERSONAL INFORMATION
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-personal">
+            <div class="ab-card-header" onclick="toggleSection('sec-personal')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-solid fa-id-card"></i></div>
+                <div>
+                  <div class="ab-card-title">Personal Information</div>
+                  <div class="ab-card-subtitle">Bio, career objective, contact details</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">Shown in the About section and the contact info grid. Keep the bio concise — 2–3 sentences work best.</p>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="bio">Bio</label>
+                    <span class="char-counter" id="cc-bio"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="bio" th:field="*{bio}" rows="3" maxlength="400"
+                    placeholder="Final-year B.Tech CSE student comfortable across frontend, backend, and database layers..."></textarea>
+                  <span class="field-hint">Displayed below your name in the hero section. Max 400 characters.</span>
+                </div>
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="careerObjective">Career Objective</label>
+                    <span class="char-counter" id="cc-careerObjective"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="careerObjective" th:field="*{careerObjective}" rows="3" maxlength="500"
+                    placeholder="Seeking an entry-level SDE role or final-year internship..."></textarea>
+                  <span class="field-hint">Shown in the About card alongside your education. Max 500 characters.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="phone">Phone</label></div>
+                  <input class="glass-input" id="phone" type="tel" th:field="*{phone}" placeholder="+91-9876543210"/>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="email">Email</label></div>
+                  <input class="glass-input" id="email" type="email" th:field="*{email}" placeholder="you@example.com"/>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="location">Location</label></div>
+                  <input class="glass-input" id="location" th:field="*{location}" placeholder="Lucknow, Uttar Pradesh"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 3 · SOCIAL & CONTACT LINKS
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-social">
+            <div class="ab-card-header" onclick="toggleSection('sec-social')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-brands fa-github"></i></div>
+                <div>
+                  <div class="ab-card-title">Social &amp; Contact Links</div>
+                  <div class="ab-card-subtitle">GitHub, LinkedIn, WhatsApp, username for stats</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">These links appear in the hero socials row and the Contact section. GitHub Username is used to fetch live repo/follower stats.</p>
+              <div class="form-grid">
+                <div class="form-group">
+                  <div class="field-label-row"><label for="githubUrl">GitHub URL</label></div>
+                  <input class="glass-input url-input" id="githubUrl" type="url" th:field="*{githubUrl}" placeholder="https://github.com/username"/>
+                  <span class="field-error" id="err-githubUrl">Must be a valid URL starting with https://</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="linkedinUrl">LinkedIn URL</label></div>
+                  <input class="glass-input url-input" id="linkedinUrl" type="url" th:field="*{linkedinUrl}" placeholder="https://linkedin.com/in/username"/>
+                  <span class="field-error" id="err-linkedinUrl">Must be a valid URL starting with https://</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="whatsappUrl">WhatsApp Link</label></div>
+                  <input class="glass-input url-input" id="whatsappUrl" type="url" th:field="*{whatsappUrl}" placeholder="https://wa.me/91XXXXXXXXXX"/>
+                  <span class="field-error" id="err-whatsappUrl">Must be a valid URL starting with https://</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="githubUsername">GitHub Username <span style="font-size:.72rem;">(for stats API)</span></label></div>
+                  <input class="glass-input" id="githubUsername" th:field="*{githubUsername}" placeholder="princegupt1234"/>
+                  <span class="field-hint">Only the username — no @ or URL. Used to fetch public repos &amp; followers.</span>
+                  <span class="field-error" id="err-githubUsername">Username must not contain spaces or special characters.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 4 · HERO TECH STACK
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-techstack">
+            <div class="ab-card-header" onclick="toggleSection('sec-techstack')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div>
+                  <div class="ab-card-title">Hero Tech Stack</div>
+                  <div class="ab-card-subtitle">Chips shown below your bio in the hero section</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">Each technology you enter appears as a coloured chip strip below your bio. Separate them with <code>|</code>. Keep each label short (1–3 words).</p>
+              <div class="form-group">
+                <div class="field-label-row"><label for="heroTechStack">Tech Stack</label></div>
+                <input class="glass-input" id="heroTechStack" th:field="*{heroTechStack}"
+                  placeholder="Java|Spring Boot|REST APIs|MySQL|React"/>
+                <span class="field-hint">Pipe-separated. Example: <code>Java|Spring Boot|MySQL|React</code></span>
+              </div>
+              <div style="margin-top:4px;">
+                <div style="font-size:.78rem;color:var(--text-secondary);margin-bottom:6px;">Live chip preview:</div>
+                <div class="chip-preview-row" id="techChipPreview"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 5 · CURRENTLY BUILDING
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-building">
+            <div class="ab-card-header" onclick="toggleSection('sec-building')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-solid fa-hammer"></i></div>
+                <div>
+                  <div class="ab-card-title">Currently Building</div>
+                  <div class="ab-card-subtitle">Active project shown in the "What I'm working on" section</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">Displayed in the "Currently" section of your portfolio. Fill in as much detail as you like — all fields are optional.</p>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="currentlyBuilding">Summary</label>
+                    <span class="char-counter" id="cc-currentlyBuilding"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="currentlyBuilding" th:field="*{currentlyBuilding}" rows="2" maxlength="200"
+                    placeholder="Short note shown above the building panel..."></textarea>
+                  <span class="field-hint">One or two sentences. Max 200 characters.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="buildingProjectTitle">Project Title</label></div>
+                  <input class="glass-input" id="buildingProjectTitle" th:field="*{buildingProjectTitle}" placeholder="Portfolio Admin System"/>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="buildingStatus">Status</label></div>
+                  <input class="glass-input" id="buildingStatus" th:field="*{buildingStatus}" placeholder="In Progress"/>
+                  <span class="field-hint">e.g. In Progress, Beta, Live, Paused</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="buildingProgress">Progress %</label>
+                    <span class="char-counter" id="cc-buildingProgress"></span>
+                  </div>
+                  <input class="glass-input" id="buildingProgress" type="number" min="0" max="100" th:field="*{buildingProgress}" placeholder="65"/>
+                  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div></div>
+                  <span class="field-error" id="err-buildingProgress">Value must be between 0 and 100.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="buildingProjectUrl">Project URL</label></div>
+                  <input class="glass-input url-input" id="buildingProjectUrl" type="url" th:field="*{buildingProjectUrl}" placeholder="https://github.com/you/project"/>
+                  <span class="field-error" id="err-buildingProjectUrl">Must be a valid URL starting with https://</span>
+                </div>
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="buildingProjectDesc">Short Description</label>
+                    <span class="char-counter" id="cc-buildingProjectDesc"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="buildingProjectDesc" th:field="*{buildingProjectDesc}" rows="2" maxlength="300"
+                    placeholder="Full-stack portfolio with Spring Boot admin panel, REST APIs, Thymeleaf templates, and MySQL — deployed on Render."></textarea>
+                </div>
+                <div class="form-group full">
+                  <div class="field-label-row"><label for="buildingTechStack">Tech Stack</label></div>
+                  <input class="glass-input" id="buildingTechStack" th:field="*{buildingTechStack}" placeholder="Spring Boot|MySQL|Thymeleaf|REST API"/>
+                  <span class="field-hint">Pipe-separated. Shown as chips on the building panel.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 6 · CURRENTLY LEARNING
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-learning">
+            <div class="ab-card-header" onclick="toggleSection('sec-learning')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-solid fa-book-open"></i></div>
+                <div>
+                  <div class="ab-card-title">Currently Learning</div>
+                  <div class="ab-card-subtitle">Learning summary, path, and mini-cards</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">Displayed in the "Currently" section alongside the building panel. Learning Cards render as small icon cards — up to 5 recommended.</p>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="currentlyLearning">Summary</label>
+                    <span class="char-counter" id="cc-currentlyLearning"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="currentlyLearning" th:field="*{currentlyLearning}" rows="2" maxlength="300"
+                    placeholder="Deepening backend expertise and problem-solving skills through structured learning and daily practice."></textarea>
+                </div>
+                <div class="form-group full">
+                  <div class="field-label-row"><label for="learningPath">Learning Path</label></div>
+                  <input class="glass-input" id="learningPath" th:field="*{learningPath}"
+                    placeholder="Spring Boot Advanced|DSA Practice|System Design|React + Next.js|Cloud &amp; DevOps"/>
+                  <span class="field-hint">Pipe-separated steps. Legacy field — kept for reference.</span>
+                </div>
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="learningCards">Learning Cards</label>
+                    <span class="char-counter" id="cc-learningCards-count" style="font-size:.75rem;color:var(--text-secondary);"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="learningCards" th:field="*{learningCards}" rows="6"
+                    placeholder="Spring Boot Advanced::fa-solid fa-leaf::Backend::Security, microservices &amp; JPA|DSA Practice::fa-solid fa-code::Algorithms::Daily problem solving|System Design::fa-solid fa-sitemap::Architecture::Scalable distributed systems|React + Next.js::fa-brands fa-react::Frontend::Modern full-stack web apps|Cloud &amp; DevOps::fa-brands fa-aws::DevOps::AWS, Docker &amp; CI/CD pipelines"></textarea>
+                  <span class="field-hint">
+                    Separate cards with <code>|</code>. Each card format: <code>Title::fa-icon-class::Category::One-line description</code><br>
+                    Example: <code>Spring Boot Advanced::fa-solid fa-leaf::Backend::Security &amp; microservices</code><br>
+                    Up to 5 cards recommended.
+                  </span>
+                  <div id="lcCardError" class="field-error"></div>
+                  <!-- Live preview -->
+                  <div style="margin-top:12px;">
+                    <div style="font-size:.78rem;color:var(--text-secondary);margin-bottom:8px;">Live card preview:</div>
+                    <div class="lc-preview-grid" id="lcPreviewGrid"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════════════════════════════════════════════
+               SECTION 7 · CONTACT PANEL, AVAILABILITY & FOOTER
+          ═══════════════════════════════════════════════ -->
+          <div class="ab-card" id="sec-contact">
+            <div class="ab-card-header" onclick="toggleSection('sec-contact')">
+              <div class="ab-card-header-left">
+                <div class="ab-card-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                <div>
+                  <div class="ab-card-title">Contact Panel, Availability &amp; Footer</div>
+                  <div class="ab-card-subtitle">Let's Connect message, availability badge, footer text</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-down ab-chevron"></i>
+            </div>
+            <div class="ab-card-body">
+              <p class="sec-desc">These fields control the "Let's Connect" panel in the Contact section and the footer at the bottom of your portfolio.</p>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <div class="field-label-row">
+                    <label for="contactMessage">Contact Panel Message</label>
+                    <span class="char-counter" id="cc-contactMessage"></span>
+                  </div>
+                  <textarea class="glass-textarea" id="contactMessage" th:field="*{contactMessage}" rows="3" maxlength="300"
+                    placeholder="I'm open to full-time roles, freelance projects, and interesting collaborations. Drop a message and I'll get back to you within 24 hours."></textarea>
+                  <span class="field-hint">Shown in the <strong style="color:var(--text);">Let's Connect</strong> panel on the Contact section. Max 300 characters.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row"><label for="availabilityText">Availability Badge Text</label></div>
+                  <input class="glass-input" id="availabilityText" th:field="*{availabilityText}" placeholder="Open to opportunities"/>
+                  <span class="field-hint">Shown as a green pulsing badge in the About and Contact sections.</span>
+                </div>
+                <div class="form-group" style="justify-content:flex-end;">
+                  <div class="avail-row">
+                    <input type="hidden" name="availabilityVisible" value="false"/>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible == null or availabilityVisible == true}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="availabilityVisible">Show availability badge on portfolio</label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="footerTagline">Footer Tagline</label>
+                    <span class="char-counter" id="cc-footerTagline"></span>
+                  </div>
+                  <input class="glass-input" id="footerTagline" th:field="*{footerTagline}" placeholder="Full Stack Developer" maxlength="80"/>
+                  <span class="field-hint">Shown below your name in the footer.</span>
+                </div>
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="footerSub">Footer Sub-text</label>
+                    <span class="char-counter" id="cc-footerSub"></span>
+                  </div>
+                  <input class="glass-input" id="footerSub" th:field="*{footerSub}" placeholder="Building clean, scalable software with Java &amp; Spring Boot." maxlength="120"/>
+                  <span class="field-hint">One-liner shown below the tagline in the footer.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /about-sections -->
+
+        <!-- Sticky save bar -->
+        <div class="save-bar">
+          <span class="save-bar-msg" id="saveBarMsg">All changes are saved when you click Save.</span>
+          <button type="submit" class="glass-btn primary" id="saveBtn">
+            <i class="fa-solid fa-floppy-disk"></i> Save All Changes
+          </button>
+        </div>
+
+      </form><!-- /aboutForm -->
+
+
+      <!-- ═══════════════════════════════════════════════
+           EDUCATION TIMELINE (separate form, unchanged)
+      ═══════════════════════════════════════════════ -->
+      <div class="ab-card" id="sec-education" style="margin-top:22px;">
+        <div class="ab-card-header" onclick="toggleSection('sec-education')">
+          <div class="ab-card-header-left">
+            <div class="ab-card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div>
+              <div class="ab-card-title">Education Timeline</div>
+              <div class="ab-card-subtitle">Degrees, institutions, scores</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down ab-chevron"></i>
+        </div>
+        <div class="ab-card-body">
+          <div class="glass-table-wrap" style="margin-bottom:22px;">
+            <table class="glass-table">
+              <thead><tr><th>Degree</th><th>Institution</th><th>Duration</th><th>Score</th><th></th></tr></thead>
+              <tbody>
+              <tr th:each="edu : ${education}">
+                <td th:text="${edu.degree}">Degree</td>
+                <td th:text="${edu.institution}">Institution</td>
+                <td th:text="${edu.duration}">Duration</td>
+                <td th:text="${edu.scoreLabel}">Score</td>
+                <td>
+                  <form th:action="@{'/admin/about/education/' + ${edu.id} + '/delete'}" method="post" data-confirm="Delete this education entry?" style="margin:0;">
+                    <button type="submit" class="action-icons danger" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(education)}">
+                <td colspan="5" style="color:var(--text-secondary);text-align:center;padding:20px;">No education entries yet.</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <h4 style="margin-bottom:14px;font-size:.92rem;">Add Education Entry</h4>
+          <form th:action="@{/admin/about/education/save}" th:object="${newEducation}" method="post" class="form-grid">
+            <div class="form-group"><label>Degree / Qualification</label><input class="glass-input" th:field="*{degree}" placeholder="B.Tech, Computer Science"/></div>
+            <div class="form-group"><label>Institution</label><input class="glass-input" th:field="*{institution}" placeholder="University Name"/></div>
+            <div class="form-group"><label>Duration</label><input class="glass-input" th:field="*{duration}" placeholder="Aug 2023 – Aug 2027"/></div>
+            <div class="form-group"><label>Score / Grade</label><input class="glass-input" th:field="*{scoreLabel}" placeholder="Pursuing / 8.5 CGPA / 85%"/></div>
+            <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" placeholder="1"/></div>
+            <div class="form-actions form-group full">
+              <button type="submit" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Entry</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-shell -->
+
 <script th:src="@{/js/admin.js}"></script>
+<script>
+/* ── Collapsible sections ── */
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+/* ── Photo file input ── */
+(function() {
+  var inp = document.getElementById('photoFileInput');
+  var circle = document.getElementById('photoCircle');
+  var nameEl = document.getElementById('photoFileName');
+  if (!inp) return;
+  inp.addEventListener('change', function() {
+    if (!inp.files || !inp.files[0]) return;
+    var file = inp.files[0];
+    nameEl.textContent = file.name;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      circle.innerHTML = '<img src="' + e.target.result + '" alt="Preview"/>';
+    };
+    reader.readAsDataURL(file);
+  });
+  // trigger file dialog on file-drop click
+  var dropZone = document.querySelector('.file-drop');
+  if (dropZone) {
+    dropZone.addEventListener('click', function(e) {
+      if (e.target !== inp) inp.click();
+    });
+  }
+})();
+
+/* ── Character counters ── */
+function initCharCounter(inputId, counterId, max) {
+  var el = document.getElementById(inputId);
+  var cc = document.getElementById(counterId);
+  if (!el || !cc) return;
+  function update() {
+    var len = el.value.length;
+    cc.textContent = len + ' / ' + max;
+    cc.className = 'char-counter' + (len > max ? ' over' : len > max * 0.85 ? ' warn' : '');
+  }
+  el.addEventListener('input', update);
+  update();
+}
+initCharCounter('fullName', 'cc-fullName', 80);
+initCharCounter('title', 'cc-title', 100);
+initCharCounter('heroEyebrow', 'cc-heroEyebrow', 60);
+initCharCounter('bio', 'cc-bio', 400);
+initCharCounter('careerObjective', 'cc-careerObjective', 500);
+initCharCounter('currentlyBuilding', 'cc-currentlyBuilding', 200);
+initCharCounter('buildingProjectDesc', 'cc-buildingProjectDesc', 300);
+initCharCounter('currentlyLearning', 'cc-currentlyLearning', 300);
+initCharCounter('contactMessage', 'cc-contactMessage', 300);
+initCharCounter('footerTagline', 'cc-footerTagline', 80);
+initCharCounter('footerSub', 'cc-footerSub', 120);
+
+/* ── Hero typed phrases ── */
+(function() {
+  var inp = document.getElementById('heroPhrasesInput');
+  var errEl = document.getElementById('heroPhraseValidation');
+  var listEl = document.getElementById('heroPhraseList');
+  var previewEl = document.getElementById('heroPreview');
+  if (!inp) return;
+
+  function getPhrases() {
+    return inp.value.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+  }
+  function setPhrases(arr) {
+    inp.value = arr.join(' | ');
+  }
+  function render() {
+    var phrases = getPhrases();
+    var errors = [];
+    if (!phrases.length) errors.push('Enter at least one phrase.');
+    phrases.forEach(function(p, i) {
+      if (p.length > 60) errors.push('Phrase ' + (i+1) + ' is too long (' + p.length + ' chars, max 60).');
+    });
+    errEl.textContent = errors.join(' ');
+    errEl.className = 'field-error' + (errors.length ? ' show' : '');
+
+    listEl.innerHTML = phrases.map(function(p, i) {
+      var len = p.length;
+      var lenClass = len > 60 ? ' warn' : '';
+      return '<div class="phrase-item">'
+        + '<span class="phrase-item-text">' + (i+1) + '. ' + escHtml(p) + '</span>'
+        + '<span class="phrase-item-len' + lenClass + '">' + len + '/60</span>'
+        + '<button type="button" class="phrase-btn up" data-i="' + i + '" data-dir="-1">▲</button>'
+        + '<button type="button" class="phrase-btn dn" data-i="' + i + '" data-dir="1">▼</button>'
+        + '<button type="button" class="phrase-btn rm" data-i="' + i + '" data-rm="1">✕</button>'
+        + '</div>';
+    }).join('');
+
+    previewEl.textContent = phrases.length
+      ? 'Preview: ' + phrases.slice(0,3).join(' • ') + (phrases.length > 3 ? ' …' : '')
+      : 'Preview: no phrases entered yet.';
+  }
+
+  inp.addEventListener('input', render);
+  listEl.addEventListener('click', function(e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var phrases = getPhrases();
+    var i = parseInt(btn.dataset.i, 10);
+    if (btn.dataset.rm) {
+      phrases.splice(i, 1);
+    } else {
+      var dir = parseInt(btn.dataset.dir, 10);
+      var t = i + dir;
+      if (t >= 0 && t < phrases.length) {
+        var tmp = phrases[i]; phrases[i] = phrases[t]; phrases[t] = tmp;
+      }
+    }
+    setPhrases(phrases);
+    render();
+  });
+  render();
+})();
+
+/* ── Tech stack chip preview ── */
+(function() {
+  var inp = document.getElementById('heroTechStack');
+  var preview = document.getElementById('techChipPreview');
+  if (!inp || !preview) return;
+  function render() {
+    var chips = inp.value.split('|').map(function(t){ return t.trim(); }).filter(Boolean);
+    preview.innerHTML = chips.length
+      ? chips.map(function(c){ return '<span class="chip-preview">' + escHtml(c) + '</span>'; }).join('')
+      : '<span style="font-size:.78rem;color:var(--text-secondary);">No chips yet — enter technologies above.</span>';
+  }
+  inp.addEventListener('input', render);
+  render();
+})();
+
+/* ── Progress bar ── */
+(function() {
+  var inp = document.getElementById('buildingProgress');
+  var bar = document.getElementById('progressBarFill');
+  var err = document.getElementById('err-buildingProgress');
+  var cc  = document.getElementById('cc-buildingProgress');
+  if (!inp) return;
+  function render() {
+    var v = parseInt(inp.value, 10);
+    var valid = !isNaN(v) && v >= 0 && v <= 100;
+    if (bar) bar.style.width = (valid ? v : 0) + '%';
+    if (err) err.className = 'field-error' + (!valid && inp.value !== '' ? ' show' : '');
+    if (cc)  cc.textContent = valid ? v + '%' : '';
+  }
+  inp.addEventListener('input', render);
+  render();
+})();
+
+/* ── URL validation ── */
+document.querySelectorAll('.url-input').forEach(function(inp) {
+  var errId = 'err-' + inp.id;
+  var errEl = document.getElementById(errId);
+  if (!errEl) return;
+  inp.addEventListener('blur', function() {
+    var v = inp.value.trim();
+    var ok = !v || /^https?:\/\/.+/.test(v);
+    errEl.className = 'field-error' + (ok ? '' : ' show');
+  });
+  inp.addEventListener('input', function() {
+    errEl.className = 'field-error';
+  });
+});
+
+/* ── GitHub username validation ── */
+(function() {
+  var inp = document.getElementById('githubUsername');
+  var err = document.getElementById('err-githubUsername');
+  if (!inp || !err) return;
+  inp.addEventListener('blur', function() {
+    var v = inp.value.trim();
+    var ok = !v || /^[a-zA-Z0-9\-]+$/.test(v);
+    err.className = 'field-error' + (ok ? '' : ' show');
+  });
+})();
+
+/* ── Learning cards preview ── */
+(function() {
+  var inp = document.getElementById('learningCards');
+  var grid = document.getElementById('lcPreviewGrid');
+  var countEl = document.getElementById('cc-learningCards-count');
+  var errEl = document.getElementById('lcCardError');
+  if (!inp || !grid) return;
+  function render() {
+    var raw = inp.value.trim();
+    if (!raw) {
+      grid.innerHTML = '<span class="lc-preview-empty">No cards yet — enter card data above.</span>';
+      if (countEl) countEl.textContent = '0 / 5 cards';
+      if (errEl) errEl.className = 'field-error';
+      return;
+    }
+    var cards = raw.split('|').map(function(c){ return c.trim(); }).filter(Boolean);
+    if (countEl) countEl.textContent = cards.length + ' / 5 cards';
+    var errors = [];
+    if (cards.length > 5) errors.push('More than 5 cards — only the first 5 will be shown.');
+    var html = '';
+    cards.slice(0, 5).forEach(function(card, idx) {
+      var parts = card.split('::').map(function(p){ return p.trim(); });
+      if (parts.length < 4) {
+        errors.push('Card ' + (idx+1) + ': expected Title::icon::Category::Description.');
+        html += '<div class="lc-preview-card" style="border-color:rgba(239,68,68,.4);">'
+          + '<div class="lc-preview-icon" style="color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i></div>'
+          + '<div class="lc-preview-cat">Card ' + (idx+1) + '</div>'
+          + '<div class="lc-preview-title" style="color:var(--danger);">Invalid format</div>'
+          + '<div class="lc-preview-desc">' + escHtml(card.substring(0,60)) + '</div>'
+          + '</div>';
+        return;
+      }
+      html += '<div class="lc-preview-card">'
+        + '<div class="lc-preview-icon"><i class="' + escHtml(parts[1]) + '"></i></div>'
+        + '<div class="lc-preview-cat">' + escHtml(parts[2]) + '</div>'
+        + '<div class="lc-preview-title">' + escHtml(parts[0]) + '</div>'
+        + '<div class="lc-preview-desc">' + escHtml(parts[3]) + '</div>'
+        + '</div>';
+    });
+    grid.innerHTML = html;
+    if (errEl) {
+      errEl.textContent = errors.join(' ');
+      errEl.className = 'field-error' + (errors.length ? ' show' : '');
+    }
+  }
+  inp.addEventListener('input', render);
+  render();
+})();
+
+/* ── Save button state ── */
+(function() {
+  var form = document.getElementById('aboutForm');
+  var btn  = document.getElementById('saveBtn');
+  var msg  = document.getElementById('saveBarMsg');
+  if (!form || !btn) return;
+
+  // Mark dirty on any input change
+  var dirty = false;
+  form.querySelectorAll('input,textarea,select').forEach(function(el) {
+    el.addEventListener('input', function() {
+      dirty = true;
+      msg.textContent = 'You have unsaved changes.';
+      msg.className = 'save-bar-msg';
+    });
+  });
+
+  form.addEventListener('submit', function() {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+    msg.textContent = 'Saving changes…';
+    msg.className = 'save-bar-msg';
+    dirty = false;
+  });
+
+  // Warn on page leave if dirty
+  window.addEventListener('beforeunload', function(e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+})();
+
+/* ── Utility ── */
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>

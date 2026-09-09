@@ -35,14 +35,40 @@
             </div>
             <div class="glass-card">
                 <h3 style="margin-bottom:16px;">Reply</h3>
-                <form th:action="@{'/admin/messages/' + ${message.id} + '/reply'}" method="post">
-                    <textarea class="glass-textarea" name="replyText" rows="5" th:text="${message.replyText}" placeholder="Type your reply notes here..."></textarea>
+                <form th:action="@{'/admin/messages/' + ${message.id} + '/reply'}" method="post" id="replyForm">
+                    <textarea class="glass-textarea" name="replyText" id="replyText" rows="5" th:text="${message.replyText}" placeholder="Type your reply notes here..."></textarea>
                     <div class="form-actions">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-reply"></i> Save Reply</button>
-                        <a th:href="'mailto:' + ${message.email}" class="glass-btn"><i class="fa-solid fa-paper-plane"></i> Open in Email</a>
+                        <button type="submit" class="glass-btn primary" id="saveReplyBtn"><i class="fa-solid fa-floppy-disk"></i> Save Reply</button>
+                        <a id="openEmailBtn" href="#" class="glass-btn"
+                           th:attr="data-email=${message.email}, data-subject=${'Re: ' + (message.subject ?: 'Your message')}"
+                        ><i class="fa-solid fa-paper-plane"></i> Open in Email</a>
                     </div>
                 </form>
             </div>
+            <script>
+            (function() {
+                var textarea = document.getElementById('replyText');
+                var emailBtn = document.getElementById('openEmailBtn');
+                var email = emailBtn.dataset.email;
+                var subject = emailBtn.dataset.subject;
+                var form = document.getElementById('replyForm');
+                var saveBtn = document.getElementById('saveReplyBtn');
+
+                function updateEmailBtn() {
+                    emailBtn.href = 'mailto:' + encodeURIComponent(email)
+                        + '?subject=' + encodeURIComponent(subject)
+                        + '&body=' + encodeURIComponent(textarea.value || '');
+                }
+
+                textarea.addEventListener('input', updateEmailBtn);
+                updateEmailBtn();
+
+                form.addEventListener('submit', function() {
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+                });
+            })();
+            </script>
         </div>
     </div>
 </div>
