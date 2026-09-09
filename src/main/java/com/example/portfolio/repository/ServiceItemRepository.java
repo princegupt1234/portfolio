@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ServiceItemRepository extends JpaRepository<ServiceItem, Long> {
     List<ServiceItem> findAllByOrderBySortOrderAsc();
+    List<ServiceItem> findByVisibleTrueOrderBySortOrderAsc();
 }

@@ -125,7 +125,7 @@ public class HomeController {
         List<Experience> experiences = experienceRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Project> projects = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Certificate> certificates = certificateRepository.findByVisibleTrueOrderBySortOrderAsc();
-        List<ServiceItem> services = serviceItemRepository.findAllByOrderBySortOrderAsc();
+        List<ServiceItem> services = serviceItemRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Testimonial> testimonials = testimonialRepository.findByPublishedTrue();
         List<BuildingProject> buildingProjects = buildingProjectRepository.findAllByOrderBySortOrderAsc();
         List<LearningProject> learningProjects = learningProjectRepository.findAllByOrderBySortOrderAsc();

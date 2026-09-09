@@ -305,10 +305,6 @@
 .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 24px; }
 .service-icon { width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 18px; }
 
-/* Testimonials */
-.testimonial-track { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
-.testimonial-track::-webkit-scrollbar { height: 4px; }
-.testimonial-card { min-width: min(320px, 85vw); scroll-snap-align: start; flex-shrink: 0; }
 .stars { color: var(--warning); margin-bottom: 12px; }
 
 /* Contact */

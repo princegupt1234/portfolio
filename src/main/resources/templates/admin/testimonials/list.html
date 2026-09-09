@@ -27,7 +27,12 @@
                         <td th:text="${t.name}">Name</td>
                         <td th:text="${t.role}">Role</td>
                         <td th:text="${t.rating} + ' / 5'">5/5</td>
-                        <td><span class="status-pill" th:classappend="${t.published} ? 'on' : 'off'" th:text="${t.published} ? 'Published' : 'Hidden'">Published</span></td>
+                        <td>
+                            <form th:action="@{'/admin/testimonials/' + ${t.id} + '/toggle-published'}" method="post" style="margin:0;">
+                                <button type="submit" class="status-pill" th:classappend="${t.published} ? 'on' : 'off'"
+                                        th:text="${t.published} ? 'Published' : 'Hidden'">Published</button>
+                            </form>
+                        </td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/testimonials/' + ${t.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>

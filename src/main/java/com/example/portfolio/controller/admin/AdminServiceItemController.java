@@ -48,6 +48,16 @@ public class AdminServiceItemController {
         return "redirect:/admin/services";
     }
 
+    @PostMapping("/{id}/toggle-visible")
+    public String toggleVisible(@PathVariable("id") Long id) {
+        serviceItemRepository.findById(id).ifPresent(s -> {
+            s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
+            serviceItemRepository.save(s);
+        });
+        dataVersionService.bump();
+        return "redirect:/admin/services";
+    }
+
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         serviceItemRepository.deleteById(id);

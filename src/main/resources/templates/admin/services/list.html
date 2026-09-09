@@ -20,12 +20,18 @@
             </div>
             <div class="glass-card glass-table-wrap">
                 <table class="glass-table">
-                    <thead><tr><th>Icon</th><th>Title</th><th>Description</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Icon</th><th>Title</th><th>Description</th><th>Visible</th><th>Actions</th></tr></thead>
                     <tbody>
                     <tr th:each="s : ${services}">
                         <td><i th:class="${s.icon}"></i></td>
                         <td th:text="${s.title}">Title</td>
                         <td th:text="${#strings.abbreviate(s.description, 80)}">Desc</td>
+                        <td>
+                            <form th:action="@{'/admin/services/' + ${s.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                <button type="submit" class="status-pill" th:classappend="${s.visible} ? 'on' : 'off'"
+                                        th:text="${s.visible} ? 'Visible' : 'Hidden'">Visible</button>
+                            </form>
+                        </td>
                         <td>
                             <div class="action-icons">
                                 <a th:href="@{'/admin/services/' + ${s.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>
@@ -35,7 +41,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(services)}"><td colspan="4" style="text-align:center; color:var(--text-secondary);">No services yet.</td></tr>
+                    <tr th:if="${#lists.isEmpty(services)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No services yet.</td></tr>
                     </tbody>
                 </table>
             </div>

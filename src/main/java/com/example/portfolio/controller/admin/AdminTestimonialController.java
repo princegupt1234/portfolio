@@ -61,6 +61,16 @@ public class AdminTestimonialController {
         return "redirect:/admin/testimonials";
     }
 
+    @PostMapping("/{id}/toggle-published")
+    public String togglePublished(@PathVariable("id") Long id) {
+        testimonialRepository.findById(id).ifPresent(t -> {
+            t.setPublished(!Boolean.TRUE.equals(t.getPublished()));
+            testimonialRepository.save(t);
+        });
+        dataVersionService.bump();
+        return "redirect:/admin/testimonials";
+    }
+
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         testimonialRepository.deleteById(id);
