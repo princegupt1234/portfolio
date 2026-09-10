@@ -18,10 +18,13 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.mail.enabled}")
+    @Value("${app.mail.enabled:false}")
     private boolean mailEnabled;
 
-    @Value("${app.mail.notify-to}")
+    @Value("${spring.mail.username:}")
+    private String mailUsername;
+
+    @Value("${app.mail.notify-to:}")
     private String notifyTo;
 
     @Value("${app.mail.reply-from:${spring.mail.username:}}")
@@ -31,8 +34,12 @@ public class MailService {
         this.mailSender = mailSender;
     }
 
+    private boolean isConfigured() {
+        return mailEnabled && mailUsername != null && !mailUsername.isBlank();
+    }
+
     public void notifyNewMessage(String fromName, String fromEmail, String subject, String message) {
-        if (!mailEnabled) {
+        if (!isConfigured()) {
             return;
         }
         try {
@@ -51,8 +58,8 @@ public class MailService {
     }
 
     public boolean sendReply(String toEmail, String toName, String subject, String body, String originalMessage) {
-        if (!mailEnabled) {
-            log.warn("Mail sending is disabled. Reply email not sent to {}", toEmail);
+        if (!isConfigured()) {
+            log.warn("Mail sending is disabled or not configured. Reply email not sent to {}", toEmail);
             return false;
         }
         if (toEmail == null || toEmail.isBlank()) {
