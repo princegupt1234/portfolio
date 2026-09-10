@@ -15,20 +15,23 @@ public class AboutInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String fullName;
+    @Column(columnDefinition = "TEXT")
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String heroEyebrow;
     private Integer heroTypingSpeed;
     private Integer heroDeletingSpeed;
     private Integer heroPauseDuration;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String heroPrimaryCtaLabel;
 
     @Column(columnDefinition = "TEXT")
     private String heroPrimaryCtaLink;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String heroSecondaryCtaLabel;
 
     @Column(columnDefinition = "TEXT")
@@ -43,15 +46,24 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String careerObjective;
 
+    @Column(columnDefinition = "TEXT")
     private String profileImage;
+    @Column(columnDefinition = "TEXT")
     private String resumeUrl;
+    @Column(columnDefinition = "TEXT")
     private String phone;
+    @Column(columnDefinition = "TEXT")
     private String email;
+    @Column(columnDefinition = "TEXT")
     private String location;
 
+    @Column(columnDefinition = "TEXT")
     private String githubUrl;
+    @Column(columnDefinition = "TEXT")
     private String linkedinUrl;
+    @Column(columnDefinition = "TEXT")
     private String whatsappUrl;
+    @Column(columnDefinition = "TEXT")
     private String githubUsername;
 
     @Column(columnDefinition = "TEXT")
@@ -69,10 +81,12 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String currentlyBuilding;
 
+    @Column(columnDefinition = "TEXT")
     private String buildingProjectUrl;
 
     private Integer buildingProgress; // 0-100
 
+    @Column(columnDefinition = "TEXT")
     private String buildingStatus; // e.g. "In Progress", "Beta", "Live"
 
     @Column(columnDefinition = "TEXT")
@@ -87,10 +101,11 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String contactMessage;
 
+    @Column(columnDefinition = "TEXT")
     private String availabilityText;
-    private Boolean availabilityVisible;
+    private Boolean availabilityVisible = false;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String footerTagline;
 
     @Column(columnDefinition = "TEXT")

@@ -77,6 +77,7 @@ table.glass-table tr:hover td { background: rgba(255,255,255,0.03); }
 .status-pill.unread { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
 button.status-pill { cursor: pointer; transition: opacity 0.2s; }
 button.status-pill:hover { opacity: 0.75; }
+button.status-pill:disabled { cursor: wait; opacity: 0.6; min-width: 48px; }
 
 /* Form */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }

@@ -13,16 +13,24 @@ import com.example.portfolio.service.FileStorageService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/about")
@@ -146,6 +154,71 @@ public class AdminAboutController {
         buildingProjectRepository.deleteById(id);
         dataVersionService.bump();
         return "redirect:/admin/about#sec-building";
+    }
+
+    // ── REST API for inline CRUD (used by JS fetch) ──────────────────────────
+
+    @GetMapping("/api/building")
+    @ResponseBody
+    public List<BuildingProject> apiListBuilding() {
+        return buildingProjectRepository.findAllByOrderBySortOrderAsc();
+    }
+
+    @PostMapping("/api/building")
+    @ResponseBody
+    public ResponseEntity<BuildingProject> apiCreateBuilding(@RequestBody BuildingProject project) {
+        project.setId(null); // ensure insert not update
+        if (!isValidBuildingProject(project))
+            return ResponseEntity.badRequest().build();
+        BuildingProject saved = buildingProjectRepository.save(project);
+        dataVersionService.bump();
+        return ResponseEntity.ok(saved);
+    }
+
+    @PutMapping("/api/building/{id}")
+    @ResponseBody
+    public ResponseEntity<BuildingProject> apiUpdateBuilding(@PathVariable Long id,
+                                                              @RequestBody BuildingProject project) {
+        return buildingProjectRepository.findById(id).map(existing -> {
+            if (!isValidBuildingProject(project))
+                return ResponseEntity.<BuildingProject>badRequest().build();
+            existing.setTitle(project.getTitle());
+            existing.setStatus(project.getStatus());
+            existing.setProgress(project.getProgress());
+            existing.setSortOrder(project.getSortOrder());
+            existing.setProjectUrl(project.getProjectUrl());
+            existing.setDescription(project.getDescription());
+            existing.setSummary(project.getSummary());
+            existing.setTechStack(project.getTechStack());
+            BuildingProject saved = buildingProjectRepository.save(existing);
+            dataVersionService.bump();
+            return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    private boolean isValidBuildingProject(BuildingProject project) {
+        if (project.getTitle() == null || project.getTitle().isBlank()) return false;
+        if (project.getStatus() == null || project.getStatus().isBlank()) return false;
+        if (project.getProgress() != null && (project.getProgress() < 0 || project.getProgress() > 100)) return false;
+        if (project.getSortOrder() != null && project.getSortOrder() < 0) return false;
+        if (project.getProjectUrl() == null || project.getProjectUrl().isBlank()) return true;
+        try {
+            URI uri = new URI(project.getProjectUrl());
+            return ("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))
+                    && uri.getHost() != null;
+        } catch (URISyntaxException ex) {
+            return false;
+        }
+    }
+
+    @DeleteMapping("/api/building/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> apiDeleteBuilding(@PathVariable Long id) {
+        if (!buildingProjectRepository.existsById(id))
+            return ResponseEntity.notFound().build();
+        buildingProjectRepository.deleteById(id);
+        dataVersionService.bump();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/learning/save")

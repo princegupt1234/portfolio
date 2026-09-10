@@ -110,6 +110,96 @@
       .ab-card-body { padding:16px; }
       .save-bar { padding:12px 14px; }
     }
+
+    /* About workspace refresh: compact, scannable, and touch-friendly. */
+    .about-workspace { max-width: 1280px; margin: 0 auto; }
+    .about-hero { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:18px; }
+    .about-kicker { color:var(--primary); font:600 .7rem var(--font-mono); letter-spacing:1.6px; text-transform:uppercase; margin-bottom:7px; }
+    .about-hero h1 { font-size:clamp(1.35rem,2.5vw,1.9rem); margin:0; letter-spacing:-.02em; }
+    .about-hero p { max-width:620px; color:var(--text-secondary); font-size:.83rem; line-height:1.6; margin:7px 0 0; }
+    .about-hero-actions { display:flex; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
+    .about-nav { position:sticky; top:58px; z-index:25; display:flex; gap:6px; overflow-x:auto; padding:7px; margin:0 0 20px; background:rgba(8,13,27,.88); border:1px solid var(--glass-border); border-radius:14px; backdrop-filter:blur(18px); scrollbar-width:none; }
+    .about-nav::-webkit-scrollbar { display:none; }
+    .about-nav a { display:inline-flex; align-items:center; gap:7px; flex:0 0 auto; padding:8px 11px; border-radius:9px; color:var(--text-secondary); font-size:.75rem; white-space:nowrap; transition:background .2s,color .2s; }
+    .about-nav a:hover, .about-nav a:focus-visible { color:var(--text); background:rgba(255,255,255,.08); outline:none; }
+    .about-nav a i { color:var(--primary); font-size:.75rem; }
+    .about-sections { gap:14px; }
+    .ab-card { border-radius:14px; }
+    .ab-card-header { padding:15px 18px; }
+    .ab-card-header-left { gap:11px; }
+    .ab-card-icon { width:32px; height:32px; border-radius:9px; font-size:.82rem; }
+    .ab-card-title { font-size:.9rem; }
+    .ab-card-subtitle { font-size:.73rem; }
+    .ab-card-body { padding:18px; }
+    .sec-desc { margin-bottom:14px; padding:8px 11px; font-size:.76rem; }
+    .form-grid { gap:13px; }
+    .form-group { gap:6px; }
+    .form-group label, .field-label-row label { font-size:.78rem; }
+    .glass-input, .glass-textarea { font-size:.82rem; }
+    .glass-textarea { min-height:76px; }
+    .field-hint { font-size:.7rem; }
+    .save-bar { margin-top:14px; border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; }
+    .save-bar-msg { font-size:.75rem; }
+    .about-workspace > #sec-education { margin-top:14px !important; }
+    @media(max-width:700px){
+      .about-hero { align-items:flex-start; flex-direction:column; gap:14px; }
+      .about-hero-actions { justify-content:flex-start; }
+      .about-nav { top:51px; margin-left:-2px; margin-right:-2px; }
+      .ab-card-header { padding:13px 14px; }
+      .ab-card-body { padding:14px; }
+    }
+
+    .profile-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .profile-form-grid .full { grid-column:1/-1; }
+    .profile-advanced { margin-top:16px; padding-top:15px; border-top:1px solid var(--glass-border); }
+    .profile-advanced summary { cursor:pointer; color:var(--text-secondary); font-size:.78rem; font-weight:600; list-style:none; display:flex; align-items:center; gap:8px; }
+    .profile-advanced summary::-webkit-details-marker { display:none; }
+    .profile-advanced summary::before { content:'+'; width:19px; height:19px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--glass-border); border-radius:6px; color:var(--primary); }
+    .profile-advanced[open] summary::before { content:'−'; }
+    .profile-advanced .form-grid { margin-top:14px; }
+    .profile-live-preview { margin-top:18px; padding-top:18px; border-top:1px solid var(--glass-border); }
+    .profile-preview-label { display:flex; align-items:center; gap:8px; margin-bottom:10px; color:var(--text-muted); font:600 .68rem var(--font-mono); letter-spacing:1.4px; text-transform:uppercase; }
+    .profile-preview-label::after { content:''; height:1px; flex:1; background:var(--glass-border); }
+    .profile-preview { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(150px,.6fr); gap:20px; align-items:center; padding:22px; border:1px solid rgba(59,130,246,.24); border-radius:14px; background:linear-gradient(135deg,rgba(59,130,246,.09),rgba(6,182,212,.05)),rgba(255,255,255,.025); overflow:hidden; }
+    .profile-preview .preview-eyebrow { color:var(--primary); font:600 .68rem var(--font-mono); letter-spacing:1px; margin-bottom:7px; }
+    .profile-preview .preview-name { margin:0; color:var(--text); font:700 clamp(1.35rem,3vw,2rem) var(--font-heading); }
+    .profile-preview .preview-title { color:var(--secondary); font:500 .82rem var(--font-mono); margin:5px 0 10px; }
+    .profile-preview .preview-bio { color:var(--text-secondary); font-size:.78rem; line-height:1.65; margin:0 0 12px; }
+    .profile-preview .preview-chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .profile-preview .preview-chip { padding:4px 9px; border:1px solid rgba(59,130,246,.28); border-radius:999px; background:rgba(59,130,246,.12); color:#93c5fd; font-size:.68rem; }
+    .profile-preview .preview-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:15px; }
+    .profile-preview .preview-action { padding:7px 11px; border:1px solid var(--glass-border); border-radius:8px; color:var(--text-secondary); font-size:.68rem; }
+    .profile-preview .preview-action.primary { border-color:rgba(59,130,246,.45); background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; }
+    .profile-preview-photo { width:132px; aspect-ratio:1; margin-left:auto; border:1px solid rgba(255,255,255,.14); border-radius:50%; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; overflow:hidden; color:var(--text-muted); font-size:2.2rem; box-shadow:0 0 0 9px rgba(59,130,246,.06); }
+    .profile-preview-photo img { width:100%; height:100%; object-fit:cover; }
+    @media(max-width:700px){ .profile-form-grid,.profile-preview { grid-template-columns:1fr; } .profile-preview-photo { margin:0 auto; grid-row:1; width:108px; } }
+    .personal-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .personal-form-grid .full { grid-column:1/-1; }
+    .personal-live-preview { margin-top:18px; padding-top:18px; border-top:1px solid var(--glass-border); }
+    .personal-preview-label { display:flex; align-items:center; gap:8px; margin-bottom:10px; color:var(--text-muted); font:600 .68rem var(--font-mono); letter-spacing:1.4px; text-transform:uppercase; }
+    .personal-preview-label::after { content:''; height:1px; flex:1; background:var(--glass-border); }
+    .personal-preview { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(210px,.75fr); gap:18px; padding:18px; border:1px solid var(--glass-border); border-radius:14px; background:rgba(255,255,255,.025); }
+    .personal-preview h3 { margin:0 0 8px; font:600 1rem var(--font-heading); }
+    .personal-preview .preview-bio { color:var(--text); font-size:.8rem; line-height:1.65; margin:0 0 9px; }
+    .personal-preview .preview-objective { color:var(--text-secondary); font-size:.78rem; line-height:1.7; margin:0; }
+    .personal-preview .preview-contact { display:grid; grid-template-columns:1fr 1fr; gap:10px; align-content:start; padding-left:16px; border-left:1px solid var(--glass-border); }
+    .personal-preview .preview-contact-item { min-width:0; }
+    .personal-preview .preview-contact-label { color:var(--text-muted); font-size:.64rem; letter-spacing:.7px; text-transform:uppercase; }
+    .personal-preview .preview-contact-value { color:var(--text); font-size:.76rem; margin-top:3px; overflow-wrap:anywhere; }
+    @media(max-width:700px){ .personal-form-grid,.personal-preview { grid-template-columns:1fr; } .personal-preview .preview-contact { padding:14px 0 0; border-left:0; border-top:1px solid var(--glass-border); } }
+    .cta-editor { grid-column:1/-1; margin-top:4px; padding-top:16px; border-top:1px solid var(--glass-border); }
+    .cta-editor-heading { display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+    .cta-editor-heading i { color:var(--primary); }
+    .cta-editor-heading strong { color:var(--text); font-size:.82rem; }
+    .cta-editor-heading span { color:var(--text-muted); font-size:.7rem; }
+    .cta-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .cta-preview-wrap { margin-top:15px; padding:13px; border:1px solid var(--glass-border); border-radius:11px; background:rgba(255,255,255,.025); }
+    .cta-preview-label { color:var(--text-muted); font:600 .65rem var(--font-mono); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:9px; }
+    .cta-preview-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .cta-preview-button { display:inline-flex; align-items:center; gap:7px; padding:8px 12px; border-radius:8px; border:1px solid var(--glass-border); color:var(--text-secondary); font-size:.72rem; }
+    .cta-preview-button.primary { color:#fff; border-color:rgba(59,130,246,.45); background:linear-gradient(135deg,var(--primary),var(--secondary)); }
+    .cta-preview-link { color:var(--text-muted); font:400 .65rem var(--font-mono); overflow-wrap:anywhere; }
+    @media(max-width:700px){ .cta-grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -119,16 +209,30 @@
   <div class="admin-main">
     <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='About Management', unread=0)}"></div>
     <div class="admin-content">
+      <div class="about-workspace">
 
-      <div class="page-header">
+      <div class="about-hero">
         <div>
-          <h1>About Management</h1>
-          <p style="font-size:.82rem;color:var(--text-secondary);margin-top:4px;">Edit every section of your public portfolio from one place.</p>
+          <div class="about-kicker">Portfolio content</div>
+          <h1>About workspace</h1>
+          <p>Keep your public profile, story, links, projects, learning, and contact details in one focused workspace.</p>
         </div>
-        <a href="#" onclick="document.getElementById('aboutForm').requestSubmit();return false;" class="glass-btn primary">
-          <i class="fa-solid fa-floppy-disk"></i> Save All
-        </a>
+        <div class="about-hero-actions">
+          <a th:href="@{/}" target="_blank" class="glass-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> View site</a>
+          <a href="#" onclick="document.getElementById('aboutForm').requestSubmit();return false;" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save all</a>
+        </div>
       </div>
+
+      <nav class="about-nav" aria-label="About sections">
+        <a href="#sec-profile"><i class="fa-solid fa-user"></i> Profile</a>
+        <a href="#sec-personal"><i class="fa-solid fa-id-card"></i> Personal</a>
+        <a href="#sec-social"><i class="fa-solid fa-link"></i> Links</a>
+        <a href="#sec-techstack"><i class="fa-solid fa-layer-group"></i> Stack</a>
+        <a href="#sec-building"><i class="fa-solid fa-hammer"></i> Building</a>
+        <a href="#sec-learning"><i class="fa-solid fa-book-open"></i> Learning</a>
+        <a href="#sec-contact"><i class="fa-solid fa-paper-plane"></i> Contact</a>
+        <a href="#sec-education"><i class="fa-solid fa-graduation-cap"></i> Education</a>
+      </nav>
 
       <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post" enctype="multipart/form-data">
         <input type="hidden" th:field="*{id}"/>
@@ -149,7 +253,7 @@
               <i class="fa-solid fa-chevron-down ab-chevron"></i>
             </div>
             <div class="ab-card-body">
-              <p class="sec-desc">This section controls the hero banner — the very first thing visitors see. Keep the typed phrases punchy and under 60 characters each.</p>
+              <p class="sec-desc">Update the essentials visitors see first. Less-used animation and button settings are tucked into Advanced options.</p>
 
               <!-- Photo -->
               <div class="form-group" style="margin-bottom:20px;">
@@ -171,7 +275,7 @@
                 </div>
               </div>
 
-              <div class="form-grid">
+              <div class="profile-form-grid">
                 <!-- Full Name -->
                 <div class="form-group">
                   <div class="field-label-row">
@@ -209,6 +313,11 @@
                   <div id="heroPreview" style="margin-top:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03);font-family:var(--font-mono);font-size:.88rem;color:#94a3b8;"></div>
                 </div>
 
+              </div>
+
+              <details class="profile-advanced">
+                <summary>Advanced hero settings <span style="font-weight:400;color:var(--text-muted);">animation timing and buttons</span></summary>
+                <div class="form-grid">
                 <!-- Typing speeds -->
                 <div class="form-group">
                   <div class="field-label-row"><label for="heroTypingSpeed">Typing Speed <span style="font-size:.72rem;">(ms / char)</span></label></div>
@@ -227,21 +336,52 @@
                 </div>
 
                 <!-- CTA Buttons -->
-                <div class="form-group">
-                  <div class="field-label-row"><label for="heroPrimaryCtaLabel">Primary CTA Label</label></div>
-                  <input class="glass-input" id="heroPrimaryCtaLabel" th:field="*{heroPrimaryCtaLabel}" placeholder="View Projects"/>
+                <div class="cta-editor">
+                  <div class="cta-editor-heading"><i class="fa-solid fa-bullseye"></i><strong>Call to action buttons</strong><span>Labels and destinations visitors use in the hero.</span></div>
+                  <div class="cta-grid">
+                    <div class="form-group">
+                      <div class="field-label-row"><label for="heroPrimaryCtaLabel">Primary button label</label></div>
+                      <input class="glass-input" id="heroPrimaryCtaLabel" th:field="*{heroPrimaryCtaLabel}" placeholder="e.g. View Projects"/>
+                    </div>
+                    <div class="form-group">
+                      <div class="field-label-row"><label for="heroPrimaryCtaLink">Primary button link</label></div>
+                      <input class="glass-input" id="heroPrimaryCtaLink" th:field="*{heroPrimaryCtaLink}" placeholder="e.g. #projects"/>
+                    </div>
+                    <div class="form-group">
+                      <div class="field-label-row"><label for="heroSecondaryCtaLabel">Secondary button label</label></div>
+                      <input class="glass-input" id="heroSecondaryCtaLabel" th:field="*{heroSecondaryCtaLabel}" placeholder="e.g. Download Resume"/>
+                    </div>
+                    <div class="form-group">
+                      <div class="field-label-row"><label for="heroSecondaryCtaLink">Secondary button link</label></div>
+                      <input class="glass-input" id="heroSecondaryCtaLink" th:field="*{heroSecondaryCtaLink}" placeholder="e.g. /resume/download"/>
+                    </div>
+                  </div>
+                  <div class="cta-preview-wrap">
+                    <div class="cta-preview-label"><i class="fa-solid fa-eye"></i> Live preview</div>
+                    <div class="cta-preview-actions">
+                      <a class="cta-preview-button primary" id="ctaPreviewPrimary" href="#"><i class="fa-solid fa-arrow-right"></i><span class="cta-preview-text">View Projects</span></a><span class="cta-preview-link" id="ctaPreviewPrimaryLink">#projects</span>
+                      <a class="cta-preview-button" id="ctaPreviewSecondary" href="#"><i class="fa-solid fa-download"></i><span class="cta-preview-text">Download Resume</span></a><span class="cta-preview-link" id="ctaPreviewSecondaryLink">/resume/download</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <div class="field-label-row"><label for="heroPrimaryCtaLink">Primary CTA Link</label></div>
-                  <input class="glass-input" id="heroPrimaryCtaLink" th:field="*{heroPrimaryCtaLink}" placeholder="#projects"/>
                 </div>
-                <div class="form-group">
-                  <div class="field-label-row"><label for="heroSecondaryCtaLabel">Secondary CTA Label</label></div>
-                  <input class="glass-input" id="heroSecondaryCtaLabel" th:field="*{heroSecondaryCtaLabel}" placeholder="Download Resume"/>
-                </div>
-                <div class="form-group">
-                  <div class="field-label-row"><label for="heroSecondaryCtaLink">Secondary CTA Link</label></div>
-                  <input class="glass-input" id="heroSecondaryCtaLink" th:field="*{heroSecondaryCtaLink}" placeholder="/resume/download"/>
+              </details>
+
+              <div class="profile-live-preview">
+                <div class="profile-preview-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Live preview</div>
+                <div class="profile-preview">
+                  <div>
+                    <div class="preview-eyebrow" id="profilePreviewEyebrow">// Hello, I'm</div>
+                    <h3 class="preview-name" id="profilePreviewName">Your name</h3>
+                    <div class="preview-title" id="profilePreviewTitle">Your professional title</div>
+                    <p class="preview-bio" id="profilePreviewBio">Your introduction will appear here.</p>
+                    <div class="preview-chips" id="profilePreviewChips"></div>
+                    <div class="preview-actions">
+                      <span class="preview-action primary" id="profilePreviewPrimary">View Projects</span>
+                      <span class="preview-action" id="profilePreviewSecondary">Download Resume</span>
+                    </div>
+                  </div>
+                  <div class="profile-preview-photo" id="profilePreviewPhoto"><i class="fa-solid fa-user"></i></div>
                 </div>
               </div>
             </div>
@@ -256,43 +396,58 @@
                 <div class="ab-card-icon"><i class="fa-solid fa-id-card"></i></div>
                 <div>
                   <div class="ab-card-title">Personal Information</div>
-                  <div class="ab-card-subtitle">Bio, career objective, contact details</div>
+                  <div class="ab-card-subtitle">Your story and the contact details visitors need</div>
                 </div>
               </div>
               <i class="fa-solid fa-chevron-down ab-chevron"></i>
             </div>
             <div class="ab-card-body">
-              <p class="sec-desc">Shown in the About section and the contact info grid. Keep the bio concise — 2–3 sentences work best.</p>
-              <div class="form-grid">
+              <p class="sec-desc">Write the short version first, then add your longer career direction and the contact details shown on the public About panel.</p>
+              <div class="personal-form-grid">
                 <div class="form-group full">
                   <div class="field-label-row">
-                    <label for="bio">Bio</label>
+                    <label for="bio">Short bio</label>
                     <span class="char-counter" id="cc-bio"></span>
                   </div>
                   <textarea class="glass-textarea" id="bio" th:field="*{bio}" rows="3" maxlength="400"
                     placeholder="Final-year B.Tech CSE student comfortable across frontend, backend, and database layers..."></textarea>
-                  <span class="field-hint">Displayed below your name in the hero section. Max 400 characters.</span>
+                  <span class="field-hint">Displayed below your name in the hero section. Keep it to 2–3 sentences.</span>
                 </div>
                 <div class="form-group full">
                   <div class="field-label-row">
-                    <label for="careerObjective">Career Objective</label>
+                    <label for="careerObjective">About / career objective</label>
                     <span class="char-counter" id="cc-careerObjective"></span>
                   </div>
                   <textarea class="glass-textarea" id="careerObjective" th:field="*{careerObjective}" rows="3" maxlength="500"
                     placeholder="Seeking an entry-level SDE role or final-year internship..."></textarea>
-                  <span class="field-hint">Shown in the About card alongside your education. Max 500 characters.</span>
+                  <span class="field-hint">Shown in the main About card alongside your education.</span>
                 </div>
                 <div class="form-group">
-                  <div class="field-label-row"><label for="phone">Phone</label></div>
-                  <input class="glass-input" id="phone" type="tel" th:field="*{phone}" placeholder="+91-9876543210"/>
+                  <div class="field-label-row"><label for="phone">Phone number</label></div>
+                  <input class="glass-input" id="phone" type="tel" th:field="*{phone}" placeholder="e.g. +91 98765 43210"/>
                 </div>
                 <div class="form-group">
                   <div class="field-label-row"><label for="email">Email</label></div>
-                  <input class="glass-input" id="email" type="email" th:field="*{email}" placeholder="you@example.com"/>
+                  <input class="glass-input" id="email" type="email" th:field="*{email}" placeholder="e.g. hello@example.com"/>
                 </div>
                 <div class="form-group">
                   <div class="field-label-row"><label for="location">Location</label></div>
-                  <input class="glass-input" id="location" th:field="*{location}" placeholder="Lucknow, Uttar Pradesh"/>
+                  <input class="glass-input" id="location" th:field="*{location}" placeholder="e.g. Lucknow, Uttar Pradesh"/>
+                </div>
+              </div>
+              <div class="personal-live-preview">
+                <div class="personal-preview-label"><i class="fa-solid fa-eye"></i> Live preview</div>
+                <div class="personal-preview">
+                  <div>
+                    <h3>About me</h3>
+                    <p class="preview-bio" id="personalPreviewBio">Your short bio will appear here.</p>
+                    <p class="preview-objective" id="personalPreviewObjective">Your career objective will appear here.</p>
+                  </div>
+                  <div class="preview-contact">
+                    <div class="preview-contact-item"><div class="preview-contact-label">Email</div><div class="preview-contact-value" id="personalPreviewEmail">Not added</div></div>
+                    <div class="preview-contact-item"><div class="preview-contact-label">Location</div><div class="preview-contact-value" id="personalPreviewLocation">Not added</div></div>
+                    <div class="preview-contact-item"><div class="preview-contact-label">Phone</div><div class="preview-contact-value" id="personalPreviewPhone">Not added</div></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -396,11 +551,11 @@
                     <td th:text="${bp.progress != null ? bp.progress + '%' : ''}">Progress</td>
                     <td th:text="${bp.sortOrder}">0</td>
                     <td style="display:flex;gap:8px;">
-                      <a th:href="@{'/admin/about/building/' + ${bp.id} + '/edit'}" class="action-icons" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);text-decoration:none;">
+                      <a th:href="@{'/admin/about/building/' + ${bp.id} + '/edit'}" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);text-decoration:none;">
                         <i class="fa-solid fa-pen"></i>
                       </a>
-                      <form th:action="@{'/admin/about/building/' + ${bp.id} + '/delete'}" method="post" data-confirm="Delete this project?" style="margin:0;">
-                        <button type="submit" class="action-icons danger" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);">
+                      <form th:action="@{'/admin/about/building/' + ${bp.id} + '/delete'}" method="post" style="margin:0;" onsubmit="return confirm('Delete this project?');">
+                        <button type="submit" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);">
                           <i class="fa-solid fa-trash"></i>
                         </button>
                       </form>
@@ -413,44 +568,46 @@
                 </table>
               </div>
               <!-- Add / Edit form -->
+              <form th:action="@{/admin/about/building/save}" method="post">
               <h4 style="margin-bottom:14px;font-size:.92rem;" th:text="${editingBuildingProject != null and editingBuildingProject.id != null} ? 'Edit Project' : 'Add Project'">Add Project</h4>
-              <form th:action="@{/admin/about/building/save}" th:object="${editingBuildingProject}" method="post" class="form-grid">
-                <input type="hidden" th:field="*{id}"/>
-                <div class="form-group"><label>Project Title</label><input class="glass-input" th:field="*{title}" placeholder="Portfolio Admin System"/></div>
+              <div class="form-grid">
+                <input type="hidden" name="id" th:value="${editingBuildingProject.id}"/>
+                <div class="form-group"><label>Project Title</label><input class="glass-input" name="title" th:value="${editingBuildingProject.title}" placeholder="Portfolio Admin System"/></div>
                 <div class="form-group">
                   <label>Status</label>
-                  <input class="glass-input" th:field="*{status}" placeholder="In Progress"/>
+                  <input class="glass-input" name="status" th:value="${editingBuildingProject.status}" placeholder="In Progress"/>
                   <span class="field-hint">e.g. In Progress, Beta, Live, Paused</span>
                 </div>
                 <div class="form-group">
                   <label>Progress %</label>
-                  <input class="glass-input" type="number" min="0" max="100" th:field="*{progress}" placeholder="65"/>
+                  <input class="glass-input" name="progress" th:value="${editingBuildingProject.progress}" type="number" min="0" max="100" placeholder="65"/>
                 </div>
                 <div class="form-group">
                   <label>Sort Order</label>
-                  <input class="glass-input" type="number" th:field="*{sortOrder}" placeholder="1"/>
+                  <input class="glass-input" name="sortOrder" th:value="${editingBuildingProject.sortOrder}" type="number" placeholder="1"/>
                 </div>
                 <div class="form-group">
                   <label>Project URL</label>
-                  <input class="glass-input" type="url" th:field="*{projectUrl}" placeholder="https://github.com/you/project"/>
+                  <input class="glass-input" name="projectUrl" th:value="${editingBuildingProject.projectUrl}" type="url" placeholder="https://github.com/you/project"/>
                 </div>
                 <div class="form-group full">
                   <label>Short Description</label>
-                  <textarea class="glass-textarea" th:field="*{description}" rows="2" maxlength="300" placeholder="Full-stack portfolio with Spring Boot admin panel..."></textarea>
+                  <textarea class="glass-textarea" name="description" rows="2" maxlength="300" placeholder="Full-stack portfolio with Spring Boot admin panel..." th:text="${editingBuildingProject.description}"></textarea>
                 </div>
                 <div class="form-group full">
                   <label>Summary (shown above panel)</label>
-                  <textarea class="glass-textarea" th:field="*{summary}" rows="2" maxlength="200" placeholder="One or two sentences..."></textarea>
+                  <textarea class="glass-textarea" name="summary" rows="2" maxlength="200" placeholder="One or two sentences..." th:text="${editingBuildingProject.summary}"></textarea>
                 </div>
                 <div class="form-group full">
                   <label>Tech Stack</label>
-                  <input class="glass-input" th:field="*{techStack}" placeholder="Spring Boot|MySQL|Thymeleaf|REST API"/>
+                  <input class="glass-input" name="techStack" th:value="${editingBuildingProject.techStack}" placeholder="Spring Boot|MySQL|Thymeleaf|REST API"/>
                   <span class="field-hint">Pipe-separated. Shown as chips on the building panel.</span>
                 </div>
                 <div class="form-actions form-group full">
                   <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Project</button>
                   <a th:if="${editingBuildingProject != null and editingBuildingProject.id != null}" th:href="@{/admin/about#sec-building}" class="glass-btn">Cancel</a>
                 </div>
+              </div>
               </form>
             </div>
           </div>
@@ -464,27 +621,29 @@
                 <div class="ab-card-icon"><i class="fa-solid fa-book-open"></i></div>
                 <div>
                   <div class="ab-card-title">Currently Learning</div>
-                  <div class="ab-card-subtitle">Learning summary, path, and mini-cards</div>
+                  <div class="ab-card-subtitle">Learning summary, mini-cards, and learning path entries</div>
                 </div>
               </div>
               <i class="fa-solid fa-chevron-down ab-chevron"></i>
             </div>
             <div class="ab-card-body">
-              <p class="sec-desc">Displayed in the "Currently" section alongside the building panel. Learning Cards render as small icon cards — up to 5 recommended.</p>
+              <p class="sec-desc">Displayed in the "Currently" section alongside the building panel. The summary and learning cards come from the main About form below. Learning Path entries are managed as individual rows.</p>
+
+              <!-- Summary + cards (part of aboutForm) -->
               <div class="form-grid">
                 <div class="form-group full">
                   <div class="field-label-row">
-                    <label for="currentlyLearning">Summary</label>
+                    <label for="currentlyLearning">Learning Summary</label>
                     <span class="char-counter" id="cc-currentlyLearning"></span>
                   </div>
                   <textarea class="glass-textarea" id="currentlyLearning" th:field="*{currentlyLearning}" rows="2" maxlength="300"
                     placeholder="Deepening backend expertise and problem-solving skills through structured learning and daily practice."></textarea>
                 </div>
                 <div class="form-group full">
-                  <div class="field-label-row"><label for="learningPath">Learning Path</label></div>
+                  <div class="field-label-row"><label for="learningPath">Learning Path <span style="font-size:.72rem;color:var(--text-muted);">(legacy, pipe-separated)</span></label></div>
                   <input class="glass-input" id="learningPath" th:field="*{learningPath}"
                     placeholder="Spring Boot Advanced|DSA Practice|System Design|React + Next.js|Cloud &amp; DevOps"/>
-                  <span class="field-hint">Pipe-separated steps. Legacy field — kept for reference.</span>
+                  <span class="field-hint">Pipe-separated steps. Kept for reference.</span>
                 </div>
                 <div class="form-group full">
                   <div class="field-label-row">
@@ -494,17 +653,61 @@
                   <textarea class="glass-textarea" id="learningCards" th:field="*{learningCards}" rows="6"
                     placeholder="Spring Boot Advanced::fa-solid fa-leaf::Backend::Security, microservices &amp; JPA|DSA Practice::fa-solid fa-code::Algorithms::Daily problem solving|System Design::fa-solid fa-sitemap::Architecture::Scalable distributed systems|React + Next.js::fa-brands fa-react::Frontend::Modern full-stack web apps|Cloud &amp; DevOps::fa-brands fa-aws::DevOps::AWS, Docker &amp; CI/CD pipelines"></textarea>
                   <span class="field-hint">
-                    Separate cards with <code>|</code>. Each card format: <code>Title::fa-icon-class::Category::One-line description</code><br>
-                    Example: <code>Spring Boot Advanced::fa-solid fa-leaf::Backend::Security &amp; microservices</code><br>
-                    Up to 5 cards recommended.
+                    Separate cards with <code>|</code>. Each card: <code>Title::fa-icon-class::Category::Description</code><br>
+                    Example: <code>Spring Boot Advanced::fa-solid fa-leaf::Backend::Security &amp; microservices</code> — up to 5 cards.
                   </span>
                   <div id="lcCardError" class="field-error"></div>
-                  <!-- Live preview -->
                   <div style="margin-top:12px;">
                     <div style="font-size:.78rem;color:var(--text-secondary);margin-bottom:8px;">Live card preview:</div>
                     <div class="lc-preview-grid" id="lcPreviewGrid"></div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Learning Path entries (separate forms, outside aboutForm) -->
+              <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--glass-border);">
+                <h4 style="font-size:.88rem;margin:0 0 12px;">Learning Path Entries</h4>
+                <div class="glass-table-wrap" style="margin-bottom:16px;">
+                  <table class="glass-table">
+                    <thead><tr><th>Title</th><th>Status</th><th>Sort</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="lp : ${learningProjects}">
+                      <td th:text="${lp.title}">Title</td>
+                      <td th:text="${lp.status}">Status</td>
+                      <td th:text="${lp.sortOrder}">0</td>
+                      <td style="display:flex;gap:6px;">
+                        <form th:action="@{'/admin/about/learning/' + ${lp.id} + '/move'}" method="post" style="margin:0;">
+                          <input type="hidden" name="dir" value="-1"/>
+                          <button type="submit" style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);cursor:pointer;color:var(--text-secondary);font-size:.75rem;">▲</button>
+                        </form>
+                        <form th:action="@{'/admin/about/learning/' + ${lp.id} + '/move'}" method="post" style="margin:0;">
+                          <input type="hidden" name="dir" value="1"/>
+                          <button type="submit" style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);cursor:pointer;color:var(--text-secondary);font-size:.75rem;">▼</button>
+                        </form>
+                        <form th:action="@{'/admin/about/learning/' + ${lp.id} + '/delete'}" method="post" style="margin:0;" onsubmit="return confirm('Delete this entry?');">
+                          <button type="submit" style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);cursor:pointer;color:var(--text-secondary);font-size:.75rem;"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                      </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(learningProjects)}">
+                      <td colspan="4" style="color:var(--text-secondary);text-align:center;padding:16px;">No entries yet.</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <h4 style="font-size:.88rem;margin:0 0 12px;">Add Learning Entry</h4>
+                <form th:action="@{/admin/about/learning/save}" th:object="${newLearningProject}" method="post" class="form-grid">
+                  <div class="form-group"><label>Title</label><input class="glass-input" th:field="*{title}" placeholder="Spring Boot Advanced"/></div>
+                  <div class="form-group"><label>Status</label><input class="glass-input" th:field="*{status}" placeholder="In Progress"/></div>
+                  <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" placeholder="1"/></div>
+                  <div class="form-group full">
+                    <label>Summary</label>
+                    <textarea class="glass-textarea" th:field="*{summary}" rows="2" placeholder="Brief description of what you are learning..."></textarea>
+                  </div>
+                  <div class="form-actions form-group full">
+                    <button type="submit" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Entry</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -542,9 +745,8 @@
                 </div>
                 <div class="form-group" style="justify-content:flex-end;">
                   <div class="avail-row">
-                    <input type="hidden" name="availabilityVisible" value="false"/>
                     <label class="toggle-switch">
-                      <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible == null or availabilityVisible == true}"/>
+                      <input type="checkbox" id="availabilityVisible" th:field="*{availabilityVisible}"/>
                       <span class="toggle-slider"></span>
                     </label>
                     <label for="availabilityVisible">Show availability badge on portfolio</label>
@@ -608,8 +810,8 @@
                 <td th:text="${edu.duration}">Duration</td>
                 <td th:text="${edu.scoreLabel}">Score</td>
                 <td>
-                  <form th:action="@{'/admin/about/education/' + ${edu.id} + '/delete'}" method="post" data-confirm="Delete this education entry?" style="margin:0;">
-                    <button type="submit" class="action-icons danger" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);">
+                  <form th:action="@{'/admin/about/education/' + ${edu.id} + '/delete'}" method="post" style="margin:0;" onsubmit="return confirm('Delete this education entry?');">
+                    <button type="submit" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);">
                       <i class="fa-solid fa-trash"></i>
                     </button>
                   </form>
@@ -634,6 +836,8 @@
           </form>
         </div>
       </div>
+
+      </div><!-- /about-workspace -->
 
     </div><!-- /admin-content -->
   </div><!-- /admin-main -->
@@ -882,6 +1086,102 @@ document.querySelectorAll('.url-input').forEach(function(inp) {
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+/* ── Basic Introduction live preview ── */
+(function() {
+  var fields = ['heroEyebrow','fullName','title','heroPrimaryCtaLabel','heroSecondaryCtaLabel','heroTechStack','bio'];
+  var photoInput = document.getElementById('photoFileInput');
+  if (!document.getElementById('profilePreviewName')) return;
+
+  function value(id, fallback) {
+    var field = document.getElementById(id);
+    return field && field.value.trim() ? field.value.trim() : fallback;
+  }
+
+  function render() {
+    document.getElementById('profilePreviewEyebrow').textContent = value('heroEyebrow', '// Hello, I\'m');
+    document.getElementById('profilePreviewName').textContent = value('fullName', 'Your name');
+    document.getElementById('profilePreviewTitle').textContent = value('title', 'Your professional title');
+    document.getElementById('profilePreviewBio').textContent = value('bio', 'Your introduction will appear here.');
+    document.getElementById('profilePreviewPrimary').textContent = value('heroPrimaryCtaLabel', 'View Projects');
+    document.getElementById('profilePreviewSecondary').textContent = value('heroSecondaryCtaLabel', 'Download Resume');
+
+    var chips = value('heroTechStack', '').split('|').map(function(chip) { return chip.trim(); }).filter(Boolean);
+    document.getElementById('profilePreviewChips').innerHTML = chips.map(function(chip) {
+      return '<span class="preview-chip">' + escHtml(chip) + '</span>';
+    }).join('');
+  }
+
+  fields.forEach(function(id) {
+    var field = document.getElementById(id);
+    if (field) field.addEventListener('input', render);
+  });
+
+  if (photoInput) {
+    photoInput.addEventListener('change', function() {
+      if (!photoInput.files || !photoInput.files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function(event) {
+        document.getElementById('profilePreviewPhoto').innerHTML = '<img src="' + event.target.result + '" alt="Profile preview">';
+      };
+      reader.readAsDataURL(photoInput.files[0]);
+    });
+  }
+
+  render();
+})();
+
+/* ── CTA live preview ── */
+(function() {
+  var ids = ['heroPrimaryCtaLabel','heroPrimaryCtaLink','heroSecondaryCtaLabel','heroSecondaryCtaLink'];
+  if (!document.getElementById('ctaPreviewPrimary')) return;
+  function value(id, fallback) {
+    var field = document.getElementById(id);
+    return field && field.value.trim() ? field.value.trim() : fallback;
+  }
+  function render() {
+    var primaryLabel = value('heroPrimaryCtaLabel', 'View Projects');
+    var primaryLink = value('heroPrimaryCtaLink', '#projects');
+    var secondaryLabel = value('heroSecondaryCtaLabel', 'Download Resume');
+    var secondaryLink = value('heroSecondaryCtaLink', '/resume/download');
+    document.querySelector('#ctaPreviewPrimary .cta-preview-text').textContent = primaryLabel;
+    document.querySelector('#ctaPreviewSecondary .cta-preview-text').textContent = secondaryLabel;
+    document.getElementById('ctaPreviewPrimary').setAttribute('href', primaryLink);
+    document.getElementById('ctaPreviewSecondary').setAttribute('href', secondaryLink);
+    document.getElementById('ctaPreviewPrimaryLink').textContent = primaryLink;
+    document.getElementById('ctaPreviewSecondaryLink').textContent = secondaryLink;
+  }
+  ids.forEach(function(id) {
+    var field = document.getElementById(id);
+    if (field) field.addEventListener('input', render);
+  });
+  render();
+})();
+
+/* ── Personal information live preview ── */
+(function() {
+  var fieldIds = ['bio','careerObjective','email','location','phone'];
+  if (!document.getElementById('personalPreviewObjective')) return;
+
+  function text(id, fallback) {
+    var field = document.getElementById(id);
+    return field && field.value.trim() ? field.value.trim() : fallback;
+  }
+
+  function render() {
+    document.getElementById('personalPreviewBio').textContent = text('bio', 'Your short bio will appear here.');
+    document.getElementById('personalPreviewObjective').textContent = text('careerObjective', 'Your career objective will appear here.');
+    document.getElementById('personalPreviewEmail').textContent = text('email', 'Not added');
+    document.getElementById('personalPreviewLocation').textContent = text('location', 'Not added');
+    document.getElementById('personalPreviewPhone').textContent = text('phone', 'Not added');
+  }
+
+  fieldIds.forEach(function(id) {
+    var field = document.getElementById(id);
+    if (field) field.addEventListener('input', render);
+  });
+  render();
+})();
 </script>
 </body>
 </html>

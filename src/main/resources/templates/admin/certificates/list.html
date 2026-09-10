@@ -6,6 +6,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .achievement-workspace { max-width:1200px; margin:0 auto; }
+        .achievement-head { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin-bottom:18px; }
+        .achievement-kicker { color:var(--primary); font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px; }
+        .achievement-head h1 { margin:0; font-size:clamp(1.35rem,2.5vw,1.9rem); }
+        .achievement-head p { color:var(--text-secondary); font-size:.8rem; line-height:1.6; margin:7px 0 0; }
+        .achievement-table-card { padding:0; overflow:hidden; }
+        .achievement-toolbar { display:flex; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid var(--glass-border); color:var(--text-secondary); font-size:.75rem; }
+        .achievement-toolbar strong { color:var(--text); }
+        .achievement-table-card table { font-size:.82rem; }
+        .achievement-table-card th { padding:11px 14px; font-size:.68rem; }
+        .achievement-table-card td { padding:12px 14px; }
+        .achievement-thumb { width:42px; height:32px; border-radius:7px; object-fit:cover; border:1px solid var(--glass-border); background:rgba(255,255,255,.06); }
+        .achievement-title-cell strong { display:block; font-size:.82rem; }
+        .achievement-title-cell span { display:block; color:var(--text-muted); font-size:.7rem; margin-top:3px; }
+        .achievement-order { display:inline-flex; min-width:25px; justify-content:center; padding:3px 6px; border-radius:6px; background:rgba(255,255,255,.06); color:var(--text-secondary); font:600 .7rem var(--font-mono); }
+        @media(max-width:700px){ .achievement-head,.achievement-toolbar { align-items:flex-start; flex-direction:column; } }
+    </style>
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
@@ -14,20 +32,21 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Certificates', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1>Certificates</h1>
-                <a th:href="@{/admin/certificates/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Upload Certificate</a>
+            <div class="achievement-workspace">
+            <div class="achievement-head">
+                <div><div class="achievement-kicker">Achievements / Certifications</div><h1>Achievements</h1><p>Manage the certificates and credentials shown in your public portfolio.</p></div>
+                <a th:href="@{/admin/certificates/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add achievement</a>
             </div>
-            <div class="glass-card glass-table-wrap">
+            <div class="glass-card achievement-table-card glass-table-wrap">
+                <div class="achievement-toolbar"><span><i class="fa-solid fa-award" style="color:var(--primary);margin-right:7px;"></i> Published achievements</span><span><strong th:text="${#lists.size(certificates)}">0</strong> entries · lower order appears first</span></div>
                 <table class="glass-table">
-                    <thead><tr><th>Image</th><th>Title</th><th>Organization</th><th>Date</th><th>Credential ID</th><th>Visible</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Preview</th><th>Achievement</th><th>Date</th><th>Order</th><th>Visible</th><th>Actions</th></tr></thead>
                     <tbody>
                     <tr th:each="c : ${certificates}">
-                        <td><img class="row-thumb" th:if="${c.imageUrl}" th:src="@{${c.imageUrl}}" alt="" /><span th:unless="${c.imageUrl}">—</span></td>
-                        <td th:text="${c.title}">Cert</td>
-                        <td th:text="${c.organization}">Org</td>
+                        <td><img class="achievement-thumb" th:if="${c.imageUrl}" th:src="@{${c.imageUrl}}" alt="" /><span th:unless="${c.imageUrl}"><i class="fa-solid fa-award" style="color:var(--primary);"></i></span></td>
+                        <td class="achievement-title-cell"><strong th:text="${c.title}">Certificate</strong><span th:text="${c.organization}">Organization</span></td>
                         <td th:text="${c.issueDate}">Date</td>
-                        <td th:text="${c.credentialId}">ID</td>
+                        <td><span class="achievement-order" th:text="${c.sortOrder}">0</span></td>
                         <td>
                             <form th:action="@{'/admin/certificates/' + ${c.id} + '/toggle-visible'}" method="post" style="margin:0;">
                                 <button type="submit" class="status-pill" th:classappend="${c.visible} ? 'on' : 'off'" th:text="${c.visible} ? 'Visible' : 'Hidden'">Visible</button>
@@ -42,9 +61,10 @@
                             </div>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(certificates)}"><td colspan="6" style="text-align:center; color:var(--text-secondary);">No certificates yet.</td></tr>
+                    <tr th:if="${#lists.isEmpty(certificates)}"><td colspan="6" style="text-align:center; color:var(--text-secondary);">No achievements yet.</td></tr>
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     </div>

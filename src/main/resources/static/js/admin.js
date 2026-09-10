@@ -40,6 +40,55 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  function getCookie(name) {
+    const value = document.cookie.split('; ').find(row => row.startsWith(`${name}=`));
+    return value ? decodeURIComponent(value.split('=')[1]) : null;
+  }
+
+  function setFeaturedButtonState(button, featured) {
+    button.dataset.featured = String(featured);
+    button.classList.toggle('on', featured);
+    button.classList.toggle('off', !featured);
+    button.setAttribute('aria-pressed', String(featured));
+    button.textContent = featured ? 'Yes' : 'No';
+  }
+
+  document.querySelectorAll('[data-featured-toggle]').forEach(button => {
+    button.addEventListener('click', async () => {
+      if (button.disabled) return;
+
+      const previousValue = button.dataset.featured === 'true';
+      const requestedValue = !previousValue;
+      const projectId = button.dataset.projectId;
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      setFeaturedButtonState(button, requestedValue);
+
+      try {
+        const response = await fetch(`/admin/projects/${projectId}/featured`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+          },
+          body: JSON.stringify({ featured: requestedValue })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || typeof result.featured !== 'boolean') {
+          throw new Error(result.error || 'Featured status could not be updated.');
+        }
+        setFeaturedButtonState(button, result.featured);
+        showToast(`Project is ${result.featured ? 'now featured' : 'no longer featured'}.`);
+      } catch (error) {
+        setFeaturedButtonState(button, previousValue);
+        showToast(error.message || 'Featured status could not be updated.', 'error');
+      } finally {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+      }
+    });
+  });
+
   /* Simple client-side table search */
   document.querySelectorAll('[data-table-search]').forEach(input => {
     input.addEventListener('input', () => {
@@ -184,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     t.innerHTML = `
       <div class="toast-icon">${type === 'error' ? '✕' : '✓'}</div>
       <div class="toast-content">
-        <strong class="toast-title">${type === 'error' ? 'Reply failed' : 'Reply sent'}</strong>
+        <strong class="toast-title">${type === 'error' ? 'Update failed' : 'Update saved'}</strong>
         <span class="toast-text">${text}</span>
       </div>
       <button type="button" class="toast-close" aria-label="Close notification">×</button>

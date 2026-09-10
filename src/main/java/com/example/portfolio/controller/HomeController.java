@@ -123,7 +123,8 @@ public class HomeController {
         List<Skill> skills = skillRepository.findByVisibleTrueOrderByCategoryAscSortOrderAsc();
         List<String> skillCategories = skillRepository.findDistinctVisibleCategories();
         List<Experience> experiences = experienceRepository.findByVisibleTrueOrderBySortOrderAsc();
-        List<Project> projects = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
+        List<Project> featuredProjects = projectRepository.findByVisibleTrueAndFeaturedTrueOrderBySortOrderAsc();
+        List<Project> projects = projectRepository.findVisibleNonFeaturedOrderBySortOrderAsc();
         List<Certificate> certificates = certificateRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<ServiceItem> services = serviceItemRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Testimonial> testimonials = testimonialRepository.findByPublishedTrue();
@@ -135,6 +136,7 @@ public class HomeController {
         model.addAttribute("skills", skills);
         model.addAttribute("skillCategories", skillCategories);
         model.addAttribute("experiences", experiences);
+        model.addAttribute("featuredProjects", featuredProjects);
         model.addAttribute("projects", projects);
         model.addAttribute("certificates", certificates);
         model.addAttribute("services", services);

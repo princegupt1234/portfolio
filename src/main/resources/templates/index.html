@@ -100,7 +100,7 @@
                 <div class="info-grid" style="margin-top:24px;">
                     <div th:if="${about.email}"><div class="label">Email</div><div class="value" th:text="${about.email}"></div></div>
                     <div th:if="${about.location}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
-                    <div th:if="${about.availabilityVisible == null or about.availabilityVisible}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
+                    <div th:if="${about.availabilityVisible == true}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
                     <div th:if="${about.phone}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
                 </div>
             </div>
@@ -162,20 +162,18 @@
 </section>
 
 <!-- ===================== PROJECTS ===================== -->
-<section class="section" id="projects">
+<section class="section" id="featured-projects" th:if="${!#lists.isEmpty(featuredProjects)}">
     <div class="container">
-        <div class="section-tag">Projects</div>
-        <h2 class="section-title" data-reveal>What I've built</h2>
+        <div class="section-tag">Featured Projects</div>
+        <h2 class="section-title" data-reveal>Selected work</h2>
         <div class="projects-grid">
-            <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
+            <div class="glass-card project-card" th:each="project : ${featuredProjects}" data-reveal>
                 <div class="project-thumb">
                 <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
                     <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
                 </div>
                 <div class="project-body">
-                    <div class="project-meta-row">
-                        <span th:if="${project.featured}" class="project-featured-badge">⭐ Featured</span>
-                    </div>
+                    <div class="project-meta-row"><span class="project-featured-badge">⭐ Featured</span></div>
                     <h3 class="project-title" th:text="${project.title}">Title</h3>
                     <p class="project-desc" th:text="${project.description}">Description</p>
                     <div class="project-tech">
@@ -192,7 +190,38 @@
                 </div>
             </div>
         </div>
-        <div th:if="${#lists.isEmpty(projects)}" class="glass-card" data-reveal>
+    </div>
+</section>
+
+<section class="section" id="projects">
+    <div class="container">
+        <div class="section-tag">Projects</div>
+        <h2 class="section-title" data-reveal>What I've built</h2>
+        <div class="projects-grid">
+            <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
+                <div class="project-thumb">
+                    <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
+                    <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
+                </div>
+                <div class="project-body">
+                    <div class="project-meta-row"></div>
+                    <h3 class="project-title" th:text="${project.title}">Title</h3>
+                    <p class="project-desc" th:text="${project.description}">Description</p>
+                    <div class="project-tech">
+                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
+                    </div>
+                    <div class="project-links">
+                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
+                        </a>
+                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
+                            <i class="fa-brands fa-github"></i> GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(projects) and #lists.isEmpty(featuredProjects)}" class="glass-card" data-reveal>
             <p style="margin:0;">Projects will appear here.</p>
         </div>
     </div>
@@ -376,7 +405,17 @@ document.addEventListener('keydown', function(e) {
             <div class="glass-card building-panel" data-reveal>
                 <div class="panel-eyebrow"><span class="panel-dot building-dot"></span> BUILDING</div>
                 <h3 class="building-title" th:text="${bp.title}"></h3>
+                <p th:if="${bp.summary}" th:text="${bp.summary}" style="font-size:.85rem;color:var(--text-secondary);margin:0 0 10px;line-height:1.6;"></p>
                 <p class="building-desc" th:if="${bp.description}" th:text="${bp.description}"></p>
+                <div th:if="${bp.progress != null}" style="margin:10px 0;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                        <span style="font-size:.75rem;color:var(--text-secondary);">Progress</span>
+                        <span style="font-size:.75rem;font-weight:600;color:var(--primary);" th:text="${bp.progress} + '%'"></span>
+                    </div>
+                    <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));" th:style="'width:' + ${bp.progress} + '%'"></div>
+                    </div>
+                </div>
                 <div class="building-tech" th:if="${bp.techStack}">
                     <span class="tech-chip" th:each="t : ${#strings.arraySplit(bp.techStack, '|')}" th:text="${t.trim()}"></span>
                 </div>
@@ -508,7 +547,7 @@ document.addEventListener('keydown', function(e) {
 
             <!-- Left: Let's Connect panel -->
             <div class="glass-card contact-connect-panel" data-reveal>
-                <div class="connect-availability" th:if="${about.availabilityVisible == null or about.availabilityVisible}">
+                <div class="connect-availability" th:if="${about.availabilityVisible == true}">
                     <span class="avail-dot"></span>
                     <span class="avail-text" th:text="${about.availabilityText} ?: 'Available for opportunities'">Available for opportunities</span>
                 </div>

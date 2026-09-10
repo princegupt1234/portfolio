@@ -26,7 +26,12 @@
                         <td><img class="row-thumb" th:if="${p.imageUrl}" th:src="@{${p.imageUrl}}" alt="" /><span th:unless="${p.imageUrl}">—</span></td>
                         <td th:text="${p.title}">Project</td>
                         <td th:text="${p.techStack}">Tech</td>
-                        <td><span class="status-pill" th:classappend="${p.featured} ? 'on' : 'off'" th:text="${p.featured} ? 'Featured' : 'No'">No</span></td>
+                        <td>
+                            <button type="button" class="status-pill" data-featured-toggle
+                                    th:classappend="${p.featured} ? 'on' : 'off'"
+                                    th:attr="data-project-id=${p.id},data-featured=${p.featured},aria-pressed=${p.featured}"
+                                    th:text="${p.featured} ? 'Yes' : 'No'">No</button>
+                        </td>
                         <td><span class="badge" th:text="${p.status}">Live</span></td>
                         <td>
                             <form th:action="@{'/admin/projects/' + ${p.id} + '/toggle-visible'}" method="post" style="margin:0;">

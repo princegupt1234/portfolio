@@ -30,6 +30,7 @@ public class Project {
     private String githubUrl;
     private String liveUrl;
 
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean featured = false;
     private String status = "Live"; // Live, In Progress, Completed
     private String tags; // comma separated
