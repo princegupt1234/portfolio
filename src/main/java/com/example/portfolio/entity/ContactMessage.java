@@ -32,6 +32,8 @@ public class ContactMessage {
     @Column(length = 3000)
     private String replyText;
 
+    private LocalDateTime repliedAt;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Long getId() { return id; }
@@ -48,6 +50,8 @@ public class ContactMessage {
     public void setIsRead(Boolean isRead) { this.isRead = isRead; }
     public String getReplyText() { return replyText; }
     public void setReplyText(String replyText) { this.replyText = replyText; }
+    public LocalDateTime getRepliedAt() { return repliedAt; }
+    public void setRepliedAt(LocalDateTime repliedAt) { this.repliedAt = repliedAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

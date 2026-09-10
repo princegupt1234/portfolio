@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -63,12 +64,10 @@ public class AdminMessageController {
                         @RequestParam("replyText") String replyText) {
         ContactMessage msg = contactMessageRepository.findById(id).orElseThrow();
         msg.setReplyText(replyText);
-        contactMessageRepository.save(msg);
-
         String replySubject = "Re: " + (msg.getSubject() == null || msg.getSubject().isBlank() ? "Your message" : msg.getSubject());
-        String replyBody = replyText;
-        boolean sent = mailService.sendReply(msg.getEmail(), msg.getName(), replySubject, replyBody, msg.getMessage());
-
+        boolean sent = mailService.sendReply(msg.getEmail(), msg.getName(), replySubject, replyText, msg.getMessage());
+        if (sent) msg.setRepliedAt(LocalDateTime.now());
+        contactMessageRepository.save(msg);
         return "redirect:/admin/messages/" + id + "?sent=" + sent;
     }
 

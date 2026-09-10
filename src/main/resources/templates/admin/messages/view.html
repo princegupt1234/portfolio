@@ -18,60 +18,105 @@
                 <h1 th:text="${message.subject} ?: '(no subject)'">Subject</h1>
                 <a th:href="@{/admin/messages}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to Inbox</a>
             </div>
+
+            <!-- Original message -->
             <div class="glass-card" style="margin-bottom:22px;">
                 <p style="margin:0 0 6px;"><strong style="color:var(--text);" th:text="${message.name}">Name</strong> &lt;<span th:text="${message.email}">email</span>&gt;</p>
                 <p style="margin:0 0 20px; font-size:0.82rem;" th:text="${#temporals.format(message.createdAt, 'dd MMM yyyy, HH:mm')}">Date</p>
                 <p style="color:var(--text); white-space:pre-wrap;" th:text="${message.message}">Message body</p>
             </div>
-            <div class="glass-card" th:if="${param.sent == 'true'}">
-                <div style="padding:18px 20px; border-radius:16px; background:rgba(16,185,129,0.12); color:#a7f3d0; margin-bottom:20px;">
-                    Reply has been queued to the sender's email.
-                </div>
-            </div>
-            <div class="glass-card" th:if="${param.sent == 'false'}">
-                <div style="padding:18px 20px; border-radius:16px; background:rgba(241,245,249,0.95); color:#f97316; margin-bottom:20px; border:1px solid rgba(248,113,113,0.18);">
-                    Reply could not be delivered. Please verify SMTP mail settings and ensure <code>app.mail.enabled</code> is enabled.
-                </div>
-            </div>
+
+            <!-- Reply card -->
             <div class="glass-card">
                 <h3 style="margin-bottom:16px;">Reply</h3>
+
+                <!-- Inline status banner (hidden by default, shown by JS) -->
+                <div id="replyStatus" style="display:none; padding:14px 18px; border-radius:12px; margin-bottom:18px; font-size:0.9rem;"></div>
+
+                <!-- Server-side status on page load after redirect -->
+                <div th:if="${param.sent != null and param.sent[0] == 'true'}"
+                     style="padding:14px 18px; border-radius:12px; background:rgba(16,185,129,0.12); color:#a7f3d0; margin-bottom:18px; border:1px solid rgba(16,185,129,0.25);">
+                    <i class="fa-solid fa-circle-check"></i> Reply sent successfully to <strong th:text="${message.email}"></strong>.
+                </div>
+                <div th:if="${param.sent != null and param.sent[0] == 'false'}"
+                     style="padding:14px 18px; border-radius:12px; background:rgba(239,68,68,0.1); color:#fca5a5; margin-bottom:18px; border:1px solid rgba(239,68,68,0.25);">
+                    <i class="fa-solid fa-circle-xmark"></i> Reply could not be delivered. Check SMTP settings (<code>MAIL_USERNAME</code>, <code>MAIL_PASSWORD</code>, <code>MAIL_ENABLED=true</code>).
+                </div>
+
                 <form th:action="@{'/admin/messages/' + ${message.id} + '/reply'}" method="post" id="replyForm">
-                    <textarea class="glass-textarea" name="replyText" id="replyText" rows="5" th:text="${message.replyText}" placeholder="Type your reply notes here..."></textarea>
-                    <div class="form-actions">
-                        <button type="submit" class="glass-btn primary" id="saveReplyBtn"><i class="fa-solid fa-floppy-disk"></i> Save Reply</button>
+                    <textarea class="glass-textarea" name="replyText" id="replyText" rows="6"
+                              th:text="${message.replyText}"
+                              placeholder="Type your reply here..."></textarea>
+                    <div id="emptyError" style="display:none; color:#fca5a5; font-size:0.82rem; margin-top:6px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Reply cannot be empty.
+                    </div>
+                    <div class="form-actions" style="margin-top:16px;">
+                        <button type="submit" class="glass-btn primary" id="saveReplyBtn">
+                            <i class="fa-solid fa-paper-plane"></i> Send Reply
+                        </button>
                         <a id="openEmailBtn" href="#" class="glass-btn"
-                           th:attr="data-email=${message.email}, data-subject=${'Re: ' + (message.subject ?: 'Your message')}"
-                        ><i class="fa-solid fa-paper-plane"></i> Open in Email</a>
+                           th:attr="data-email=${message.email}, data-subject=${'Re: ' + (message.subject ?: 'Your message')}">
+                            <i class="fa-solid fa-envelope"></i> Open in Email
+                        </a>
                     </div>
                 </form>
             </div>
-            <script>
-            (function() {
-                var textarea = document.getElementById('replyText');
-                var emailBtn = document.getElementById('openEmailBtn');
-                var email = emailBtn.dataset.email;
-                var subject = emailBtn.dataset.subject;
-                var form = document.getElementById('replyForm');
-                var saveBtn = document.getElementById('saveReplyBtn');
-
-                function updateEmailBtn() {
-                    emailBtn.href = 'mailto:' + encodeURIComponent(email)
-                        + '?subject=' + encodeURIComponent(subject)
-                        + '&body=' + encodeURIComponent(textarea.value || '');
-                }
-
-                textarea.addEventListener('input', updateEmailBtn);
-                updateEmailBtn();
-
-                form.addEventListener('submit', function() {
-                    saveBtn.disabled = true;
-                    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-                });
-            })();
-            </script>
         </div>
     </div>
 </div>
 <script th:src="@{/js/admin.js}"></script>
+<script>
+(function () {
+    var textarea  = document.getElementById('replyText');
+    var emailBtn  = document.getElementById('openEmailBtn');
+    var form      = document.getElementById('replyForm');
+    var saveBtn   = document.getElementById('saveReplyBtn');
+    var emptyErr  = document.getElementById('emptyError');
+    var statusBox = document.getElementById('replyStatus');
+    var email     = emailBtn.dataset.email;
+    var subject   = emailBtn.dataset.subject;
+    var submitting = false;
+
+    /* Keep mailto link in sync with textarea */
+    function updateEmailBtn() {
+        emailBtn.href = 'mailto:' + encodeURIComponent(email)
+            + '?subject=' + encodeURIComponent(subject)
+            + '&body='    + encodeURIComponent(textarea.value || '');
+    }
+    textarea.addEventListener('input', function () {
+        emptyErr.style.display = 'none';
+        updateEmailBtn();
+    });
+    updateEmailBtn();
+
+    /* Prevent empty submit */
+    form.addEventListener('submit', function (e) {
+        if (textarea.value.trim() === '') {
+            e.preventDefault();
+            emptyErr.style.display = 'block';
+            textarea.focus();
+            return;
+        }
+        if (submitting) { e.preventDefault(); return; }
+        submitting = true;
+
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+        statusBox.style.display = 'none';
+    });
+
+    /* Scroll to status banner if present on page load (after redirect) */
+    var serverStatus = document.querySelector('[style*="circle-check"], [style*="circle-xmark"]');
+    if (!serverStatus) {
+        /* check by content */
+        var allDivs = document.querySelectorAll('.glass-card div[style]');
+        allDivs.forEach(function(d) {
+            if (d.textContent.includes('Reply sent') || d.textContent.includes('could not be delivered')) {
+                d.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+})();
+</script>
 </body>
 </html>

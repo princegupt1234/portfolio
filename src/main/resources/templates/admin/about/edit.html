@@ -543,12 +543,11 @@
               <!-- Existing projects list -->
               <div class="glass-table-wrap" style="margin-bottom:22px;">
                 <table class="glass-table">
-                  <thead><tr><th>Title</th><th>Status</th><th>Progress</th><th>Sort</th><th></th></tr></thead>
+                  <thead><tr><th>Title</th><th>Status</th><th>Sort</th><th></th></tr></thead>
                   <tbody>
                   <tr th:each="bp : ${buildingProjects}">
                     <td th:text="${bp.title}">Title</td>
                     <td th:text="${bp.status}">Status</td>
-                    <td th:text="${bp.progress != null ? bp.progress + '%' : ''}">Progress</td>
                     <td th:text="${bp.sortOrder}">0</td>
                     <td style="display:flex;gap:8px;">
                       <a th:href="@{'/admin/about/building/' + ${bp.id} + '/edit'}" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);text-decoration:none;">
@@ -562,7 +561,7 @@
                     </td>
                   </tr>
                   <tr th:if="${#lists.isEmpty(buildingProjects)}">
-                    <td colspan="5" style="color:var(--text-secondary);text-align:center;padding:20px;">No projects yet.</td>
+                    <td colspan="4" style="color:var(--text-secondary);text-align:center;padding:20px;">No projects yet.</td>
                   </tr>
                   </tbody>
                 </table>
@@ -577,10 +576,6 @@
                   <label>Status</label>
                   <input class="glass-input" name="status" th:value="${editingBuildingProject.status}" placeholder="In Progress"/>
                   <span class="field-hint">e.g. In Progress, Beta, Live, Paused</span>
-                </div>
-                <div class="form-group">
-                  <label>Progress %</label>
-                  <input class="glass-input" name="progress" th:value="${editingBuildingProject.progress}" type="number" min="0" max="100" placeholder="65"/>
                 </div>
                 <div class="form-group">
                   <label>Sort Order</label>
@@ -746,7 +741,7 @@
                 <div class="form-group" style="justify-content:flex-end;">
                   <div class="avail-row">
                     <label class="toggle-switch">
-                      <input type="checkbox" id="availabilityVisible" th:field="*{availabilityVisible}"/>
+                      <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible == true}"/>
                       <span class="toggle-slider"></span>
                     </label>
                     <label for="availabilityVisible">Show availability badge on portfolio</label>

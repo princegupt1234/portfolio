@@ -103,7 +103,9 @@ public class AdminAboutController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute AboutInfo about,
-                        @RequestParam(value = "photoFile", required = false) MultipartFile photoFile) {
+                        @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
+                        @RequestParam(value = "availabilityVisible", required = false) String availabilityVisibleParam) {
+        about.setAvailabilityVisible("true".equals(availabilityVisibleParam));
         if (photoFile != null && !photoFile.isEmpty()) {
             about.setProfileImage(fileStorageService.store(photoFile, "profile"));
         } else if (about.getId() != null) {
@@ -199,7 +201,6 @@ public class AdminAboutController {
     private boolean isValidBuildingProject(BuildingProject project) {
         if (project.getTitle() == null || project.getTitle().isBlank()) return false;
         if (project.getStatus() == null || project.getStatus().isBlank()) return false;
-        if (project.getProgress() != null && (project.getProgress() < 0 || project.getProgress() > 100)) return false;
         if (project.getSortOrder() != null && project.getSortOrder() < 0) return false;
         if (project.getProjectUrl() == null || project.getProjectUrl().isBlank()) return true;
         try {

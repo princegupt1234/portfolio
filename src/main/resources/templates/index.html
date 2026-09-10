@@ -407,15 +407,6 @@ document.addEventListener('keydown', function(e) {
                 <h3 class="building-title" th:text="${bp.title}"></h3>
                 <p th:if="${bp.summary}" th:text="${bp.summary}" style="font-size:.85rem;color:var(--text-secondary);margin:0 0 10px;line-height:1.6;"></p>
                 <p class="building-desc" th:if="${bp.description}" th:text="${bp.description}"></p>
-                <div th:if="${bp.progress != null}" style="margin:10px 0;">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-                        <span style="font-size:.75rem;color:var(--text-secondary);">Progress</span>
-                        <span style="font-size:.75rem;font-weight:600;color:var(--primary);" th:text="${bp.progress} + '%'"></span>
-                    </div>
-                    <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;">
-                        <div style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));" th:style="'width:' + ${bp.progress} + '%'"></div>
-                    </div>
-                </div>
                 <div class="building-tech" th:if="${bp.techStack}">
                     <span class="tech-chip" th:each="t : ${#strings.arraySplit(bp.techStack, '|')}" th:text="${t.trim()}"></span>
                 </div>
