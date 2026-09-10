@@ -179,21 +179,21 @@ public class AdminAboutController {
     @ResponseBody
     public ResponseEntity<BuildingProject> apiUpdateBuilding(@PathVariable Long id,
                                                               @RequestBody BuildingProject project) {
-        return buildingProjectRepository.findById(id).map(existing -> {
-            if (!isValidBuildingProject(project))
-                return ResponseEntity.<BuildingProject>badRequest().build();
-            existing.setTitle(project.getTitle());
-            existing.setStatus(project.getStatus());
-            existing.setProgress(project.getProgress());
-            existing.setSortOrder(project.getSortOrder());
-            existing.setProjectUrl(project.getProjectUrl());
-            existing.setDescription(project.getDescription());
-            existing.setSummary(project.getSummary());
-            existing.setTechStack(project.getTechStack());
-            BuildingProject saved = buildingProjectRepository.save(existing);
-            dataVersionService.bump();
-            return ResponseEntity.ok(saved);
-        }).orElse(ResponseEntity.notFound().build());
+        if (!buildingProjectRepository.existsById(id))
+            return ResponseEntity.notFound().build();
+        if (!isValidBuildingProject(project))
+            return ResponseEntity.<BuildingProject>badRequest().build();
+        BuildingProject existing = buildingProjectRepository.findById(id).get();
+        existing.setTitle(project.getTitle());
+        existing.setStatus(project.getStatus());
+        existing.setProgress(project.getProgress());
+        existing.setSortOrder(project.getSortOrder());
+        existing.setProjectUrl(project.getProjectUrl());
+        existing.setDescription(project.getDescription());
+        existing.setSummary(project.getSummary());
+        existing.setTechStack(project.getTechStack());
+        dataVersionService.bump();
+        return ResponseEntity.ok(buildingProjectRepository.save(existing));
     }
 
     private boolean isValidBuildingProject(BuildingProject project) {
