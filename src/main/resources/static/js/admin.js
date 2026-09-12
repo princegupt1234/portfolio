@@ -68,6 +68,35 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'X-XSRF-TOKEN';
   }
 
+  /* ── Form Toggle Switches (Active Sync & Label Click Delegation) ── */
+  function syncToggleSwitch(cb) {
+    const parentSwitch = cb.closest('.toggle-switch');
+    if (parentSwitch) {
+      parentSwitch.classList.toggle('checked', cb.checked);
+    }
+  }
+
+  // Synchronize on load and when state changes
+  document.querySelectorAll('.toggle-switch input[type="checkbox"]').forEach(cb => {
+    syncToggleSwitch(cb);
+    cb.addEventListener('change', () => syncToggleSwitch(cb));
+  });
+
+  // Clicking label text or the toggle group row toggles the checkbox
+  document.querySelectorAll('.toggle-group, .avail-row').forEach(group => {
+    group.style.cursor = 'pointer';
+    group.addEventListener('click', (e) => {
+      if (e.target.closest('.toggle-switch')) return;
+      if (e.target.closest('a, button, select, input, textarea')) return;
+      const cb = group.querySelector('.toggle-switch input[type="checkbox"]');
+      if (cb) {
+        cb.checked = !cb.checked;
+        syncToggleSwitch(cb);
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  });
+
   /* ── Featured Toggle Button (AJAX with Form Fallback) ── */
   function setFeaturedButtonState(button, featured) {
     button.dataset.featured = String(featured);

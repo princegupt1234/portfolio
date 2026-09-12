@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
@@ -84,26 +84,26 @@
                             <small>Lower order numbers appear first on your portfolio.</small>
                         </div>
 
-                        <div class="form-group full" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding:12px 0;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" th:field="*{visible}" />
+                        <div class="form-group full toggle-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding:12px 0; cursor:pointer;">
+                            <label class="toggle-switch" for="project-visible">
+                                <input type="checkbox" id="project-visible" th:field="*{visible}" />
                                 <span class="toggle-slider"></span>
                             </label>
-                            <div>
-                                <strong style="color:var(--text); font-size:0.9rem;">Visible on Portfolio</strong>
-                                <div style="color:var(--text-secondary); font-size:0.78rem;">Display this project publicly on your portfolio site.</div>
-                            </div>
+                            <label for="project-visible" style="cursor:pointer; margin:0; display:block;">
+                                <strong style="color:var(--text); font-size:0.9rem; display:block;">Visible on Portfolio</strong>
+                                <span style="color:var(--text-secondary); font-size:0.78rem;">Display this project publicly on your portfolio site.</span>
+                            </label>
                         </div>
 
-                        <div class="form-group full" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding:12px 0; border-top:1px solid var(--glass-border);">
-                            <label class="toggle-switch">
-                                <input type="checkbox" th:field="*{featured}" />
+                        <div class="form-group full toggle-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding:12px 0; border-top:1px solid var(--glass-border); cursor:pointer;">
+                            <label class="toggle-switch" for="project-featured">
+                                <input type="checkbox" id="project-featured" th:field="*{featured}" />
                                 <span class="toggle-slider"></span>
                             </label>
-                            <div>
-                                <strong style="color:var(--text); font-size:0.9rem;">Featured Project</strong>
-                                <div style="color:var(--text-secondary); font-size:0.78rem;">Highlight this project prominently at the top of your works section.</div>
-                            </div>
+                            <label for="project-featured" style="cursor:pointer; margin:0; display:block;">
+                                <strong style="color:var(--text); font-size:0.9rem; display:block;">Featured Project</strong>
+                                <span style="color:var(--text-secondary); font-size:0.78rem;">Highlight this project prominently at the top of your works section.</span>
+                            </label>
                         </div>
 
                         <div class="form-group full" style="border-top:1px solid var(--glass-border); padding-top:18px;">
@@ -128,6 +128,6 @@
         </div>
     </div>
 </div>
-<script th:src="@{/js/admin.js}"></script>
+<script th:src="@{/js/admin.js(v='6')}"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
@@ -48,15 +48,15 @@
                             <input id="testimonial-rating" class="glass-input" type="number" min="1" max="5" th:field="*{rating}" placeholder="5" />
                         </div>
 
-                        <div class="form-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" th:field="*{published}"/>
+                        <div class="form-group toggle-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px; cursor:pointer;">
+                            <label class="toggle-switch" for="testimonial-published">
+                                <input type="checkbox" id="testimonial-published" th:field="*{published}"/>
                                 <span class="toggle-slider"></span>
                             </label>
-                            <div>
-                                <strong style="color:var(--text); font-size:0.9rem;">Published on Portfolio</strong>
-                                <div style="color:var(--text-secondary); font-size:0.75rem;">Show this recommendation in your public testimonials section.</div>
-                            </div>
+                            <label for="testimonial-published" style="cursor:pointer; margin:0; display:block;">
+                                <strong style="color:var(--text); font-size:0.9rem; display:block;">Published on Portfolio</strong>
+                                <span style="color:var(--text-secondary); font-size:0.75rem;">Show this recommendation in your public testimonials section.</span>
+                            </label>
                         </div>
 
                         <div class="form-group full">
@@ -86,6 +86,6 @@
         </div>
     </div>
 </div>
-<script th:src="@{/js/admin.js}"></script>
+<script th:src="@{/js/admin.js(v='6')}"></script>
 </body>
 </html>

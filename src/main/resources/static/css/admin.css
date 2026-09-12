@@ -625,21 +625,36 @@ button.status-pill:disabled {
   display: inline-block;
   width: 44px;
   height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
 }
 
+.toggle-switch input[type="checkbox"],
 .toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+  z-index: 5 !important;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .toggle-slider {
   position: absolute;
-  cursor: pointer;
   inset: 0;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
-  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  box-sizing: border-box;
 }
 
 .toggle-slider::before {
@@ -647,26 +662,44 @@ button.status-pill:disabled {
   position: absolute;
   height: 18px;
   width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background: white;
+  left: 2px;
+  top: 2px;
+  background: #ffffff;
   border-radius: 50%;
-  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
 }
 
-.toggle-switch input:checked + .toggle-slider,
-.toggle-switch input:checked ~ .toggle-slider {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+.toggle-switch.checked .toggle-slider,
+.toggle-switch:has(input:checked) .toggle-slider,
+.toggle-switch input:checked ~ .toggle-slider,
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+  border-color: transparent !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4) !important;
 }
 
-.toggle-switch input:checked + .toggle-slider::before,
-.toggle-switch input:checked ~ .toggle-slider::before {
-  transform: translateX(20px);
+.toggle-switch.checked .toggle-slider::before,
+.toggle-switch:has(input:checked) .toggle-slider::before,
+.toggle-switch input:checked ~ .toggle-slider::before,
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(20px) !important;
+  background: #ffffff !important;
 }
 
+.toggle-switch:focus-within .toggle-slider,
 .toggle-switch input:focus-visible ~ .toggle-slider {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+.toggle-group {
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-group:hover {
+  opacity: 0.95;
 }
 
 /* ── Live Preview Shared Component ── */

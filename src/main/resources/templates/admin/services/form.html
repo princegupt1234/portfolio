@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
@@ -55,15 +55,15 @@
                             <small>Lower order numbers appear first.</small>
                         </div>
 
-                        <div class="form-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" th:field="*{visible}"/>
+                        <div class="form-group toggle-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px; cursor:pointer;">
+                            <label class="toggle-switch" for="service-visible">
+                                <input type="checkbox" id="service-visible" th:field="*{visible}"/>
                                 <span class="toggle-slider"></span>
                             </label>
-                            <div>
-                                <strong style="color:var(--text); font-size:0.9rem;">Visible on Portfolio</strong>
-                                <div style="color:var(--text-secondary); font-size:0.75rem;">Display this service offering on your portfolio site.</div>
-                            </div>
+                            <label for="service-visible" style="cursor:pointer; margin:0; display:block;">
+                                <strong style="color:var(--text); font-size:0.9rem; display:block;">Visible on Portfolio</strong>
+                                <span style="color:var(--text-secondary); font-size:0.75rem;">Display this service offering on your portfolio site.</span>
+                            </label>
                         </div>
 
                         <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
@@ -76,6 +76,6 @@
         </div>
     </div>
 </div>
-<script th:src="@{/js/admin.js}"></script>
+<script th:src="@{/js/admin.js(v='6')}"></script>
 </body>
 </html>

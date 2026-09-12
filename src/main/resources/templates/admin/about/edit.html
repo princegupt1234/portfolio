@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" th:href="@{/css/theme.css}">
-  <link rel="stylesheet" th:href="@{/css/admin.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
   <style>
     /* ── About-page extras ── */
     .about-sections { display:flex; flex-direction:column; gap:22px; }
@@ -750,12 +750,12 @@
                   <span class="field-hint">Shown as a green pulsing badge in the About and Contact sections.</span>
                 </div>
                 <div class="form-group" style="justify-content:flex-end;">
-                  <div class="avail-row">
-                    <label class="toggle-switch">
+                  <div class="avail-row toggle-group" style="cursor:pointer;">
+                    <label class="toggle-switch" for="availabilityVisible">
                       <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible == true}"/>
                       <span class="toggle-slider"></span>
                     </label>
-                    <label for="availabilityVisible">Show availability badge on portfolio</label>
+                    <label for="availabilityVisible" style="cursor:pointer; margin:0;">Show availability badge on portfolio</label>
                   </div>
                 </div>
                 <div class="form-group">
@@ -849,7 +849,7 @@
   </div><!-- /admin-main -->
 </div><!-- /admin-shell -->
 
-<script th:src="@{/js/admin.js}"></script>
+<script th:src="@{/js/admin.js(v='6')}"></script>
 <script>
 /* ── Collapsible sections ── */
 function toggleSection(id) {

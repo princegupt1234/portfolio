@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css(v='5')}">
 </head>
 <body>
 
@@ -162,65 +162,68 @@
 </section>
 
 <!-- ===================== PROJECTS ===================== -->
-<section class="section" id="featured-projects" th:if="${!#lists.isEmpty(featuredProjects)}">
-    <div class="container">
-        <div class="section-tag">Featured Projects</div>
-        <h2 class="section-title" data-reveal>Selected work</h2>
-        <div class="projects-grid">
-            <div class="glass-card project-card" th:each="project : ${featuredProjects}" data-reveal>
-                <div class="project-thumb">
-                <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
-                    <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
-                </div>
-                <div class="project-body">
-                    <div class="project-meta-row"><span class="project-featured-badge">⭐ Featured</span></div>
-                    <h3 class="project-title" th:text="${project.title}">Title</h3>
-                    <p class="project-desc" th:text="${project.description}">Description</p>
-                    <div class="project-tech">
-                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
-                    </div>
-                    <div class="project-links">
-                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
-                        </a>
-                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
-                            <i class="fa-brands fa-github"></i> GitHub
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <section class="section" id="projects">
     <div class="container">
-        <div class="section-tag">Projects</div>
-        <h2 class="section-title" data-reveal>What I've built</h2>
-        <div class="projects-grid">
-            <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
-                <div class="project-thumb">
-                    <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
-                    <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
-                </div>
-                <div class="project-body">
-                    <div class="project-meta-row"></div>
-                    <h3 class="project-title" th:text="${project.title}">Title</h3>
-                    <p class="project-desc" th:text="${project.description}">Description</p>
-                    <div class="project-tech">
-                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
+        <!-- Featured Projects Showcase -->
+        <div th:if="${!#lists.isEmpty(featuredProjects)}" style="margin-bottom: 56px;">
+            <div class="section-tag">Featured Projects</div>
+            <h2 class="section-title" data-reveal>Selected work</h2>
+            <div class="projects-grid">
+                <div class="glass-card project-card" th:each="project : ${featuredProjects}" data-reveal>
+                    <div class="project-thumb">
+                        <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
+                        <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
                     </div>
-                    <div class="project-links">
-                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
-                        </a>
-                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
-                            <i class="fa-brands fa-github"></i> GitHub
-                        </a>
+                    <div class="project-body">
+                        <div class="project-meta-row"><span class="project-featured-badge">⭐ Featured</span></div>
+                        <h3 class="project-title" th:text="${project.title}">Title</h3>
+                        <p class="project-desc" th:text="${project.description}">Description</p>
+                        <div class="project-tech">
+                            <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
+                        </div>
+                        <div class="project-links">
+                            <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
+                            </a>
+                            <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
+                                <i class="fa-brands fa-github"></i> GitHub
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- All Other Projects Showcase -->
+        <div th:if="${!#lists.isEmpty(projects)}">
+            <div class="section-tag" th:text="${!#lists.isEmpty(featuredProjects)} ? 'More Projects' : 'Projects'">Projects</div>
+            <h2 class="section-title" data-reveal th:text="${!#lists.isEmpty(featuredProjects)} ? 'Other builds &amp; experiments' : 'What I\'ve built'">What I've built</h2>
+            <div class="projects-grid">
+                <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
+                    <div class="project-thumb">
+                        <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
+                        <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-meta-row"></div>
+                        <h3 class="project-title" th:text="${project.title}">Title</h3>
+                        <p class="project-desc" th:text="${project.description}">Description</p>
+                        <div class="project-tech">
+                            <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
+                        </div>
+                        <div class="project-links">
+                            <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
+                            </a>
+                            <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
+                                <i class="fa-brands fa-github"></i> GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div th:if="${#lists.isEmpty(projects) and #lists.isEmpty(featuredProjects)}" class="glass-card" data-reveal>
             <p style="margin:0;">Projects will appear here.</p>
         </div>
@@ -315,22 +318,18 @@
         <div class="section-tag">Certifications</div>
         <h2 class="section-title" data-reveal>Certifications &amp; achievements</h2>
         <div class="cert-carousel" data-reveal>
-            <div class="glass-card cert-card" th:each="cert : ${certificates}"
-                 th:attr="data-cert-preview=${cert.imageUrl != null ? cert.imageUrl : ''}, data-cert-title=${cert.title}, data-cert-org=${cert.organization}, data-cert-date=${cert.issueDate}, data-cert-id=${cert.credentialId}, data-cert-pdf=${cert.pdfUrl}">
-                <!-- ONLY CERTIFICATE IMAGE IS CLICKABLE TO ZOOM -->
-                <div class="cert-thumb cert-zoomable" th:if="${cert.imageUrl}" onclick="openCertModal(this.closest('.cert-card'))" title="Click to zoom certificate image">
+            <div class="glass-card cert-card" th:each="cert : ${certificates}">
+                <!-- ONLY CERTIFICATE IMAGE HAS ZOOM TRIGGER -->
+                <div class="cert-thumb" th:if="${cert.imageUrl}" onclick="openCertModal(this)" title="Click to view full certificate">
                     <img th:src="@{${cert.imageUrl}}" th:alt="${cert.title}" loading="lazy" />
-                    <div class="cert-thumb-overlay">
-                        <span class="cert-zoom-pill"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom Certificate</span>
-                    </div>
                 </div>
-                <div class="cert-thumb cert-thumb-static" th:unless="${cert.imageUrl}">
+                <div class="cert-thumb" th:unless="${cert.imageUrl}">
                     <i class="fa-solid fa-certificate" style="font-size:2.5rem; color: var(--text-secondary);"></i>
                 </div>
                 <h4 th:text="${cert.title}">Title</h4>
                 <p style="margin:4px 0;" th:text="${cert.organization}">Org</p>
                 <p style="font-size:0.8rem; color:var(--text-secondary);" th:text="${cert.issueDate}">Date</p>
-                <a th:if="${cert.pdfUrl}" th:href="@{${cert.pdfUrl}}" target="_blank" class="glass-btn" style="margin-top:10px; padding:8px 16px; font-size:0.8rem;" onclick="event.stopPropagation();"><i class="fa-solid fa-download"></i> Download PDF</a>
+                <a th:if="${cert.pdfUrl}" th:href="@{${cert.pdfUrl}}" target="_blank" class="glass-btn" style="margin-top:10px; padding:8px 16px; font-size:0.8rem;"><i class="fa-solid fa-download"></i> Download PDF</a>
             </div>
             <div class="glass-card cert-card" th:if="${#lists.isEmpty(certificates)}">
                 <p style="margin:0;">Certificates will appear here.</p>
@@ -339,62 +338,26 @@
     </div>
 </section>
 
-<!-- Certificate Full Image & Lightbox Modal -->
-<div id="certModal" class="cert-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="certModalTitle" onclick="if(event.target===this||event.target.id==='certModalStage')closeCertModal()">
-    <!-- Top Header Bar -->
-    <div class="cert-modal-header">
-        <div class="cert-modal-title-wrap">
-            <h3 class="cert-modal-title" id="certModalTitle">Certificate Title</h3>
-            <div class="cert-modal-meta" id="certModalMeta"></div>
-        </div>
-        <div class="cert-modal-actions">
-            <button class="cert-modal-btn" onclick="zoomCert(-1)" title="Zoom Out (-)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-            <button class="cert-modal-btn" onclick="_resetZoom()" title="Reset Fit (0)"><i class="fa-solid fa-compress"></i></button>
-            <button class="cert-modal-btn" onclick="zoomCert(1)" title="Zoom In (+)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-            <a id="certOpenOriginalBtn" href="#" target="_blank" class="cert-modal-btn" title="Open Full Image in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-            <a id="certPdfBtn" href="#" target="_blank" class="cert-modal-btn" title="Download / View PDF" style="display:none;"><i class="fa-solid fa-file-pdf"></i></a>
-            <button class="cert-modal-btn close-btn" onclick="closeCertModal()" title="Close (Esc)"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+<!-- Pure Image Zoom Lightbox (Hardcoded display:none inline, zero clutter, never leaks to page) -->
+<div id="certModal" style="position:fixed; inset:0; background:rgba(3,7,18,0.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; z-index:99999; padding:16px;" onclick="if(event.target===this||event.target.id==='certModalCanvas')closeCertModal()">
+    
+    <!-- Top-Right Floating Controls -->
+    <div style="position:absolute; top:20px; right:24px; display:flex; align-items:center; gap:8px; z-index:100000;">
+        <button type="button" class="glass-btn" onclick="zoomCert(1)" title="Zoom in" style="width:38px; height:38px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:0.95rem; cursor:pointer;"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+        <button type="button" class="glass-btn" onclick="zoomCert(-1)" title="Zoom out" style="width:38px; height:38px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:0.95rem; cursor:pointer;"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+        <button type="button" class="glass-btn" onclick="_resetZoom()" title="Reset size" style="width:38px; height:38px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:0.95rem; cursor:pointer;"><i class="fa-solid fa-compress"></i></button>
+        <button type="button" class="glass-btn" onclick="closeCertModal()" title="Close" style="width:38px; height:38px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:1.1rem; cursor:pointer; background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.4);"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- Middle Stage: Floating Chevrons + Image Canvas -->
-    <div class="cert-modal-stage" id="certModalStage">
-        <button class="cert-nav-arrow prev" id="certPrevBtn" onclick="navCert(-1)" title="Previous Certificate (Left Arrow)"><i class="fa-solid fa-chevron-left"></i></button>
-
-        <div class="cert-modal-img-container" id="certModalImgContainer">
-            <img id="certModalImg" class="cert-modal-img" src="" alt="Full Certificate Image" draggable="false" />
-        </div>
-
-        <!-- Fallback when certificate has no image -->
-        <div id="certModalFallback" class="cert-modal-fallback" style="display:none;">
-            <i class="fa-solid fa-certificate" style="font-size:3.5rem; color:var(--primary); margin-bottom:16px; display:block;"></i>
-            <h3 id="certFallbackTitle" style="color:var(--text); margin-bottom:8px; font-size:1.3rem;">Certificate</h3>
-            <p id="certFallbackOrg" style="color:var(--secondary); font-size:0.95rem; margin-bottom:18px;">Organization</p>
-            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:22px;">No preview image was uploaded for this credential.</p>
-            <a id="certFallbackPdfBtn" href="#" target="_blank" class="glass-btn primary" style="display:none; padding:10px 20px;">
-                <i class="fa-solid fa-file-pdf" style="margin-right:6px;"></i> View / Download Official PDF
-            </a>
-        </div>
-
-        <button class="cert-nav-arrow next" id="certNextBtn" onclick="navCert(1)" title="Next Certificate (Right Arrow)"><i class="fa-solid fa-chevron-right"></i></button>
-    </div>
-
-    <!-- Bottom Footer Bar -->
-    <div class="cert-modal-footer">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <span id="certModalCounter" style="font-weight:600; color:var(--text); font-family:var(--font-mono);">1 of 1</span>
-            <span class="cert-modal-hint"><i class="fa-solid fa-circle-info" style="margin-right:4px;"></i> Click any area on certificate to zoom 2x · Scroll to zoom · Drag to pan · Esc to close</span>
-        </div>
-        <div>
-            <span style="color:var(--text-muted); font-size:0.75rem; margin-right:6px;">Zoom:</span>
-            <span id="certModalZoomLevel" style="color:var(--primary); font-family:var(--font-mono); font-weight:700;">100%</span>
+    <!-- Center Stage: The pure zoomed certificate image -->
+    <div id="certModalCanvas" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:zoom-out;">
+        <div id="certModalImgWrap" style="display:flex; align-items:center; justify-content:center; transition:transform 0.2s cubic-bezier(0.16,1,0.3,1); transform-origin:center center; cursor:zoom-in;">
+            <img id="certModalImg" src="" alt="Certificate" style="max-width:92vw; max-height:86vh; width:auto; height:auto; object-fit:contain; border-radius:12px; box-shadow:0 24px 64px rgba(0,0,0,0.92); user-select:none; -webkit-user-drag:none; image-rendering:-webkit-optimize-contrast;" draggable="false" />
         </div>
     </div>
 </div>
 
 <script>
-var _certCards = [];
-var _certIdx = 0;
 var _zoomScale = 1;
 var _panX = 0;
 var _panY = 0;
@@ -403,16 +366,19 @@ var _startX = 0;
 var _startY = 0;
 var _hasDragged = false;
 
-function openCertModal(card) {
-    _certCards = Array.from(document.querySelectorAll('.cert-card[data-cert-preview]')).filter(function(c) {
-        return (c.getAttribute('data-cert-preview') || '').trim() !== '';
-    });
-    _certIdx = _certCards.indexOf(card);
-    if (_certIdx < 0) _certIdx = 0;
-    _showCurrentCert();
+function openCertModal(thumbEl) {
+    var img = thumbEl.querySelector('img');
+    var src = img ? img.src : '';
+    if (!src) return;
+    
+    var modalImg = document.getElementById('certModalImg');
+    modalImg.src = src;
+    modalImg.alt = img.alt || 'Certificate';
+    _resetZoom();
+
     var modal = document.getElementById('certModal');
     if (modal) {
-        modal.classList.add('open');
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 }
@@ -420,81 +386,17 @@ function openCertModal(card) {
 function closeCertModal() {
     var modal = document.getElementById('certModal');
     if (modal) {
-        modal.classList.remove('open');
+        modal.style.display = 'none';
         document.body.style.overflow = '';
     }
     _resetZoom();
 }
 
-function _showCurrentCert() {
-    var card = _certCards[_certIdx];
-    if (!card) return;
-
-    var title = card.getAttribute('data-cert-title') || '';
-    var org = card.getAttribute('data-cert-org') || '';
-    var date = card.getAttribute('data-cert-date') || '';
-    var id = card.getAttribute('data-cert-id') || '';
-    var pdfUrl = card.getAttribute('data-cert-pdf') || '';
-
-    var cardImg = card.querySelector('.cert-thumb img');
-    var imgSrc = cardImg ? cardImg.src : (card.getAttribute('data-cert-preview') || '');
-
-    document.getElementById('certModalTitle').textContent = title || 'Certificate';
-    var metaHtml = '';
-    if (org) metaHtml += '<span class="org-badge"><i class="fa-solid fa-award" style="margin-right:4px;"></i>' + org + '</span>';
-    if (date) metaHtml += '<span><i class="fa-regular fa-calendar" style="margin-right:4px;"></i>' + date + '</span>';
-    if (id) metaHtml += '<span style="font-family:var(--font-mono); font-size:0.75rem; opacity:0.8;">Credential ID: ' + id + '</span>';
-    document.getElementById('certModalMeta').innerHTML = metaHtml;
-
-    var img = document.getElementById('certModalImg');
-    var fallback = document.getElementById('certModalFallback');
-    var openOriginalBtn = document.getElementById('certOpenOriginalBtn');
-    var pdfBtn = document.getElementById('certPdfBtn');
-    var fallbackPdfBtn = document.getElementById('certFallbackPdfBtn');
-
-    if (imgSrc) {
-        img.src = imgSrc;
-        img.alt = title;
-        img.style.display = 'block';
-        fallback.style.display = 'none';
-        openOriginalBtn.style.display = 'inline-flex';
-        openOriginalBtn.href = imgSrc;
-    } else {
-        img.style.display = 'none';
-        fallback.style.display = 'block';
-        openOriginalBtn.style.display = 'none';
-        document.getElementById('certFallbackTitle').textContent = title;
-        document.getElementById('certFallbackOrg').textContent = org;
-    }
-
-    if (pdfUrl) {
-        pdfBtn.style.display = 'inline-flex';
-        pdfBtn.href = pdfUrl;
-        fallbackPdfBtn.href = pdfUrl;
-        fallbackPdfBtn.style.display = 'inline-flex';
-    } else {
-        pdfBtn.style.display = 'none';
-        fallbackPdfBtn.style.display = 'none';
-    }
-
-    document.getElementById('certModalCounter').textContent = (_certIdx + 1) + ' of ' + _certCards.length;
-    var showNav = _certCards.length > 1;
-    document.getElementById('certPrevBtn').style.display = showNav ? 'flex' : 'none';
-    document.getElementById('certNextBtn').style.display = showNav ? 'flex' : 'none';
-
-    _resetZoom();
-}
-
 function _updateTransform() {
-    var container = document.getElementById('certModalImgContainer');
-    if (!container) return;
-    container.style.transform = 'translate(' + _panX + 'px, ' + _panY + 'px) scale(' + _zoomScale + ')';
-    container.classList.toggle('zoomed', _zoomScale > 1);
-
-    var zoomDisplay = document.getElementById('certModalZoomLevel');
-    if (zoomDisplay) {
-        zoomDisplay.textContent = Math.round(_zoomScale * 100) + '%';
-    }
+    var wrap = document.getElementById('certModalImgWrap');
+    if (!wrap) return;
+    wrap.style.transform = 'translate(' + _panX + 'px, ' + _panY + 'px) scale(' + _zoomScale + ')';
+    wrap.style.cursor = _zoomScale > 1.05 ? 'grab' : 'zoom-in';
 }
 
 function _resetZoom() {
@@ -517,21 +419,14 @@ function zoomCert(dir) {
     _updateTransform();
 }
 
-function navCert(dir) {
-    if (_certCards.length <= 1) return;
-    _certIdx = (_certIdx + dir + _certCards.length) % _certCards.length;
-    _showCurrentCert();
-}
-
-// Mouse wheel, drag, and click interactions
 (function() {
-    var stage = document.getElementById('certModalStage');
-    var container = document.getElementById('certModalImgContainer');
+    var modal = document.getElementById('certModal');
+    var wrap = document.getElementById('certModalImgWrap');
     var img = document.getElementById('certModalImg');
 
-    if (stage) {
-        stage.addEventListener('wheel', function(e) {
-            if (!document.getElementById('certModal').classList.contains('open')) return;
+    if (modal) {
+        modal.addEventListener('wheel', function(e) {
+            if (modal.style.display !== 'flex') return;
             e.preventDefault();
             if (e.deltaY < 0) {
                 zoomCert(1);
@@ -539,17 +434,9 @@ function navCert(dir) {
                 zoomCert(-1);
             }
         }, { passive: false });
-
-        // Clicking on backdrop closes the modal
-        stage.addEventListener('click', function(e) {
-            if (e.target === stage || e.target === container) {
-                closeCertModal();
-            }
-        });
     }
 
     if (img) {
-        // Click directly on certificate image to zoom into clicked spot (2.2x) or reset
         img.addEventListener('click', function(e) {
             if (_hasDragged) return;
             e.stopPropagation();
@@ -565,32 +452,16 @@ function navCert(dir) {
             }
             _updateTransform();
         });
-
-        // Double click to zoom deeper (3.0x)
-        img.addEventListener('dblclick', function(e) {
-            e.stopPropagation();
-            if (_zoomScale < 2.8) {
-                var rect = img.getBoundingClientRect();
-                var cx = rect.left + rect.width / 2;
-                var cy = rect.top + rect.height / 2;
-                _zoomScale = 3.0;
-                _panX = (cx - e.clientX) * 2.0;
-                _panY = (cy - e.clientY) * 2.0;
-            } else {
-                _resetZoom();
-            }
-            _updateTransform();
-        });
     }
 
-    if (container) {
-        container.addEventListener('mousedown', function(e) {
+    if (wrap) {
+        wrap.addEventListener('mousedown', function(e) {
             if (_zoomScale <= 1.05) return;
             _isDragging = true;
             _hasDragged = false;
             _startX = e.clientX - _panX;
             _startY = e.clientY - _panY;
-            container.classList.add('grabbing');
+            wrap.style.cursor = 'grabbing';
         });
 
         window.addEventListener('mousemove', function(e) {
@@ -608,13 +479,12 @@ function navCert(dir) {
         window.addEventListener('mouseup', function() {
             if (_isDragging) {
                 _isDragging = false;
-                container.classList.remove('grabbing');
+                if (wrap) wrap.style.cursor = _zoomScale > 1.05 ? 'grab' : 'zoom-in';
             }
         });
 
-        // Touch support for mobile devices
         var touchStartX = 0, touchStartY = 0;
-        container.addEventListener('touchstart', function(e) {
+        wrap.addEventListener('touchstart', function(e) {
             if (e.touches.length === 1 && _zoomScale > 1.05) {
                 _isDragging = true;
                 touchStartX = e.touches[0].clientX - _panX;
@@ -622,7 +492,7 @@ function navCert(dir) {
             }
         }, { passive: true });
 
-        container.addEventListener('touchmove', function(e) {
+        wrap.addEventListener('touchmove', function(e) {
             if (_isDragging && e.touches.length === 1) {
                 _panX = e.touches[0].clientX - touchStartX;
                 _panY = e.touches[0].clientY - touchStartY;
@@ -630,18 +500,14 @@ function navCert(dir) {
             }
         }, { passive: true });
 
-        container.addEventListener('touchend', function() {
+        wrap.addEventListener('touchend', function() {
             _isDragging = false;
         });
     }
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
-        var modal = document.getElementById('certModal');
-        if (!modal || !modal.classList.contains('open')) return;
+        if (!modal || modal.style.display !== 'flex') return;
         if (e.key === 'Escape') closeCertModal();
-        if (e.key === 'ArrowRight') navCert(1);
-        if (e.key === 'ArrowLeft') navCert(-1);
         if (e.key === '+' || e.key === '=') zoomCert(1);
         if (e.key === '-' || e.key === '_') zoomCert(-1);
         if (e.key === '0') _resetZoom();

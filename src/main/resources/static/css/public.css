@@ -152,7 +152,7 @@
 }
 
 /* scroll-margin for all sections so floating navbar never covers headings */
-#about, #skills, #experience, #projects, #coding, #certificates, #currently, #contact {
+#about, #skills, #experience, #projects, #coding, #certificates, #currently, #services, #testimonials, #contact {
   scroll-margin-top: 90px;
 }
 
@@ -245,6 +245,11 @@
   .cp-profile-btn { width: 100%; justify-content: center; }
   .cp-stat-val { font-size: 1.4rem; }
 }
+@media (max-width: 480px) {
+  .cp-stat { padding: 12px 6px; }
+  .cp-stat-val { font-size: 1.25rem; }
+  .cp-stat-lbl { font-size: 0.65rem; letter-spacing: 0.5px; }
+}
 
 /* Currently — Building + Learning panels */
 .currently-stack { display: flex; flex-direction: column; gap: 24px; }
@@ -301,7 +306,12 @@
   min-width: min(290px, 85vw);
   scroll-snap-align: start;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.cert-card a.glass-btn {
+  margin-top: auto;
 }
 .cert-card:hover {
   border-color: rgba(59, 130, 246, 0.35);
@@ -318,8 +328,6 @@
   justify-content: center;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.cert-thumb.cert-zoomable {
   cursor: zoom-in;
 }
 .cert-thumb img {
@@ -328,236 +336,9 @@
   object-fit: cover;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
 }
-.cert-thumb.cert-zoomable:hover img {
+.cert-thumb:hover img {
   transform: scale(1.06);
   filter: brightness(1.05);
-}
-.cert-thumb-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.15));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
-.cert-thumb.cert-zoomable:hover .cert-thumb-overlay {
-  opacity: 1;
-}
-.cert-zoom-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(59, 130, 246, 0.6);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-  transform: translateY(4px);
-  transition: transform 0.25s ease;
-}
-.cert-thumb.cert-zoomable:hover .cert-zoom-pill {
-  transform: translateY(0);
-}
-
-/* ── Certificate Full Lightbox Modal ── */
-.cert-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 7, 18, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 9999;
-  display: none;
-  flex-direction: column;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.cert-modal-backdrop.open {
-  display: flex;
-  opacity: 1;
-}
-.cert-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  z-index: 10;
-  gap: 16px;
-}
-.cert-modal-title-wrap {
-  min-width: 0;
-  flex: 1;
-}
-.cert-modal-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.cert-modal-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-top: 3px;
-  flex-wrap: wrap;
-}
-.cert-modal-meta .org-badge {
-  color: var(--primary);
-  font-weight: 600;
-}
-.cert-modal-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-.cert-modal-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--text);
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.cert-modal-btn:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: var(--primary);
-  color: #fff;
-  transform: translateY(-1px);
-}
-.cert-modal-btn.close-btn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: var(--danger);
-  color: #fff;
-}
-.cert-modal-stage {
-  position: relative;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  padding: 10px 16px;
-  touch-action: none;
-  user-select: none;
-  cursor: zoom-out;
-}
-.cert-modal-img-container {
-  max-width: 100%;
-  max-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-origin: center center;
-  cursor: zoom-in;
-}
-.cert-modal-img-container.zoomed {
-  cursor: grab;
-}
-.cert-modal-img-container.grabbing {
-  cursor: grabbing;
-  transition: none !important;
-}
-.cert-modal-img {
-  display: block;
-  max-width: 94vw;
-  max-height: calc(100vh - 125px);
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 10px;
-  box-shadow: 0 20px 64px rgba(0, 0, 0, 0.92), 0 0 0 1px rgba(255, 255, 255, 0.16);
-  pointer-events: auto;
-  user-select: none;
-  -webkit-user-drag: none;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
-.cert-nav-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
-  z-index: 5;
-}
-.cert-nav-arrow:hover {
-  background: rgba(59, 130, 246, 0.3);
-  border-color: var(--primary);
-  color: #fff;
-  transform: translateY(-50%) scale(1.08);
-}
-.cert-nav-arrow.prev { left: 24px; }
-.cert-nav-arrow.next { right: 24px; }
-.cert-modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.75);
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  backdrop-filter: blur(12px);
-  z-index: 10;
-}
-.cert-modal-hint {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-.cert-modal-fallback {
-  text-align: center;
-  padding: 48px 32px;
-  max-width: 480px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  backdrop-filter: blur(12px);
-}
-
-@media (max-width: 640px) {
-  .cert-modal-header { padding: 12px 16px; }
-  .cert-modal-title { font-size: 0.95rem; }
-  .cert-modal-btn { width: 34px; height: 34px; font-size: 0.8rem; }
-  .cert-nav-arrow { width: 38px; height: 38px; font-size: 0.95rem; }
-  .cert-nav-arrow.prev { left: 10px; }
-  .cert-nav-arrow.next { right: 10px; }
-  .cert-modal-hint { display: none; }
-  .cert-modal-footer { padding: 8px 16px; }
 }
 
 /* Services */
