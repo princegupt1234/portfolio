@@ -118,7 +118,7 @@ public class AdminAboutController {
                         @RequestParam(value = "terminalEnabled", required = false) String terminalEnabledParam,
                         @RequestParam(value = "recruiterPitchEnabled", required = false) String recruiterPitchEnabledParam,
                         @RequestParam(value = "aiChatEnabled", required = false) String aiChatEnabledParam,
-                        @RequestParam(value = "blogSectionVisible", required = false) String blogSectionVisibleParam,
+                        @RequestParam(value = "quickStatsVisible", required = false) String quickStatsVisibleParam,
                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         AboutInfo existing = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
 
@@ -136,6 +136,16 @@ public class AdminAboutController {
         existing.setFooterTagline(form.getFooterTagline());
         existing.setFooterSub(form.getFooterSub());
 
+        // Quick Credibility Stats
+        if (form.getQuickStats() != null) {
+            existing.setQuickStats(form.getQuickStats());
+        }
+        if (quickStatsVisibleParam != null) {
+            existing.setQuickStatsVisible("true".equals(quickStatsVisibleParam));
+        } else if (form.getQuickStats() != null) {
+            existing.setQuickStatsVisible(false);
+        }
+
         // Recruiter Modal
         existing.setRecruiterPitchEnabled("true".equals(recruiterPitchEnabledParam));
         existing.setRecruiterTargetRole(form.getRecruiterTargetRole());
@@ -147,11 +157,6 @@ public class AdminAboutController {
         existing.setAiChatEnabled("true".equals(aiChatEnabledParam));
         existing.setAiChatWelcomeMessage(form.getAiChatWelcomeMessage());
         existing.setAiChatPromptChips(form.getAiChatPromptChips());
-
-        // Tech Blog Homepage Section
-        existing.setBlogSectionVisible("true".equals(blogSectionVisibleParam));
-        existing.setBlogSectionTitle(form.getBlogSectionTitle());
-        existing.setBlogSectionSubtitle(form.getBlogSectionSubtitle());
 
         aboutInfoRepository.save(existing);
         dataVersionService.bump();

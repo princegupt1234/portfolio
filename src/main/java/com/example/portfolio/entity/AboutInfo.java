@@ -147,13 +147,6 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String aiChatPromptChips;
 
-    // ----- Tech Blog Section Controls -----
-    private Boolean blogSectionVisible = true;
-    @Column(columnDefinition = "TEXT")
-    private String blogSectionTitle;
-    @Column(columnDefinition = "TEXT")
-    private String blogSectionSubtitle;
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getFullName() { return fullName; }
@@ -264,11 +257,4 @@ public class AboutInfo {
     public void setAiChatWelcomeMessage(String aiChatWelcomeMessage) { this.aiChatWelcomeMessage = aiChatWelcomeMessage; }
     public String getAiChatPromptChips() { return aiChatPromptChips; }
     public void setAiChatPromptChips(String aiChatPromptChips) { this.aiChatPromptChips = aiChatPromptChips; }
-
-    public Boolean getBlogSectionVisible() { return blogSectionVisible; }
-    public void setBlogSectionVisible(Boolean blogSectionVisible) { this.blogSectionVisible = blogSectionVisible; }
-    public String getBlogSectionTitle() { return blogSectionTitle; }
-    public void setBlogSectionTitle(String blogSectionTitle) { this.blogSectionTitle = blogSectionTitle; }
-    public String getBlogSectionSubtitle() { return blogSectionSubtitle; }
-    public void setBlogSectionSubtitle(String blogSectionSubtitle) { this.blogSectionSubtitle = blogSectionSubtitle; }
 }

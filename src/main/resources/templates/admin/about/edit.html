@@ -94,6 +94,37 @@
       .personal-form-grid, .personal-preview { grid-template-columns: 1fr; }
       .personal-preview .preview-contact { padding: 14px 0 0; border-left: 0; border-top: 1px solid var(--glass-border); }
     }
+
+    .stat-builder-row {
+      display: grid;
+      grid-template-columns: 130px 1.2fr 180px 42px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--glass-border);
+      transition: all 0.2s ease;
+    }
+    .stat-builder-row:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(59,130,246,0.3);
+    }
+    @media(max-width:768px) {
+      .stat-builder-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .stat-del-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
+      color: #ef4444; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .stat-del-btn:hover {
+      background: rgba(239,68,68,0.25);
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -135,6 +166,7 @@
         </div>
 
         <nav class="about-nav" aria-label="About anchors">
+          <a href="#sec-quickstats"><i class="fa-solid fa-chart-simple"></i> Quick Stats</a>
           <a href="#sec-story"><i class="fa-solid fa-book-bookmark"></i> Story &amp; Bio</a>
           <a href="#sec-workpref"><i class="fa-solid fa-briefcase"></i> Work Preferences</a>
           <a href="#sec-education"><i class="fa-solid fa-graduation-cap"></i> Education Timeline</a>
@@ -143,12 +175,85 @@
           <a href="#sec-settings"><i class="fa-solid fa-paper-plane"></i> Contact &amp; Footer</a>
           <a href="#sec-recruiter"><i class="fa-solid fa-bolt"></i> Recruiter Pitch</a>
           <a href="#sec-aichat"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a>
-          <a href="#sec-blog"><i class="fa-solid fa-newspaper"></i> Blog Showcase</a>
         </nav>
 
         <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post">
           <input type="hidden" th:field="*{id}"/>
           <div class="about-sections">
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 0 · QUICK CREDIBILITY STATS COUNTERS
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-quickstats">
+              <div class="ab-card-header" onclick="toggleSection('sec-quickstats')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(59,130,246,0.18); color:var(--primary);"><i class="fa-solid fa-chart-simple"></i></div>
+                  <div>
+                    <div class="ab-card-title">Quick Credibility Stats (Counter Cards)</div>
+                    <div class="ab-card-subtitle">4 Key metric counter cards displayed right between Hero and About (Projects, DSA, Experience)</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">These 4 credibility cards appear prominently under the hero scroll indicator. Customize the counter number, label, and icon for each card.</p>
+
+                <div class="form-group" style="margin-bottom:18px;">
+                  <div class="toggle-group" style="display:flex; align-items:center; gap:14px; padding:8px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="quickStatsVisibleAbout">
+                      <input type="checkbox" id="quickStatsVisibleAbout" name="quickStatsVisible" value="true" th:checked="*{quickStatsVisible != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="quickStatsVisibleAbout" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Show Quick Stats on Portfolio</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Display the 4 metric cards on the live portfolio homepage.</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Visual Card Builder Container -->
+                <div style="margin-bottom:14px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <label style="font-weight:600; font-size:0.85rem; color:var(--text);"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:6px;"></i> Stat Counter Cards</label>
+                    <button type="button" class="glass-btn" onclick="addStatRow()" style="padding:5px 12px; font-size:0.78rem; gap:6px;">
+                      <i class="fa-solid fa-plus" style="color:var(--primary);"></i> Add Stat Card
+                    </button>
+                  </div>
+
+                  <div id="statBuilderContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div style="margin-bottom:14px; padding:10px 14px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid var(--glass-border);">
+                  <div style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:6px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary); margin-right:4px;"></i> Quick Insert Presets (click to add):</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('15+', 'Projects Built', 'fa-solid fa-folder-open')">+ 15+ Projects</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('350+', 'DSA Problems Solved', 'fa-solid fa-code')">+ 350+ DSA</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('1+ Yrs', 'Hands-on Dev', 'fa-solid fa-laptop-code')">+ 1+ Yrs Dev</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('100%', 'Delivery &amp; Testing', 'fa-solid fa-circle-check')">+ 100% Delivery</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('Production-Ready', 'Spring Boot &amp; REST', 'fa-solid fa-server')">+ Spring Boot</button>
+                  </div>
+                </div>
+
+                <!-- Raw pipe textarea (sync'd) -->
+                <div class="form-group" style="margin-top:14px;">
+                  <div class="field-label-row">
+                    <label for="quickStatsInput"><i class="fa-solid fa-code" style="margin-right:6px; color:var(--text-secondary);"></i> Raw Pipe-Separated Storage</label>
+                    <span style="font-size:0.72rem; color:var(--text-secondary);">Format: <code>Number::Label::IconClass</code> separated by <code>|</code></span>
+                  </div>
+                  <textarea class="glass-textarea" id="quickStatsInput" th:field="*{quickStats}" rows="2"
+                    placeholder="10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery &amp; Testing::fa-solid fa-circle-check"></textarea>
+                </div>
+
+                <!-- Live Preview on dark surface -->
+                <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--glass-border);">
+                  <div style="font-size:.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-eye" style="color:var(--primary);"></i> Live Portfolio Preview:
+                  </div>
+                  <div id="quickStatsPreviewGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px;"></div>
+                </div>
+              </div>
+            </div>
 
             <!-- ═══════════════════════════════════════════════
                  CARD 1 · STORY & PERSONAL DETAILS
@@ -484,56 +589,6 @@
                     <span class="field-hint">Format: <code>ButtonLabel :: PromptQuestion</code> separated by <code>|</code>.</span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- ═══════════════════════════════════════════════
-                 CARD 7 · TECH BLOG & NOTES SHOWCASE
-            ═══════════════════════════════════════════════ -->
-            <div class="ab-card" id="sec-blog">
-              <div class="ab-card-header" onclick="toggleSection('sec-blog')">
-                <div class="ab-card-header-left">
-                  <div class="ab-card-icon" style="background:rgba(6,182,212,0.15); color:#06b6d4;"><i class="fa-solid fa-newspaper"></i></div>
-                  <div>
-                    <div class="ab-card-title">Tech Blog Homepage Showcase Controls</div>
-                    <div class="ab-card-subtitle">Toggle homepage blog grid visibility, custom section title, and subtitle</div>
-                  </div>
-                </div>
-                <i class="fa-solid fa-chevron-down ab-chevron"></i>
-              </div>
-              <div class="ab-card-body">
-                <p class="sec-desc">Control how engineering blog posts are presented on your homepage. You can create, edit, or delete full articles in the dedicated Blog Manager.</p>
-
-                <div class="form-grid">
-                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
-                    <label class="toggle-switch" for="blogSectionVisible">
-                      <input type="checkbox" id="blogSectionVisible" name="blogSectionVisible" value="true" th:checked="*{blogSectionVisible != false}"/>
-                      <span class="toggle-slider"></span>
-                    </label>
-                    <label for="blogSectionVisible" style="cursor:pointer; margin:0;">
-                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Show Blog Showcase Section on Homepage</strong>
-                      <span style="color:var(--text-secondary); font-size:0.78rem;">When enabled, the latest published blog articles appear dynamically on the index page.</span>
-                    </label>
-                  </div>
-
-                  <div class="form-group full">
-                    <label for="blogSectionTitle"><i class="fa-solid fa-heading" style="color:#06b6d4; margin-right:6px;"></i> Blog Section Title</label>
-                    <input class="glass-input" id="blogSectionTitle" th:field="*{blogSectionTitle}" placeholder="Technical Writing &amp; Deep Dives"/>
-                  </div>
-
-                  <div class="form-group full">
-                    <label for="blogSectionSubtitle"><i class="fa-solid fa-align-left" style="color:#06b6d4; margin-right:6px;"></i> Blog Section Subtitle</label>
-                    <textarea class="glass-textarea" id="blogSectionSubtitle" th:field="*{blogSectionSubtitle}" rows="2"
-                      placeholder="Architectural patterns, Spring Boot internals, and algorithmic roadmaps."></textarea>
-                  </div>
-
-                  <div class="form-group full" style="margin-top:4px;">
-                    <a th:href="@{/admin/blogs}" class="glass-btn primary" target="_blank" style="display:inline-flex; align-items:center; gap:8px;">
-                      <i class="fa-solid fa-pen-to-square"></i> Open Full Blog Article Manager <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
             </div>
 
           </div><!-- /about-sections -->
@@ -749,6 +804,151 @@
   }
   const lcInp = document.getElementById('learningCards');
   if (lcInp) { lcInp.addEventListener('input', updateLearningCardsPreview); updateLearningCardsPreview(); }
+
+  // Quick Credibility Stats Interactive Builder
+  (function() {
+    const rawInput = document.getElementById('quickStatsInput');
+    const container = document.getElementById('statBuilderContainer');
+    const previewGrid = document.getElementById('quickStatsPreviewGrid');
+    if (!rawInput || !container || !previewGrid) return;
+
+    function parseStats() {
+      const val = rawInput.value || '';
+      const items = [];
+      val.split('|').forEach(part => {
+        const trimmed = part.trim();
+        if (!trimmed) return;
+        const segs = trimmed.split('::').map(s => s.trim());
+        items.push({
+          num: segs[0] || '',
+          lbl: segs[1] || '',
+          ico: segs[2] || 'fa-solid fa-chart-simple'
+        });
+      });
+      return items;
+    }
+
+    function renderRows(items) {
+      container.innerHTML = '';
+      if (items.length === 0) {
+        container.innerHTML = '<div style="font-size:0.8rem; color:var(--text-secondary); padding:12px; text-align:center; background:rgba(255,255,255,0.02); border-radius:10px;">No stat items yet. Click "+ Add Stat Card" above to add one.</div>';
+      }
+      items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'stat-builder-row';
+        row.innerHTML = `
+          <div>
+            <label style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">Value / Count</label>
+            <input type="text" class="glass-input stat-val-inp" value="${item.num.replace(/"/g, '&quot;')}" placeholder="e.g. 10+" style="font-weight:700; font-size:0.85rem;" />
+          </div>
+          <div>
+            <label style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">Metric Label</label>
+            <input type="text" class="glass-input stat-lbl-inp" value="${item.lbl.replace(/"/g, '&quot;')}" placeholder="e.g. Projects Built" style="font-size:0.85rem;" />
+          </div>
+          <div>
+            <label style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">Icon Class</label>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="stat-ico-badge" style="width:30px; height:30px; border-radius:7px; background:rgba(59,130,246,0.15); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:0.85rem; flex-shrink:0;">
+                <i class="${item.ico}"></i>
+              </span>
+              <input type="text" class="glass-input stat-ico-inp" value="${item.ico.replace(/"/g, '&quot;')}" placeholder="fa-solid fa-code" style="font-size:0.75rem; font-family:var(--font-mono);" />
+            </div>
+          </div>
+          <div style="padding-top:16px; display:flex; justify-content:center;">
+            <button type="button" class="stat-del-btn" title="Remove Stat" onclick="removeStatRow(${index})">
+              <i class="fa-solid fa-trash-can" style="font-size:0.85rem;"></i>
+            </button>
+          </div>
+        `;
+
+        const valInp = row.querySelector('.stat-val-inp');
+        const lblInp = row.querySelector('.stat-lbl-inp');
+        const icoInp = row.querySelector('.stat-ico-inp');
+        const icoBadge = row.querySelector('.stat-ico-badge i');
+
+        function onRowChange() {
+          item.num = valInp.value;
+          item.lbl = lblInp.value;
+          item.ico = icoInp.value || 'fa-solid fa-chart-simple';
+          icoBadge.className = item.ico;
+          syncToRaw();
+          updatePreview();
+        }
+
+        valInp.addEventListener('input', onRowChange);
+        lblInp.addEventListener('input', onRowChange);
+        icoInp.addEventListener('input', onRowChange);
+
+        container.appendChild(row);
+      });
+    }
+
+    function syncToRaw() {
+      const rows = container.querySelectorAll('.stat-builder-row');
+      const parts = [];
+      rows.forEach(r => {
+        const v = r.querySelector('.stat-val-inp').value.trim();
+        const l = r.querySelector('.stat-lbl-inp').value.trim();
+        const i = r.querySelector('.stat-ico-inp').value.trim() || 'fa-solid fa-chart-simple';
+        if (v || l) {
+          parts.push(v + '::' + l + '::' + i);
+        }
+      });
+      rawInput.value = parts.join('|');
+    }
+
+    function updatePreview() {
+      previewGrid.innerHTML = '';
+      const items = parseStats();
+      items.forEach(it => {
+        const card = document.createElement('div');
+        card.style.cssText = 'padding:14px 16px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid var(--glass-border); display:flex; align-items:center; gap:12px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);';
+        card.innerHTML = `
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(59,130,246,.15); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0;">
+            <i class="${it.ico}"></i>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-weight:700; font-size:1.2rem; color:var(--text); letter-spacing:-0.02em; line-height:1.2;">${it.num || '—'}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${it.lbl || 'Metric'}</div>
+          </div>
+        `;
+        previewGrid.appendChild(card);
+      });
+    }
+
+    window.addStatRow = function() {
+      const items = parseStats();
+      items.push({ num: '10+', lbl: 'Metric Label', ico: 'fa-solid fa-star' });
+      rawInput.value = items.map(it => it.num + '::' + it.lbl + '::' + it.ico).join('|');
+      renderRows(items);
+      updatePreview();
+    };
+
+    window.addStatPreset = function(num, lbl, ico) {
+      const items = parseStats();
+      items.push({ num, lbl, ico });
+      rawInput.value = items.map(it => it.num + '::' + it.lbl + '::' + it.ico).join('|');
+      renderRows(items);
+      updatePreview();
+    };
+
+    window.removeStatRow = function(index) {
+      const items = parseStats();
+      items.splice(index, 1);
+      rawInput.value = items.map(it => it.num + '::' + it.lbl + '::' + it.ico).join('|');
+      renderRows(items);
+      updatePreview();
+    };
+
+    rawInput.addEventListener('input', function() {
+      renderRows(parseStats());
+      updatePreview();
+    });
+
+    const initialItems = parseStats();
+    renderRows(initialItems);
+    updatePreview();
+  })();
 
   // Keyboard shortcut Ctrl+S
   document.addEventListener('keydown', function(e) {

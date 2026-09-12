@@ -94,4 +94,23 @@ class AdminAboutControllerTest {
         verify(aboutInfoRepository).save(any(AboutInfo.class));
         verify(dataVersionService).bump();
     }
+
+    @Test
+    void savesQuickStatsFieldsAndRedirects() throws Exception {
+        AboutInfo existing = new AboutInfo();
+        existing.setId(1L);
+        when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
+
+        mockMvc.perform(post("/admin/about/save")
+                        .param("quickStats", "15+::Projects::fa-solid fa-code|400+::DSA::fa-solid fa-laptop")
+                        .param("quickStatsVisible", "true"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/about"));
+
+        verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
+                "15+::Projects::fa-solid fa-code|400+::DSA::fa-solid fa-laptop".equals(info.getQuickStats()) &&
+                Boolean.TRUE.equals(info.getQuickStatsVisible())
+        ));
+        verify(dataVersionService).bump();
+    }
 }

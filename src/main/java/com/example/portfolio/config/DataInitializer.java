@@ -3,7 +3,6 @@ package com.example.portfolio.config;
 import com.example.portfolio.entity.AboutInfo;
 import com.example.portfolio.entity.Admin;
 import com.example.portfolio.entity.BuildingProject;
-import com.example.portfolio.entity.BlogPost;
 import com.example.portfolio.entity.Certificate;
 import com.example.portfolio.entity.LearningProject;
 import com.example.portfolio.entity.EducationEntry;
@@ -14,7 +13,6 @@ import com.example.portfolio.entity.Skill;
 import com.example.portfolio.entity.Testimonial;
 import com.example.portfolio.repository.AboutInfoRepository;
 import com.example.portfolio.repository.AdminRepository;
-import com.example.portfolio.repository.BlogPostRepository;
 import com.example.portfolio.repository.BuildingProjectRepository;
 import com.example.portfolio.repository.CertificateRepository;
 import com.example.portfolio.repository.LearningProjectRepository;
@@ -52,7 +50,6 @@ public class DataInitializer implements CommandLineRunner {
     private final TestimonialRepository testimonialRepository;
     private final BuildingProjectRepository buildingProjectRepository;
     private final LearningProjectRepository learningProjectRepository;
-    private final BlogPostRepository blogPostRepository;
     private final GithubStatsService githubStatsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -70,7 +67,6 @@ public class DataInitializer implements CommandLineRunner {
                             TestimonialRepository testimonialRepository,
                             BuildingProjectRepository buildingProjectRepository,
                             LearningProjectRepository learningProjectRepository,
-                            BlogPostRepository blogPostRepository,
                             GithubStatsService githubStatsService, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.aboutInfoRepository = aboutInfoRepository;
@@ -83,7 +79,6 @@ public class DataInitializer implements CommandLineRunner {
         this.testimonialRepository = testimonialRepository;
         this.buildingProjectRepository = buildingProjectRepository;
         this.learningProjectRepository = learningProjectRepository;
-        this.blogPostRepository = blogPostRepository;
         this.githubStatsService = githubStatsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -101,7 +96,6 @@ public class DataInitializer implements CommandLineRunner {
         seedCertificates();
         seedServices();
         seedTestimonials();
-        seedBlogs();
         // Pre-warm external API caches asynchronously so first page load is fast
         aboutInfoRepository.findAll().stream().findFirst().ifPresent(about -> {
             if (about.getGithubUsername() != null) githubStatsService.fetchStats(about.getGithubUsername());
@@ -161,9 +155,6 @@ public class DataInitializer implements CommandLineRunner {
             info.setAiChatEnabled(true);
             info.setAiChatWelcomeMessage("👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java & Spring Boot mastery, featured projects, 350+ LeetCode DSA record, or hiring availability!");
             info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode 350+ :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
-            info.setBlogSectionVisible(true);
-            info.setBlogSectionTitle("Technical Writing & Deep Dives");
-            info.setBlogSectionSubtitle("Architectural patterns, Spring Boot internals, and algorithmic roadmaps.");
             aboutInfoRepository.save(info);
         } else {
             aboutInfoRepository.findAll().stream().findFirst().ifPresent(info -> {
@@ -219,18 +210,6 @@ public class DataInitializer implements CommandLineRunner {
                 }
                 if (info.getAiChatPromptChips() == null || info.getAiChatPromptChips().isBlank()) {
                     info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode 350+ :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
-                    changed = true;
-                }
-                if (info.getBlogSectionVisible() == null) {
-                    info.setBlogSectionVisible(true);
-                    changed = true;
-                }
-                if (info.getBlogSectionTitle() == null || info.getBlogSectionTitle().isBlank()) {
-                    info.setBlogSectionTitle("Technical Writing & Deep Dives");
-                    changed = true;
-                }
-                if (info.getBlogSectionSubtitle() == null || info.getBlogSectionSubtitle().isBlank()) {
-                    info.setBlogSectionSubtitle("Architectural patterns, Spring Boot internals, and algorithmic roadmaps.");
                     changed = true;
                 }
                 if (changed) {
@@ -358,7 +337,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedProjects() {
-        if (projectRepository.count() == 0) {
+        if (projectRepository.count() == 0 && adminRepository.count() == 0) {
             Project p1 = new Project();
             p1.setTitle("POS Billing System");
             p1.setDescription("A full-stack Point of Sale application with invoice generation, cart management, " +
@@ -465,103 +444,6 @@ public class DataInitializer implements CommandLineRunner {
                     "to database design, with strong ownership and attention to detail.");
             t.setPublished(true);
             testimonialRepository.save(t);
-        }
-    }
-
-    private void seedBlogs() {
-        if (blogPostRepository.count() == 0) {
-            BlogPost b1 = new BlogPost();
-            b1.setTitle("Deep Dive: Eliminating Hibernate N+1 Query Problems in Spring Boot");
-            b1.setSlug("eliminating-hibernate-n-plus-1-queries-spring-boot");
-            b1.setSummary("How unnoticed lazy loading issues silently degrade Spring Boot API response times, and step-by-step techniques to eliminate them using JOIN FETCH, Entity Graphs, and batch fetching.");
-            b1.setTags("Java, Spring Boot, Hibernate, MySQL, Performance");
-            b1.setReadTimeMinutes(6);
-            b1.setFeatured(true);
-            b1.setPublished(true);
-            b1.setContent("### The Silent Performance Killer in Relational Backends\n\n"
-                    + "When developing RESTful APIs with **Spring Boot** and **Spring Data JPA**, one of the most frequent performance bottlenecks is the infamous **N+1 Query Problem**.\n\n"
-                    + "It typically occurs when you have a `@OneToMany` or `@ManyToOne` relationship with `FetchType.LAZY`. While lazy loading prevents fetching excessive data on initialization, naive loops over child entities trigger an additional SQL SELECT for every single parent record!\n\n"
-                    + "```java\n"
-                    + "// If there are 100 departments, this triggers 1 + 100 queries!\n"
-                    + "List<Department> departments = departmentRepository.findAll();\n"
-                    + "for (Department dept : departments) {\n"
-                    + "    System.out.println(dept.getEmployees().size());\n"
-                    + "}\n"
-                    + "```\n\n"
-                    + "### Solution 1: JPQL JOIN FETCH\n"
-                    + "By writing an explicit `JOIN FETCH` query, Hibernate eagerly fetches both the parent and children in a single SQL `INNER/LEFT JOIN`:\n\n"
-                    + "```java\n"
-                    + "@Query(\"SELECT d FROM Department d LEFT JOIN FETCH d.employees\")\n"
-                    + "List<Department> findAllWithEmployees();\n"
-                    + "```\n\n"
-                    + "### Solution 2: JPA Entity Graphs\n"
-                    + "JPA 2.1 introduces `@EntityGraph`, which allows declarative fetching without hardcoding custom JPQL joins everywhere:\n\n"
-                    + "```java\n"
-                    + "@EntityGraph(attributePaths = {\"employees\"})\n"
-                    + "List<Department> findAll();\n"
-                    + "```\n\n"
-                    + "### Solution 3: Batch Fetching (`default_batch_fetch_size`)\n"
-                    + "Setting `spring.jpa.properties.hibernate.default_batch_fetch_size=30` instructs Hibernate to batch secondary lookups into `WHERE id IN (?, ?, ...)` instead of firing individual queries.\n\n"
-                    + "### Conclusion\n"
-                    + "Monitoring SQL statements in staging and leveraging `JOIN FETCH` or `EntityGraph` keeps API response times predictable (sub-50ms) even under high concurrency.");
-            blogPostRepository.save(b1);
-
-            BlogPost b2 = new BlogPost();
-            b2.setTitle("My Roadmap to Solving 350+ LeetCode Problems: Patterns over Memorization");
-            b2.setSlug("roadmap-solving-350-plus-leetcode-problems-patterns");
-            b2.setSummary("Why blindly grinding 500+ problems fails, and how categorizing problems into core algorithmic archetypes transformed my problem-solving clarity.");
-            b2.setTags("DSA, LeetCode, Algorithms, Problem Solving, Java");
-            b2.setReadTimeMinutes(7);
-            b2.setFeatured(true);
-            b2.setPublished(true);
-            b2.setContent("### The Trap of Grinding Without Structure\n\n"
-                    + "When I began competitive programming and interview preparation, I fell into the common trap of randomly solving whatever appeared on the daily challenge. After 60 problems, I still froze whenever a problem had an unfamiliar story wrapper.\n\n"
-                    + "The shift happened when I stopped counting problems and started categorizing by **algorithmic patterns**.\n\n"
-                    + "### The 6 Foundational Patterns That Changed Everything\n\n"
-                    + "1. **Two Pointers & Sliding Window**: For sorted arrays and contiguous subarray problems (e.g., Longest Substring Without Repeating Characters).\n"
-                    + "2. **Fast & Slow Pointers**: Floyd's Cycle Detection for linked lists and cyclic arrays.\n"
-                    + "3. **Monotonic Stack**: For 'Next Greater Element' or temperature ranges in $O(N)$ instead of nested $O(N^2)$ loops.\n"
-                    + "4. **BFS vs DFS on Graphs & Trees**: Level-order traversal for shortest unweighted paths vs recursion for component connectivity.\n"
-                    + "5. **Backtracking with Pruning**: Generating permutations, combinations, and N-Queens with state restoration.\n"
-                    + "6. **Dynamic Programming**: Identifying sub-problems and choosing between Top-Down Memoization vs Bottom-Up Tabulation.\n\n"
-                    + "### Translating DSA to Real-World Engineering\n\n"
-                    + "Mastering these patterns doesn't just pass technical interviews—it instills an instinctive understanding of space/time trade-offs, enabling you to write memory-efficient algorithms and avoid accidental $O(N^2)$ processing in production backend services.");
-            blogPostRepository.save(b2);
-
-            BlogPost b3 = new BlogPost();
-            b3.setTitle("Architecting Stateless JWT Authentication with Role-Based Access in Spring Security 6");
-            b3.setSlug("stateless-jwt-authentication-spring-security-6");
-            b3.setSummary("A complete production architecture guide for modern Spring Security 6: building stateless token verification, handling expired token refresh, and enforcing declarative role boundaries.");
-            b3.setTags("Spring Security, JWT, Authentication, Architecture, REST API");
-            b3.setReadTimeMinutes(5);
-            b3.setFeatured(false);
-            b3.setPublished(true);
-            b3.setContent("### Moving Away from Deprecated Adapters\n\n"
-                    + "In Spring Security 6 (Spring Boot 3), `WebSecurityConfigurerAdapter` is completely gone. Modern applications define component-based `SecurityFilterChain` beans with functional lambda DSLs.\n\n"
-                    + "### Architecture Overview\n\n"
-                    + "A robust token authentication flow consists of:\n\n"
-                    + "1. **`JwtAuthenticationFilter`**: Intercepts HTTP requests, extracts the `Authorization: Bearer <token>` header, validates the HMAC-SHA256 signature, and populates `SecurityContextHolder`.\n"
-                    + "2. **`UserDetailsService`**: Loads user credentials and granted authorities (`ROLE_ADMIN`, `ROLE_USER`) from the relational database.\n"
-                    + "3. **`SessionCreationPolicy.STATELESS`**: Ensures the server stores zero HTTP session state in memory, allowing effortless horizontal scaling across multiple container instances.\n\n"
-                    + "```java\n"
-                    + "@Bean\n"
-                    + "public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {\n"
-                    + "    return http\n"
-                    + "        .csrf(csrf -> csrf.disable())\n"
-                    + "        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))\n"
-                    + "        .authorizeHttpRequests(auth -> auth\n"
-                    + "            .requestMatchers(\"/api/auth/**\").permitAll()\n"
-                    + "            .requestMatchers(\"/admin/**\").hasRole(\"ADMIN\")\n"
-                    + "            .anyRequest().authenticated()\n"
-                    + "        )\n"
-                    + "        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)\n"
-                    + "        .build();\n"
-                    + "}\n"
-                    + "```\n\n"
-                    + "### Production Hardening Tips\n\n"
-                    + "• Store secrets in environment variables (`${JWT_SECRET}`), never hardcoded.\n"
-                    + "• Keep access token expiry short (15-60 mins) and issue secure HttpOnly refresh tokens for renew cycles.");
-            blogPostRepository.save(b3);
         }
     }
 }

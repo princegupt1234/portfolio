@@ -117,6 +117,37 @@
       .profile-form-grid, .hero-live-preview { grid-template-columns: 1fr; }
       .profile-preview-photo { margin: 0 auto; grid-row: 1; }
     }
+
+    .stat-builder-row {
+      display: grid;
+      grid-template-columns: 130px 1.2fr 180px 42px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--glass-border);
+      transition: all 0.2s ease;
+    }
+    .stat-builder-row:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(59,130,246,0.3);
+    }
+    @media(max-width:768px) {
+      .stat-builder-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .stat-del-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
+      color: #ef4444; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .stat-del-btn:hover {
+      background: rgba(239,68,68,0.25);
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -433,18 +464,44 @@
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <div class="field-label-row">
-                    <label for="quickStatsInput">Stats Items (Pipe-separated)</label>
+                <!-- Visual Card Builder Container -->
+                <div style="margin-bottom:14px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <label style="font-weight:600; font-size:0.85rem; color:var(--text);"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:6px;"></i> Stat Counter Cards</label>
+                    <button type="button" class="glass-btn" onclick="addStatRow()" style="padding:5px 12px; font-size:0.78rem; gap:6px;">
+                      <i class="fa-solid fa-plus" style="color:var(--primary);"></i> Add Stat Card
+                    </button>
                   </div>
-                  <textarea class="glass-textarea" id="quickStatsInput" th:field="*{quickStats}" rows="3"
-                    placeholder="15+ :: Projects Built :: fa-solid fa-code | 350+ :: LeetCode Problems :: fa-solid fa-laptop-code | 99.9% :: API Uptime :: fa-solid fa-server | Final Year :: B.Tech CSE :: fa-solid fa-graduation-cap"></textarea>
-                  <span class="field-hint">Format: <code>Number::Label::IconClass</code> separated by <code>|</code>. Icons from FontAwesome.</span>
+
+                  <div id="statBuilderContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
                 </div>
 
-                <div style="margin-top:16px;">
-                  <div style="font-size:.78rem; color:var(--text-secondary); margin-bottom:8px;">Live stats preview:</div>
-                  <div class="quick-stats-preview-grid" id="quickStatsPreviewGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;"></div>
+                <!-- Quick Presets -->
+                <div style="margin-bottom:14px; padding:10px 14px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid var(--glass-border);">
+                  <div style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:6px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary); margin-right:4px;"></i> Quick Insert Presets (click to add):</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('15+', 'Projects Built', 'fa-solid fa-folder-open')">+ 15+ Projects</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('350+', 'DSA Problems Solved', 'fa-solid fa-code')">+ 350+ DSA</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('1+ Yrs', 'Hands-on Dev', 'fa-solid fa-laptop-code')">+ 1+ Yrs Dev</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('100%', 'Delivery &amp; Testing', 'fa-solid fa-circle-check')">+ 100% Delivery</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('Production-Ready', 'Spring Boot &amp; REST', 'fa-solid fa-server')">+ Spring Boot</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="quickStatsInput"><i class="fa-solid fa-code" style="margin-right:6px; color:var(--text-secondary);"></i> Raw Pipe-Separated Storage</label>
+                    <span style="font-size:0.72rem; color:var(--text-secondary);">Format: <code>Number::Label::IconClass</code> separated by <code>|</code></span>
+                  </div>
+                  <textarea class="glass-textarea" id="quickStatsInput" th:field="*{quickStats}" rows="2"
+                    placeholder="10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery &amp; Testing::fa-solid fa-circle-check"></textarea>
+                </div>
+
+                <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--glass-border);">
+                  <div style="font-size:.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-eye" style="color:var(--primary);"></i> Live Portfolio Preview:
+                  </div>
+                  <div id="quickStatsPreviewGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px;"></div>
                 </div>
               </div>
             </div>
@@ -544,29 +601,150 @@
   const techInp = document.getElementById('heroTechStackInput');
   if (techInp) { techInp.addEventListener('input', updateTechChips); updateTechChips(); }
 
-  // Quick stats live cards preview
-  function updateQuickStatsPreview() {
-    const inp = document.getElementById('quickStatsInput');
-    const grid = document.getElementById('quickStatsPreviewGrid');
-    if (!inp || !grid) return;
-    grid.innerHTML = '';
-    const val = inp.value || '';
-    val.split('|').map(s => s.trim()).filter(Boolean).forEach(part => {
-      const segs = part.split('::').map(p => p.trim());
-      const num = segs[0] || '10+';
-      const lbl = segs[1] || 'Metric';
-      const ico = segs[2] || 'fa-solid fa-chart-simple';
+  // Quick Credibility Stats Interactive Builder
+  (function() {
+    const rawInput = document.getElementById('quickStatsInput');
+    const container = document.getElementById('statBuilderContainer');
+    const previewGrid = document.getElementById('quickStatsPreviewGrid');
+    if (!rawInput || !container || !previewGrid) return;
 
-      const card = document.createElement('div');
-      card.style.cssText = 'padding:14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid var(--glass-border); display:flex; align-items:center; gap:12px;';
-      card.innerHTML = '<div style="width:36px; height:36px; border-radius:9px; background:rgba(59,130,246,.15); color:var(--primary); display:flex; align-items:center; justify-content:center;"><i class="' + ico + '"></i></div>' +
-                       '<div><div style="font-weight:700; font-size:1.1rem; color:var(--text);">' + num + '</div>' +
-                       '<div style="font-size:0.75rem; color:var(--text-secondary);">' + lbl + '</div></div>';
-      grid.appendChild(card);
+    function parseStats() {
+      const val = rawInput.value || '';
+      const items = [];
+      val.split('|').forEach(part => {
+        const trimmed = part.trim();
+        if (!trimmed) return;
+        const segs = trimmed.split('::').map(s => s.trim());
+        items.push({
+          num: segs[0] || '',
+          lbl: segs[1] || '',
+          ico: segs[2] || 'fa-solid fa-chart-simple'
+        });
+      });
+      return items;
+    }
+
+    function renderRows(items) {
+      container.innerHTML = '';
+      if (items.length === 0) {
+        container.innerHTML = '<div style="font-size:0.8rem; color:var(--text-secondary); padding:12px; text-align:center; background:rgba(255,255,255,0.02); border-radius:10px;">No stat items yet. Click "+ Add Stat Card" above to add one.</div>';
+      }
+      items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'stat-builder-row';
+        row.innerHTML = `
+          <div>
+            <label style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">Value / Count</label>
+            <input type="text" class="glass-input stat-val-inp" value="${item.num.replace(/"/g, '&quot;')}" placeholder="e.g. 10+" style="font-weight:700; font-size:0.85rem;" />
+          </div>
+          <div>
+            <label style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">Metric Label</label>
+            <input type="text" class="glass-input stat-lbl-inp" value="${item.lbl.replace(/"/g, '&quot;')}" placeholder="e.g. Projects Built" style="font-size:0.85rem;" />
+          </div>
+          <div>
+            <label style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">Icon Class</label>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="stat-ico-badge" style="width:30px; height:30px; border-radius:7px; background:rgba(59,130,246,0.15); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:0.85rem; flex-shrink:0;">
+                <i class="${item.ico}"></i>
+              </span>
+              <input type="text" class="glass-input stat-ico-inp" value="${item.ico.replace(/"/g, '&quot;')}" placeholder="fa-solid fa-code" style="font-size:0.75rem; font-family:var(--font-mono);" />
+            </div>
+          </div>
+          <div style="padding-top:16px; display:flex; justify-content:center;">
+            <button type="button" class="stat-del-btn" title="Remove Stat" onclick="removeStatRow(${index})">
+              <i class="fa-solid fa-trash-can" style="font-size:0.85rem;"></i>
+            </button>
+          </div>
+        `;
+
+        const valInp = row.querySelector('.stat-val-inp');
+        const lblInp = row.querySelector('.stat-lbl-inp');
+        const icoInp = row.querySelector('.stat-ico-inp');
+        const icoBadge = row.querySelector('.stat-ico-badge i');
+
+        function onRowChange() {
+          item.num = valInp.value;
+          item.lbl = lblInp.value;
+          item.ico = icoInp.value || 'fa-solid fa-chart-simple';
+          icoBadge.className = item.ico;
+          syncToRaw();
+          updatePreview();
+        }
+
+        valInp.addEventListener('input', onRowChange);
+        lblInp.addEventListener('input', onRowChange);
+        icoInp.addEventListener('input', onRowChange);
+
+        container.appendChild(row);
+      });
+    }
+
+    function syncToRaw() {
+      const rows = container.querySelectorAll('.stat-builder-row');
+      const parts = [];
+      rows.forEach(r => {
+        const v = r.querySelector('.stat-val-inp').value.trim();
+        const l = r.querySelector('.stat-lbl-inp').value.trim();
+        const i = r.querySelector('.stat-ico-inp').value.trim() || 'fa-solid fa-chart-simple';
+        if (v || l) {
+          parts.push(v + '::' + l + '::' + i);
+        }
+      });
+      rawInput.value = parts.join('|');
+    }
+
+    function updatePreview() {
+      previewGrid.innerHTML = '';
+      const items = parseStats();
+      items.forEach(it => {
+        const card = document.createElement('div');
+        card.style.cssText = 'padding:14px 16px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid var(--glass-border); display:flex; align-items:center; gap:12px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);';
+        card.innerHTML = `
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(59,130,246,.15); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0;">
+            <i class="${it.ico}"></i>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-weight:700; font-size:1.2rem; color:var(--text); letter-spacing:-0.02em; line-height:1.2;">${it.num || '—'}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${it.lbl || 'Metric'}</div>
+          </div>
+        `;
+        previewGrid.appendChild(card);
+      });
+    }
+
+    window.addStatRow = function() {
+      const items = parseStats();
+      items.push({ num: '10+', lbl: 'Metric Label', ico: 'fa-solid fa-star' });
+      rawInput.value = items.map(it => it.num + '::' + it.lbl + '::' + it.ico).join('|');
+      renderRows(items);
+      updatePreview();
+    };
+
+    window.addStatPreset = function(num, lbl, ico) {
+      const items = parseStats();
+      items.push({ num, lbl, ico });
+      rawInput.value = items.map(it => it.num + '::' + it.lbl + '::' + it.ico).join('|');
+      renderRows(items);
+      updatePreview();
+    };
+
+    window.removeStatRow = function(index) {
+      const items = parseStats();
+      items.splice(index, 1);
+      rawInput.value = items.map(it => it.num + '::' + it.lbl + '::' + it.ico).join('|');
+      renderRows(items);
+      updatePreview();
+    };
+
+    rawInput.addEventListener('input', function() {
+      renderRows(parseStats());
+      updatePreview();
     });
-  }
-  const qsInp = document.getElementById('quickStatsInput');
-  if (qsInp) { qsInp.addEventListener('input', updateQuickStatsPreview); updateQuickStatsPreview(); }
+
+    const initialItems = parseStats();
+    renderRows(initialItems);
+    updatePreview();
+  })();
 
   // Photo file upload preview
   const photoFileInput = document.getElementById('photoFileInput');

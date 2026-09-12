@@ -10,8 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-    <link rel="stylesheet" th:href="@{/css/theme.css(v='9')}">
-    <link rel="stylesheet" th:href="@{/css/public.css(v='9')}">
+    <link rel="stylesheet" th:href="@{/css/theme.css(v='12')}">
+    <link rel="stylesheet" th:href="@{/css/public.css(v='16')}">
     <script>
         (function() {
             try {
@@ -40,18 +40,17 @@
         <li><a href="#projects">Projects</a></li>
         <li><a href="#coding">Coding</a></li>
         <li><a href="#certificates">Certificates</a></li>
-        <li th:if="${about.blogSectionVisible != false}"><a th:href="@{/blog}">Blog</a></li>
         <li><a href="#contact">Contact</a></li>
         <li class="mobile-nav-resume" style="display:none;"><a th:href="@{/resume/download}" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-file-arrow-down" style="margin-right:6px;"></i> Download Resume</a></li>
         <li class="mobile-nav-resume" style="display:none;" th:if="${about.recruiterPitchEnabled != false}"><a href="javascript:void(0)" onclick="openRecruiterModal()" style="color:#f59e0b; font-weight:600;"><i class="fa-solid fa-bolt" style="margin-right:6px;"></i> 30s Recruiter Brief</a></li>
     </ul>
-    <div style="display:flex; align-items:center; gap:8px;">
-        <button type="button" class="glass-btn nav-pitch-btn" th:if="${about.recruiterPitchEnabled != false}" onclick="openRecruiterModal()" title="30-Second Recruiter Briefing" style="gap:5px; color:#f59e0b; border-color:rgba(245,158,11,0.35);"><i class="fa-solid fa-bolt"></i> <span class="hide-xs">30s Brief</span></button>
+    <div class="nav-actions">
+        <button type="button" class="glass-btn nav-pitch-btn" th:if="${about.recruiterPitchEnabled != false}" onclick="openRecruiterModal()" title="30-Second Recruiter Briefing"><i class="fa-solid fa-bolt"></i> <span class="nav-pitch-text">30s Brief</span></button>
         <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
-        <button type="button" class="glass-btn nav-resume-btn" onclick="openResumeModal()" title="Preview Resume in browser" style="gap:6px;"><i class="fa-solid fa-eye"></i> View</button>
+        <button type="button" class="glass-btn nav-resume-btn" onclick="openResumeModal()" title="Preview Resume in browser"><i class="fa-solid fa-eye"></i> View</button>
         <a th:href="@{/resume/download}" class="glass-btn primary nav-resume-btn"><i class="fa-solid fa-download"></i> Resume</a>
     </div>
-    <button class="nav-toggle"><i class="fa-solid fa-bars"></i></button>
+    <button class="nav-toggle" aria-label="Toggle navigation menu"><i class="fa-solid fa-bars"></i></button>
 </nav>
 
 <!-- ===================== HERO ===================== -->
@@ -204,85 +203,43 @@
 <!-- ===================== PROJECTS ===================== -->
 <section class="section" id="projects">
     <div class="container">
-        <!-- Featured Projects Showcase -->
-        <div th:if="${!#lists.isEmpty(featuredProjects)}" style="margin-bottom: 56px;">
-            <div class="section-tag">Featured Projects</div>
-            <h2 class="section-title" data-reveal>Selected work</h2>
-            <div class="projects-grid">
-                <div class="glass-card project-card" th:each="project : ${featuredProjects}" data-reveal>
-                    <div class="project-thumb">
-                        <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
-                        <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
+        <div class="section-tag">Featured Work</div>
+        <h2 class="section-title" data-reveal>What I've built</h2>
+        <div class="projects-grid" th:if="${!#lists.isEmpty(projects)}">
+            <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
+                <div class="project-thumb">
+                    <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
+                    <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
+                </div>
+                <div class="project-body">
+                    <div class="project-meta-row" th:if="${project.featured}"><span class="project-featured-badge">⭐ Featured</span></div>
+                    <h3 class="project-title" th:text="${project.title}">Title</h3>
+                    <p class="project-desc" th:text="${project.description}">Description</p>
+                    <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(project.engineeringHighlight)}">
+                        <i class="fa-solid fa-bolt"></i> <span th:text="${project.engineeringHighlight}"></span>
                     </div>
-                    <div class="project-body">
-                        <div class="project-meta-row"><span class="project-featured-badge">⭐ Featured</span></div>
-                        <h3 class="project-title" th:text="${project.title}">Title</h3>
-                        <p class="project-desc" th:text="${project.description}">Description</p>
-                        <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(project.engineeringHighlight)}">
-                            <i class="fa-solid fa-bolt"></i> <span th:text="${project.engineeringHighlight}"></span>
-                        </div>
-                        <div class="project-tech">
-                            <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
-                        </div>
-                        <div class="project-links">
-                            <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
-                            </a>
-                            <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
-                                <i class="fa-brands fa-github"></i> GitHub
-                            </a>
-                            <a th:if="${project.demoVideoUrl}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
-                                <i class="fa-solid fa-circle-play"></i> Demo
-                            </a>
-                            <button type="button" th:if="${project.architectureImageUrl}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
-                                <i class="fa-solid fa-sitemap"></i> Architecture
-                            </button>
-                        </div>
+                    <div class="project-tech">
+                        <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
+                    </div>
+                    <div class="project-links">
+                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
+                        </a>
+                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
+                            <i class="fa-brands fa-github"></i> GitHub
+                        </a>
+                        <a th:if="${project.demoVideoUrl}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
+                            <i class="fa-solid fa-circle-play"></i> Demo
+                        </a>
+                        <button type="button" th:if="${project.architectureImageUrl}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
+                            <i class="fa-solid fa-sitemap"></i> Architecture
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- All Other Projects Showcase -->
-        <div th:if="${!#lists.isEmpty(projects)}">
-            <div class="section-tag" th:text="${!#lists.isEmpty(featuredProjects)} ? 'More Projects' : 'Projects'">Projects</div>
-            <h2 class="section-title" data-reveal th:text="${!#lists.isEmpty(featuredProjects)} ? 'Other builds &amp; experiments' : 'What I\'ve built'">What I've built</h2>
-            <div class="projects-grid">
-                <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
-                    <div class="project-thumb">
-                        <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
-                        <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
-                    </div>
-                    <div class="project-body">
-                        <div class="project-meta-row"></div>
-                        <h3 class="project-title" th:text="${project.title}">Title</h3>
-                        <p class="project-desc" th:text="${project.description}">Description</p>
-                        <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(project.engineeringHighlight)}">
-                            <i class="fa-solid fa-bolt"></i> <span th:text="${project.engineeringHighlight}"></span>
-                        </div>
-                        <div class="project-tech">
-                            <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
-                        </div>
-                        <div class="project-links">
-                            <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
-                            </a>
-                            <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
-                                <i class="fa-brands fa-github"></i> GitHub
-                            </a>
-                            <a th:if="${project.demoVideoUrl}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
-                                <i class="fa-solid fa-circle-play"></i> Demo
-                            </a>
-                            <button type="button" th:if="${project.architectureImageUrl}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
-                                <i class="fa-solid fa-sitemap"></i> Architecture
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(projects) and #lists.isEmpty(featuredProjects)}" class="glass-card" data-reveal>
+        <div th:if="${#lists.isEmpty(projects)}" class="glass-card" data-reveal>
             <p style="margin:0;">Projects will appear here.</p>
         </div>
     </div>
@@ -709,49 +666,6 @@ function zoomCert(dir) {
     </div>
 </section>
 
-<!-- ===================== TECH BLOG & NOTES ===================== -->
-<section class="section" id="blog" th:if="${about.blogSectionVisible != false and recentBlogs != null and !#lists.isEmpty(recentBlogs)}">
-    <div class="container">
-        <div class="section-tag">Engineering Notes</div>
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:28px;">
-            <div>
-                <h2 class="section-title" data-reveal style="margin-bottom:0;" th:text="${about.blogSectionTitle} ?: 'Technical Writing &amp; Deep Dives'">Technical Writing &amp; Deep Dives</h2>
-                <p class="section-subtitle" data-reveal style="margin-top:6px;" th:text="${about.blogSectionSubtitle} ?: 'Architectural patterns, Spring Boot internals, and algorithmic roadmaps.'">Architectural patterns, Spring Boot internals, and algorithmic roadmaps.</p>
-            </div>
-            <a th:href="@{/blog}" class="glass-btn primary" data-reveal style="padding:8px 18px; font-size:0.85rem; border-radius:999px;">
-                View All Articles <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:24px;">
-            <article class="glass-card" data-reveal th:each="post : ${recentBlogs}" style="padding:26px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.25s ease, box-shadow 0.25s ease;">
-                <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                            <span th:each="tag : ${#strings.arraySplit(post.tags, ',')}" class="badge-tag" style="font-size:0.75rem;" th:text="${tag.trim()}">Java</span>
-                        </div>
-                        <span th:if="${post.featured}" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:999px; border:1px solid rgba(245,158,11,0.3);">
-                            <i class="fa-solid fa-star"></i> Featured
-                        </span>
-                    </div>
-                    <h3 style="font-size:1.15rem; font-weight:700; line-height:1.4; margin-bottom:10px; letter-spacing:-0.02em;">
-                        <a th:href="@{'/blog/' + ${post.slug}}" style="color:var(--text); text-decoration:none;" th:text="${post.title}">Article Title</a>
-                    </h3>
-                    <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.55; margin-bottom:16px;" th:text="${post.summary}">
-                        Summary of article...
-                    </p>
-                </div>
-                <div style="border-top:1px solid var(--border-color); padding-top:14px; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-muted);">
-                    <span><i class="fa-regular fa-clock"></i> <span th:text="${post.readTimeMinutes} ?: 5">5</span> min read</span>
-                    <a th:href="@{'/blog/' + ${post.slug}}" class="glass-btn" style="padding:5px 12px; font-size:0.78rem; border-radius:999px;">
-                        Read <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </article>
-        </div>
-    </div>
-</section>
-
 <!-- ===================== CONTACT ===================== -->
 <section class="section" id="contact">
     <div class="container">
@@ -1047,6 +961,11 @@ function zoomCert(dir) {
     </div>
 </th:block>
 
+<!-- Floating Top Arrow (Back to Top) positioned above Ask AI -->
+<a href="#home" id="floatingBackToTop" class="floating-top-btn" title="Back to top" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+</a>
+
 <!-- ===================== "ASK PRINCE AI" CHATBOT WIDGET ===================== -->
 <th:block th:if="${about.aiChatEnabled != false}">
 <div id="aiChatWidget">
@@ -1057,7 +976,7 @@ function zoomCert(dir) {
     </button>
 
     <!-- AI Chat Popup Drawer -->
-    <div id="aiChatDrawer" class="ai-chat-drawer">
+    <div id="aiChatDrawer" class="ai-chat-drawer" style="display:none;">
         <div class="ai-chat-header">
             <div class="ai-chat-header-left">
                 <div class="ai-chat-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
@@ -1124,64 +1043,63 @@ function zoomCert(dir) {
                 <a href="#home" class="logo">
                     <span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span>
                 </a>
-                <p class="footer-tagline" th:text="${about.footerTagline} ?: (${about.title} ?: 'Full Stack Developer')">Full Stack Developer</p>
-                <p class="footer-bio" th:text="${about.footerSub} ?: 'Building clean, scalable, high-performance software with Java &amp; Spring Boot.'">Building clean, scalable, high-performance software with Java &amp; Spring Boot.</p>
+                <p class="footer-tagline" th:text="${!#strings.isEmpty(about.footerTagline) ? about.footerTagline : (!#strings.isEmpty(about.title) ? about.title : 'Full Stack Developer')}">Full Stack Developer</p>
+                <p class="footer-bio" th:text="${!#strings.isEmpty(about.footerSub) ? about.footerSub : 'Building clean, scalable, high-performance software with Java &amp; Spring Boot.'}">Building clean, scalable, high-performance software with Java &amp; Spring Boot.</p>
                 <div class="footer-status-pill" th:if="${about.availabilityVisible != false}">
                     <span class="status-dot"></span>
-                    <span th:text="${about.availabilityText} ?: 'Available for SDE Roles &amp; Internships'">Available for SDE Roles &amp; Internships</span>
+                    <span th:text="${!#strings.isEmpty(about.availabilityText) ? about.availabilityText : 'Available for SDE Roles &amp; Internships'}">Available for SDE Roles &amp; Internships</span>
                 </div>
             </div>
 
-            <!-- Navigation Links -->
-            <div class="footer-col">
+            <!-- Navigation Links (Compact 2-Column Grid) -->
+            <div class="footer-col nav-col">
                 <h4 class="footer-col-title"><i class="fa-solid fa-compass"></i> Explore</h4>
-                <ul class="footer-links">
+                <ul class="footer-links footer-links-grid">
                     <li><a href="#home"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
-                    <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About Me</a></li>
-                    <li><a href="#skills"><i class="fa-solid fa-chevron-right"></i> Skills &amp; Stack</a></li>
+                    <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About</a></li>
+                    <li><a href="#skills"><i class="fa-solid fa-chevron-right"></i> Skills</a></li>
                     <li><a href="#experience"><i class="fa-solid fa-chevron-right"></i> Experience</a></li>
                     <li><a href="#projects"><i class="fa-solid fa-chevron-right"></i> Projects</a></li>
-                    <li><a href="#coding"><i class="fa-solid fa-chevron-right"></i> Coding Profiles</a></li>
-                    <li><a href="#certificates"><i class="fa-solid fa-chevron-right"></i> Certifications</a></li>
-                    <li><a href="#contact"><i class="fa-solid fa-chevron-right"></i> Contact Me</a></li>
+                    <li><a href="#coding"><i class="fa-solid fa-chevron-right"></i> Coding</a></li>
+                    <li><a href="#certificates"><i class="fa-solid fa-chevron-right"></i> Certificates</a></li>
+                    <li><a href="#contact"><i class="fa-solid fa-chevron-right"></i> Contact</a></li>
                 </ul>
             </div>
 
             <!-- Interactive Features -->
-            <div class="footer-col">
+            <div class="footer-col resources-col">
                 <h4 class="footer-col-title"><i class="fa-solid fa-layer-group"></i> Resources</h4>
                 <ul class="footer-links">
                     <li><a href="javascript:void(0)" onclick="openResumeModal()"><i class="fa-solid fa-eye"></i> View Resume</a></li>
                     <li><a th:href="@{/resume/download}"><i class="fa-solid fa-file-arrow-down"></i> Download Resume</a></li>
                     <li th:if="${about.terminalEnabled != false}"><a href="javascript:void(0)" onclick="openCliTerminal()"><i class="fa-solid fa-terminal"></i> Interactive CLI</a></li>
                     <li><a href="javascript:void(0)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i> Switch Theme</a></li>
-                    <li th:if="${about.calendlyUrl}"><a th:href="${about.calendlyUrl}" target="_blank" rel="noopener"><i class="fa-solid fa-calendar-check"></i> Book 1:1 Call</a></li>
-                   
+                    <li th:if="${about.calendlyUrl != null and !#strings.isEmpty(about.calendlyUrl)}"><a th:href="${about.calendlyUrl}" target="_blank" rel="noopener"><i class="fa-solid fa-calendar-check"></i> Book 1:1 Call</a></li>
                 </ul>
             </div>
 
             <!-- Connect & Socials -->
             <div class="footer-col connect-col">
                 <h4 class="footer-col-title"><i class="fa-solid fa-paper-plane"></i> Get in Touch</h4>
-                <p class="footer-location" th:if="${about.location}">
+                <p class="footer-location" th:if="${about.location != null and !#strings.isEmpty(about.location)}">
                     <i class="fa-solid fa-location-dot" style="color:var(--primary);"></i>
                     <span th:text="${about.location}">Lucknow, Uttar Pradesh</span>
                 </p>
-                <p class="footer-email" th:if="${about.email}">
+                <p class="footer-email" th:if="${about.email != null and !#strings.isEmpty(about.email)}">
                     <i class="fa-solid fa-envelope" style="color:var(--primary);"></i>
                     <a th:href="'mailto:' + ${about.email}" th:text="${about.email}">princegupt3052@gmail.com</a>
                 </p>
                 <div class="footer-socials">
-                    <a th:if="${about.githubUrl}" th:href="${about.githubUrl}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub" class="footer-social-btn">
+                    <a th:if="${about.githubUrl != null and !#strings.isEmpty(about.githubUrl)}" th:href="${about.githubUrl}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub" class="footer-social-btn">
                         <i class="fa-brands fa-github"></i>
                     </a>
-                    <a th:if="${about.linkedinUrl}" th:href="${about.linkedinUrl}" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn" class="footer-social-btn">
+                    <a th:if="${about.linkedinUrl != null and !#strings.isEmpty(about.linkedinUrl)}" th:href="${about.linkedinUrl}" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn" class="footer-social-btn">
                         <i class="fa-brands fa-linkedin-in"></i>
                     </a>
-                    <a th:if="${about.whatsappUrl}" th:href="${about.whatsappUrl}" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="footer-social-btn">
+                    <a th:if="${about.whatsappUrl != null and !#strings.isEmpty(about.whatsappUrl)}" th:href="${about.whatsappUrl}" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="footer-social-btn">
                         <i class="fa-brands fa-whatsapp"></i>
                     </a>
-                    <a th:if="${about.email}" th:href="'mailto:' + ${about.email}" aria-label="Email" title="Email" class="footer-social-btn">
+                    <a th:if="${about.email != null and !#strings.isEmpty(about.email)}" th:href="'mailto:' + ${about.email}" aria-label="Email" title="Email" class="footer-social-btn">
                         <i class="fa-solid fa-envelope"></i>
                     </a>
                 </div>
@@ -1197,14 +1115,9 @@ function zoomCert(dir) {
                 <span>Engineered with</span>
                 <span class="tech-pill"><i class="fa-brands fa-java" style="color:#f97316;"></i> Java &amp; Spring Boot</span>
             </div>
-            <a href="#home" class="footer-back-to-top" title="Scroll to top of page">
-                <span>Back to top</span> <i class="fa-solid fa-arrow-up"></i>
-            </a>
         </div>
     </div>
 </footer>
-
-<a href="#home" class="glass-btn back-to-top" aria-label="Back to top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
 
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -1217,7 +1130,7 @@ document.querySelectorAll('.exp-desc').forEach(el => {
     }
 });
 </script>
-<script th:src="@{/js/main.js(v='9')}" defer></script>
+<script th:src="@{/js/main.js(v='15')}" defer></script>
 <script>
 (function() {
   var v = null;

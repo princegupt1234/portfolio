@@ -1,24 +1,101 @@
-/* Immediate global terminal exports to guarantee availability before DOM load */
-window.toggleCliTerminal = window.toggleCliTerminal || function() {
+/* Immediate global exports to guarantee availability before and after DOM load */
+window.openRecruiterModal = function() {
+  const m = document.getElementById('recruiterModal');
+  if (m) {
+    m.style.display = 'flex';
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+};
+window.closeRecruiterModal = function() {
+  const m = document.getElementById('recruiterModal');
+  if (m) {
+    m.classList.remove('open');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+};
+window.copyRecruiterPitch = function() {
+  const modal = document.getElementById('recruiterModal');
+  const customPitch = modal ? modal.getAttribute('data-pitch') : null;
+  const pitchText = (customPitch && customPitch.trim())
+    ? customPitch.trim()
+    : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
+  navigator.clipboard.writeText(pitchText).then(() => {
+    const btn = document.getElementById('pitchCopyBtn');
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981;"></i> <span>Copied!</span>';
+      setTimeout(() => { btn.innerHTML = orig; }, 2200);
+    }
+  });
+};
+
+window.toggleAiChat = function() {
+  const d = document.getElementById('aiChatDrawer');
+  if (!d) return;
+  if (d.classList.contains('open') || d.style.display === 'flex') {
+    window.closeAiChat();
+  } else {
+    window.openAiChat();
+  }
+};
+window.openAiChat = function() {
+  const d = document.getElementById('aiChatDrawer');
+  if (!d) return;
+  d.style.display = 'flex';
+  d.classList.add('open');
+  const inp = document.getElementById('aiChatInput');
+  if (inp) setTimeout(() => inp.focus(), 100);
+};
+window.closeAiChat = function() {
+  const d = document.getElementById('aiChatDrawer');
+  if (d) {
+    d.classList.remove('open');
+    d.style.display = 'none';
+  }
+};
+
+window.openResumeModal = function() {
+  const modal = document.getElementById('resumeModal');
+  const iframe = document.getElementById('resumeIframe');
+  if (!modal) return;
+  if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src.endsWith('/'))) {
+    iframe.src = '/resume/preview';
+  }
+  modal.style.display = 'flex';
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeResumeModal = function() {
+  const modal = document.getElementById('resumeModal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+};
+
+window.toggleCliTerminal = function() {
   const d = document.getElementById('cliDrawer');
   if (d) d.classList.toggle('open');
 };
-window.openCliTerminal = window.openCliTerminal || function() {
+window.openCliTerminal = function() {
   const d = document.getElementById('cliDrawer');
   if (d) d.classList.add('open');
 };
-window.closeCliTerminal = window.closeCliTerminal || function() {
+window.closeCliTerminal = function() {
   const d = document.getElementById('cliDrawer');
   if (d) d.classList.remove('open');
 };
-window.execCliCommand = window.execCliCommand || function(c) {
+window.execCliCommand = function(c) {
   window.openCliTerminal();
 };
-window.toggleCliMaximize = window.toggleCliMaximize || function() {
+window.toggleCliMaximize = function() {
   const d = document.getElementById('cliDrawer');
   if (d) d.classList.toggle('maximized');
 };
-window.handleCliDrawerClick = window.handleCliDrawerClick || function(e) {};
+window.handleCliDrawerClick = function(e) {};
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -46,17 +123,34 @@ document.addEventListener('DOMContentLoaded', () => {
     navOverlay.addEventListener('click', closeNav);
   }
 
-  /* ---------- Navbar scroll shadow + back to top ---------- */
+  /* ---------- Navbar scroll shadow & floating back-to-top ---------- */
   const navbar = document.querySelector('.navbar');
-  const backToTop = document.querySelector('.back-to-top');
-  window.addEventListener('scroll', () => {
+  const floatingBackToTop = document.getElementById('floatingBackToTop');
+  const aiLauncher = document.getElementById('aiChatLaunchBtn');
+
+  if (floatingBackToTop && !aiLauncher) {
+    floatingBackToTop.style.bottom = '24px';
+  }
+
+  const updateScrollShadowAndTopBtn = () => {
     const y = window.scrollY;
     if (navbar) navbar.style.boxShadow = y > 40
       ? '0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.1) inset'
       : '0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(59,130,246,0.06) inset';
-    if (backToTop) backToTop.classList.toggle('visible', y > 450);
-  });
-  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    if (floatingBackToTop) {
+      floatingBackToTop.classList.toggle('visible', y > 60);
+    }
+  };
+
+  window.addEventListener('scroll', updateScrollShadowAndTopBtn, { passive: true });
+  updateScrollShadowAndTopBtn();
+
+  if (floatingBackToTop) {
+    floatingBackToTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
   /* ---------- Cursor glow ---------- */
   const glow = document.querySelector('.cursor-glow');
@@ -286,6 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.openRecruiterModal = function() {
     const modal = document.getElementById('recruiterModal');
     if (modal) {
+      modal.style.display = 'flex';
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
     }
@@ -295,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('recruiterModal');
     if (modal) {
       modal.classList.remove('open');
+      modal.style.display = 'none';
       document.body.style.overflow = '';
     }
   };
@@ -305,14 +401,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const pitchText = (customPitch && customPitch.trim())
       ? customPitch.trim()
       : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
-    navigator.clipboard.writeText(pitchText).then(() => {
+    
+    function showCopiedFeedback() {
       const btn = document.getElementById('pitchCopyBtn');
       if (btn) {
         const orig = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981;"></i> <span>Copied!</span>';
         setTimeout(() => { btn.innerHTML = orig; }, 2200);
       }
-    });
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(pitchText)
+        .then(showCopiedFeedback)
+        .catch(() => {
+          // Fallback if clipboard API blocked
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = pitchText;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showCopiedFeedback();
+          } catch(e) {}
+        });
+    } else {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = pitchText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showCopiedFeedback();
+      } catch(e) {}
+    }
   };
 
   /* ---------- Interactive Developer CLI Terminal ---------- */

@@ -1,13 +1,13 @@
 package com.example.portfolio.service;
 
 import com.example.portfolio.entity.AboutInfo;
-import com.example.portfolio.entity.BlogPost;
+import com.example.portfolio.entity.BuildingProject;
 import com.example.portfolio.entity.EducationEntry;
 import com.example.portfolio.entity.Experience;
 import com.example.portfolio.entity.Project;
 import com.example.portfolio.entity.Skill;
 import com.example.portfolio.repository.AboutInfoRepository;
-import com.example.portfolio.repository.BlogPostRepository;
+import com.example.portfolio.repository.BuildingProjectRepository;
 import com.example.portfolio.repository.EducationEntryRepository;
 import com.example.portfolio.repository.ExperienceRepository;
 import com.example.portfolio.repository.ProjectRepository;
@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,7 @@ public class PortfolioAiService {
     private final ProjectRepository projectRepository;
     private final ExperienceRepository experienceRepository;
     private final EducationEntryRepository educationEntryRepository;
-    private final BlogPostRepository blogPostRepository;
+    private final BuildingProjectRepository buildingProjectRepository;
     private final RestClient restClient;
 
     @Value("${gemini.api.key:}")
@@ -49,13 +50,13 @@ public class PortfolioAiService {
                               ProjectRepository projectRepository,
                               ExperienceRepository experienceRepository,
                               EducationEntryRepository educationEntryRepository,
-                              BlogPostRepository blogPostRepository) {
+                              BuildingProjectRepository buildingProjectRepository) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.skillRepository = skillRepository;
         this.projectRepository = projectRepository;
         this.experienceRepository = experienceRepository;
         this.educationEntryRepository = educationEntryRepository;
-        this.blogPostRepository = blogPostRepository;
+        this.buildingProjectRepository = buildingProjectRepository;
         this.restClient = RestClient.builder().build();
     }
 
@@ -128,7 +129,7 @@ public class PortfolioAiService {
         List<Skill> skills = skillRepository.findByVisibleTrueOrderByCategoryAscSortOrderAsc();
         List<Project> projects = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Experience> experiences = experienceRepository.findByVisibleTrueOrderBySortOrderAsc();
-        List<BlogPost> blogs = blogPostRepository.findByPublishedTrueOrderByCreatedAtDesc();
+        List<BuildingProject> buildingProjects = buildingProjectRepository.findAllByOrderBySortOrderAsc();
 
         StringBuilder sb = new StringBuilder();
         sb.append("CANDIDATE INFO:\n");
@@ -146,21 +147,39 @@ public class PortfolioAiService {
             sb.append("- ").append(s.getName()).append(" (").append(s.getCategory()).append("): ").append(s.getProficiency()).append("%\n");
         }
 
-        sb.append("\nFEATURED PROJECTS:\n");
-        for (Project p : projects) {
-            sb.append("- ").append(p.getTitle()).append(" [Tech: ").append(p.getTechStack()).append("]: ").append(p.getDescription()).append("\n");
+        sb.append("\nPORTFOLIO PROJECTS (from admin panel / frontend visible):\n");
+        if (projects.isEmpty()) {
+            sb.append("(No published projects currently in the catalog)\n");
+        } else {
+            for (Project p : projects) {
+                sb.append("- ").append(p.getTitle());
+                if (Boolean.TRUE.equals(p.getFeatured())) sb.append(" [Featured]");
+                sb.append(" [Tech: ").append(p.getTechStack() != null ? p.getTechStack() : "").append("]: ")
+                  .append(p.getDescription() != null ? p.getDescription() : "");
+                if (p.getEngineeringHighlight() != null && !p.getEngineeringHighlight().isBlank()) {
+                    sb.append(" | Highlight: ").append(p.getEngineeringHighlight());
+                }
+                if (p.getLiveUrl() != null && !p.getLiveUrl().isBlank()) {
+                    sb.append(" | Live: ").append(p.getLiveUrl());
+                }
+                if (p.getGithubUrl() != null && !p.getGithubUrl().isBlank()) {
+                    sb.append(" | GitHub: ").append(p.getGithubUrl());
+                }
+                sb.append("\n");
+            }
+        }
+
+        if (!buildingProjects.isEmpty()) {
+            sb.append("\nCURRENTLY BUILDING:\n");
+            for (BuildingProject bp : buildingProjects) {
+                sb.append("- ").append(bp.getTitle()).append(" [Tech: ").append(bp.getTechStack()).append("]: ")
+                  .append(bp.getSummary() != null ? bp.getSummary() : (bp.getDescription() != null ? bp.getDescription() : "")).append("\n");
+            }
         }
 
         sb.append("\nEXPERIENCE:\n");
         for (Experience e : experiences) {
             sb.append("- ").append(e.getRole()).append(" at ").append(e.getCompany()).append(" (").append(e.getDuration()).append("): ").append(e.getDescription()).append("\n");
-        }
-
-        if (!blogs.isEmpty()) {
-            sb.append("\nRECENT TECH BLOGS:\n");
-            for (BlogPost b : blogs) {
-                sb.append("- ").append(b.getTitle()).append(" (Tags: ").append(b.getTags()).append(")\n");
-            }
         }
 
         return sb.toString();
@@ -169,6 +188,40 @@ public class PortfolioAiService {
     public String buildLocalFallbackResponse(String query) {
         String q = query.toLowerCase(Locale.ROOT);
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElse(new AboutInfo());
+        List<Project> allVisible = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
+
+        // 1. Check for specific project query by title from admin panel / database
+        for (Project p : allVisible) {
+            if (p.getTitle() != null && !p.getTitle().isBlank()) {
+                String titleLower = p.getTitle().toLowerCase(Locale.ROOT);
+                if (q.contains(titleLower) || (titleLower.length() >= 5 && q.matches(".*\\b" + Pattern.quote(titleLower) + "\\b.*"))) {
+                    StringBuilder sb = new StringBuilder("🚀 **" + p.getTitle() + "**");
+                    if (Boolean.TRUE.equals(p.getFeatured())) {
+                        sb.append(" ⭐ _(Featured Project)_");
+                    }
+                    sb.append("\n\n");
+                    if (p.getDescription() != null && !p.getDescription().isBlank()) {
+                        sb.append(p.getDescription()).append("\n\n");
+                    }
+                    if (p.getTechStack() != null && !p.getTechStack().isBlank()) {
+                        sb.append("• **Tech Stack:** ").append(p.getTechStack()).append("\n");
+                    }
+                    if (p.getEngineeringHighlight() != null && !p.getEngineeringHighlight().isBlank()) {
+                        sb.append("• **Highlight:** ").append(p.getEngineeringHighlight()).append("\n");
+                    }
+                    if (p.getStatus() != null && !p.getStatus().isBlank()) {
+                        sb.append("• **Status:** ").append(p.getStatus()).append("\n");
+                    }
+                    if (p.getLiveUrl() != null && !p.getLiveUrl().isBlank()) {
+                        sb.append("• **Live Demo:** [Open Application](").append(p.getLiveUrl()).append(")\n");
+                    }
+                    if (p.getGithubUrl() != null && !p.getGithubUrl().isBlank()) {
+                        sb.append("• **GitHub:** [View Repository](").append(p.getGithubUrl()).append(")\n");
+                    }
+                    return sb.toString();
+                }
+            }
+        }
 
         // Greetings
         if (q.matches(".*\\b(hi|hello|hey|greetings|hola|namaste|who are you)\\b.*")) {
@@ -189,20 +242,46 @@ public class PortfolioAiService {
                     + (skillList.isEmpty() ? "" : "_Verified Skills:_ " + skillList);
         }
 
-        // Projects
+        // Projects (all visible projects from Admin Panel matching portfolio frontend)
         if (q.matches(".*\\b(project|projects|built|portfolio|work|github|app|apps)\\b.*")) {
-            List<Project> projects = projectRepository.findByVisibleTrueAndFeaturedTrueOrderBySortOrderAsc();
-            if (projects.isEmpty()) {
-                projects = projectRepository.findAllByOrderBySortOrderAsc();
+            if (allVisible.isEmpty()) {
+                return "🚀 Prince's project catalog is currently being updated in the admin panel. "
+                        + "You can check back shortly or explore his repositories directly on [GitHub](https://github.com/princegupt1234)!";
             }
-            StringBuilder sb = new StringBuilder("🚀 **Featured Projects Built by Prince:**\n\n");
-            int count = 0;
-            for (Project p : projects) {
-                if (count++ >= 3) break;
-                sb.append("• **").append(p.getTitle()).append("** — ").append(p.getDescription() != null ? p.getDescription() : "").append("\n")
-                  .append("  _Stack:_ ").append(p.getTechStack() != null ? p.getTechStack() : "Java, Spring Boot").append("\n\n");
+
+            StringBuilder sb = new StringBuilder("🚀 **Portfolio Projects Built by Prince:**\n\n");
+            for (Project p : allVisible) {
+                sb.append("• **").append(p.getTitle()).append("**");
+                if (Boolean.TRUE.equals(p.getFeatured())) {
+                    sb.append(" ⭐ _(Featured)_");
+                }
+                sb.append(" — ").append(p.getDescription() != null ? p.getDescription() : "").append("\n");
+                if (p.getTechStack() != null && !p.getTechStack().isBlank()) {
+                    sb.append("  _Stack:_ ").append(p.getTechStack()).append("\n");
+                }
+                if (p.getEngineeringHighlight() != null && !p.getEngineeringHighlight().isBlank()) {
+                    sb.append("  _Highlight:_ ").append(p.getEngineeringHighlight()).append("\n");
+                }
+                sb.append("\n");
             }
-            sb.append("Explore the full list with live demos in the **#projects** section!");
+
+            List<BuildingProject> building = buildingProjectRepository.findAllByOrderBySortOrderAsc();
+            if (!building.isEmpty()) {
+                sb.append("🚧 **Currently Building:**\n");
+                for (BuildingProject bp : building) {
+                    sb.append("• **").append(bp.getTitle()).append("**");
+                    if (bp.getStatus() != null && !bp.getStatus().isBlank()) {
+                        sb.append(" (").append(bp.getStatus()).append(")");
+                    }
+                    sb.append(" — ").append(bp.getSummary() != null ? bp.getSummary() : (bp.getDescription() != null ? bp.getDescription() : "")).append("\n");
+                    if (bp.getTechStack() != null && !bp.getTechStack().isBlank()) {
+                        sb.append("  _Stack:_ ").append(bp.getTechStack().replace("|", ", ")).append("\n");
+                    }
+                }
+                sb.append("\n");
+            }
+
+            sb.append("Explore all projects with interactive demos in the **#projects** section!");
             return sb.toString();
         }
 

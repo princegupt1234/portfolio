@@ -26,7 +26,6 @@ import com.example.portfolio.repository.ServiceItemRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.AnalyticsService;
-import com.example.portfolio.service.BlogService;
 import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.GithubStatsService;
 import com.example.portfolio.service.LeetCodeRepositoryStatsService;
@@ -70,7 +69,6 @@ public class HomeController {
     private final LeetCodeRepositoryStatsService leetCodeRepositoryStatsService;
     private final MailService mailService;
     private final DataVersionService dataVersionService;
-    private final BlogService blogService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -84,8 +82,7 @@ public class HomeController {
                            ContactMessageRepository contactMessageRepository, ResumeRepository resumeRepository,
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
                            LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
-                           MailService mailService, DataVersionService dataVersionService,
-                           BlogService blogService) {
+                           MailService mailService, DataVersionService dataVersionService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.skillRepository = skillRepository;
@@ -103,7 +100,6 @@ public class HomeController {
         this.leetCodeRepositoryStatsService = leetCodeRepositoryStatsService;
         this.mailService = mailService;
         this.dataVersionService = dataVersionService;
-        this.blogService = blogService;
     }
 
     @GetMapping("/api/data-version")
@@ -120,15 +116,18 @@ public class HomeController {
     }
 
     private String renderHome(Boolean contactSuccess, Model model) {
-        analyticsService.recordPortfolioView();
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                analyticsService.recordPortfolioView();
+            } catch (Exception ignored) {}
+        });
 
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElse(new AboutInfo());
         List<EducationEntry> education = educationEntryRepository.findAllByOrderBySortOrderAsc();
         List<Skill> skills = skillRepository.findByVisibleTrueOrderByCategoryAscSortOrderAsc();
         List<String> skillCategories = skillRepository.findDistinctVisibleCategories();
         List<Experience> experiences = experienceRepository.findByVisibleTrueOrderBySortOrderAsc();
-        List<Project> featuredProjects = projectRepository.findByVisibleTrueAndFeaturedTrueOrderBySortOrderAsc();
-        List<Project> projects = projectRepository.findVisibleNonFeaturedOrderBySortOrderAsc();
+        List<Project> projects = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Certificate> certificates = certificateRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<ServiceItem> services = serviceItemRepository.findByVisibleTrueOrderBySortOrderAsc();
         List<Testimonial> testimonials = testimonialRepository.findByPublishedTrue();
@@ -140,7 +139,7 @@ public class HomeController {
         model.addAttribute("skills", skills);
         model.addAttribute("skillCategories", skillCategories);
         model.addAttribute("experiences", experiences);
-        model.addAttribute("featuredProjects", featuredProjects);
+        model.addAttribute("featuredProjects", List.of());
         model.addAttribute("projects", projects);
         model.addAttribute("certificates", certificates);
         model.addAttribute("services", services);
@@ -149,7 +148,6 @@ public class HomeController {
         model.addAttribute("learningProjects", learningProjects);
         model.addAttribute("github", githubStatsService.fetchStats(about.getGithubUsername()));
         model.addAttribute("leetcodeRepo", leetCodeRepositoryStatsService.fetchStats(about.getGithubUsername()));
-        model.addAttribute("recentBlogs", blogService.getRecentPublished(3));
 
         if (!model.containsAttribute("contactForm")) {
             model.addAttribute("contactForm", new ContactForm());

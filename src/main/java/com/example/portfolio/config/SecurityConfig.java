@@ -39,7 +39,7 @@ public class SecurityConfig {
                         "/uploads/**", "/webjars/**", "/", "/about", "/skills", "/experience",
                         "/projects", "/projects/**", "/certificates", "/services", "/testimonials",
                         "/contact", "/contact/**", "/resume/download", "/resume/preview", "/api/data-version",
-                        "/api/skills", "/blog", "/blog/**", "/api/ai/**").permitAll()
+                        "/api/skills", "/api/ai/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
