@@ -49,6 +49,12 @@
                             <textarea id="project-features" class="glass-textarea" th:field="*{features}" rows="3" placeholder="JWT Authentication&#10;Stripe Payment Gateway&#10;Dockerized Deployment"></textarea>
                         </div>
 
+                        <div class="form-group full">
+                            <label for="project-engineering">Engineering Highlight / Key Feat <span style="color:var(--text-muted);">(prominent badge on card)</span></label>
+                            <input id="project-engineering" class="glass-input" th:field="*{engineeringHighlight}" placeholder="e.g. Architected custom JWT auth filter &amp; in-memory caching layer" />
+                            <small>A 1-sentence technical differentiator that catches recruiters' and hiring managers' attention.</small>
+                        </div>
+
                         <div class="form-group">
                             <label for="project-tech">Tech Stack <span style="color:var(--text-muted);">(comma separated)</span></label>
                             <input id="project-tech" class="glass-input" th:field="*{techStack}" placeholder="Java, Spring Boot, MySQL, Thymeleaf" />
@@ -67,6 +73,11 @@
                         <div class="form-group">
                             <label for="project-live">Live Demo URL</label>
                             <input id="project-live" class="glass-input" type="url" th:field="*{liveUrl}" placeholder="https://..." />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-demo-video">Demo Video URL <span style="color:var(--text-muted);">(Loom / YouTube / MP4)</span></label>
+                            <input id="project-demo-video" class="glass-input" type="url" th:field="*{demoVideoUrl}" placeholder="https://www.youtube.com/watch?v=..." />
                         </div>
 
                         <div class="form-group">
@@ -115,6 +126,18 @@
                             <div th:if="*{imageUrl}" style="margin-top:14px; display:flex; align-items:center; gap:14px;">
                                 <img th:src="@{*{imageUrl}}" style="max-width:180px; max-height:100px; border-radius:10px; border:1px solid var(--glass-border); object-fit:cover;" />
                                 <div style="color:var(--text-secondary); font-size:0.8rem;">Current image active. Uploading a new file will replace it.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group full" style="border-top:1px solid var(--glass-border); padding-top:18px;">
+                            <label>Architecture Diagram / Schema Image <span style="color:var(--text-muted);">(optional)</span></label>
+                            <div class="file-drop">
+                                <input type="file" name="archImageFile" accept="image/*" />
+                                <div class="file-drop-label"><i class="fa-solid fa-sitemap" style="margin-right:6px;"></i> Click to upload or drag architecture diagram</div>
+                            </div>
+                            <div th:if="*{architectureImageUrl}" style="margin-top:14px; display:flex; align-items:center; gap:14px;">
+                                <img th:src="@{*{architectureImageUrl}}" style="max-width:180px; max-height:100px; border-radius:10px; border:1px solid var(--glass-border); object-fit:cover;" />
+                                <div style="color:var(--text-secondary); font-size:0.8rem;">Current architecture diagram active. Uploading a new file will replace it.</div>
                             </div>
                         </div>
 

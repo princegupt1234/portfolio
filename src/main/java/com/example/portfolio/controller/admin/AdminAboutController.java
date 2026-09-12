@@ -69,6 +69,16 @@ public class AdminAboutController {
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS availability_visible BIT(1) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS footer_tagline VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS footer_sub TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS quick_stats TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS quick_stats_visible BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS work_preference TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS preferred_locations TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS languages_spoken TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS calendly_url TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS terminal_enabled BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS engineering_highlight TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS demo_video_url VARCHAR(255) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS architecture_image_url VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery(
                 "CREATE TABLE IF NOT EXISTS building_project (" +
                 "  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
@@ -92,6 +102,7 @@ public class AdminAboutController {
     public String edit(Model model) {
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
         model.addAttribute("about", about);
+        model.addAttribute("activeSub", "about");
         model.addAttribute("education", educationEntryRepository.findAllByOrderBySortOrderAsc());
         model.addAttribute("newEducation", new EducationEntry());
         model.addAttribute("buildingProjects", buildingProjectRepository.findAllByOrderBySortOrderAsc());
@@ -102,20 +113,29 @@ public class AdminAboutController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute AboutInfo about,
-                        @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
+    public String save(@ModelAttribute AboutInfo form,
                         @RequestParam(value = "availabilityVisible", required = false) String availabilityVisibleParam,
+                        @RequestParam(value = "terminalEnabled", required = false) String terminalEnabledParam,
                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        about.setAvailabilityVisible("true".equals(availabilityVisibleParam));
-        if (photoFile != null && !photoFile.isEmpty()) {
-            about.setProfileImage(fileStorageService.store(photoFile, "profile"));
-        } else if (about.getId() != null) {
-            aboutInfoRepository.findById(about.getId())
-                    .ifPresent(existing -> about.setProfileImage(existing.getProfileImage()));
-        }
-        aboutInfoRepository.save(about);
+        AboutInfo existing = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
+
+        // Update ONLY About Section fields so Hero Section data remains completely untouched
+        existing.setCareerObjective(form.getCareerObjective());
+        existing.setLocation(form.getLocation());
+        existing.setPhone(form.getPhone());
+        existing.setAvailabilityText(form.getAvailabilityText());
+        existing.setAvailabilityVisible("true".equals(availabilityVisibleParam));
+        existing.setWorkPreference(form.getWorkPreference());
+        existing.setPreferredLocations(form.getPreferredLocations());
+        existing.setLanguagesSpoken(form.getLanguagesSpoken());
+        existing.setCalendlyUrl(form.getCalendlyUrl());
+        existing.setTerminalEnabled("true".equals(terminalEnabledParam));
+        existing.setFooterTagline(form.getFooterTagline());
+        existing.setFooterSub(form.getFooterSub());
+
+        aboutInfoRepository.save(existing);
         dataVersionService.bump();
-        redirectAttributes.addFlashAttribute("successMessage", "About & Hero profile saved successfully.");
+        redirectAttributes.addFlashAttribute("successMessage", "About Section updated successfully.");
         return "redirect:/admin/about";
     }
 
@@ -137,6 +157,7 @@ public class AdminAboutController {
     public String editBuildingProjectForm(@PathVariable("id") Long id, Model model) {
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
         model.addAttribute("about", about);
+        model.addAttribute("activeSub", "about");
         model.addAttribute("education", educationEntryRepository.findAllByOrderBySortOrderAsc());
         model.addAttribute("newEducation", new EducationEntry());
         model.addAttribute("buildingProjects", buildingProjectRepository.findAllByOrderBySortOrderAsc());

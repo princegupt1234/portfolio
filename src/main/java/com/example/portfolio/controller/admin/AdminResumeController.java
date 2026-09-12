@@ -21,12 +21,15 @@ public class AdminResumeController {
     private final ResumeRepository resumeRepository;
     private final AboutInfoRepository aboutInfoRepository;
     private final FileStorageService fileStorageService;
+    private final com.example.portfolio.service.DataVersionService dataVersionService;
 
     public AdminResumeController(ResumeRepository resumeRepository, AboutInfoRepository aboutInfoRepository,
-                                  FileStorageService fileStorageService) {
+                                  FileStorageService fileStorageService,
+                                  com.example.portfolio.service.DataVersionService dataVersionService) {
         this.resumeRepository = resumeRepository;
         this.aboutInfoRepository = aboutInfoRepository;
         this.fileStorageService = fileStorageService;
+        this.dataVersionService = dataVersionService;
     }
 
     @GetMapping
@@ -59,6 +62,7 @@ public class AdminResumeController {
                 about.setResumeUrl(url);
                 aboutInfoRepository.save(about);
             });
+            dataVersionService.bump();
             redirectAttributes.addFlashAttribute("successMessage", "New resume (" + resume.getVersionLabel() + ") uploaded and set as active.");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Please select a valid PDF file to upload.");
@@ -80,6 +84,7 @@ public class AdminResumeController {
                 about.setResumeUrl(r.getFileUrl());
                 aboutInfoRepository.save(about);
             });
+            dataVersionService.bump();
             redirectAttributes.addFlashAttribute("successMessage", "Resume version " + r.getVersionLabel() + " is now active.");
         });
         return "redirect:/admin/resume";
@@ -89,6 +94,7 @@ public class AdminResumeController {
     public String delete(@PathVariable("id") Long id,
                          org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         resumeRepository.deleteById(id);
+        dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Resume version deleted successfully.");
         return "redirect:/admin/resume";
     }

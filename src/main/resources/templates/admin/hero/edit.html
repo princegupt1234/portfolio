@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><title>Hero Section Management | Admin</title>
+  <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
+  <style>
+    .workspace-tabs-strip {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px;
+      background: rgba(255, 255, 255, 0.03); padding: 5px; border-radius: 12px;
+      border: 1px solid var(--glass-border);
+    }
+    .workspace-tabs-strip .tab-pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px;
+      border-radius: 9px; color: var(--text-secondary); font-size: 0.84rem; font-weight: 500;
+      text-decoration: none; transition: all 0.2s ease;
+    }
+    .workspace-tabs-strip .tab-pill:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .workspace-tabs-strip .tab-pill.active {
+      background: linear-gradient(135deg, rgba(59,130,246,.25), rgba(6,182,212,.18));
+      border: 1px solid rgba(59,130,246,.35); color: #fff; font-weight: 600;
+      box-shadow: 0 4px 12px rgba(59,130,246,.2);
+    }
+
+    .hero-sections { display: flex; flex-direction: column; gap: 18px; }
+    .ab-card { border-radius: 16px; background: var(--glass-surface); border: 1px solid var(--glass-border); backdrop-filter: var(--blur); overflow: hidden; }
+    .ab-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 22px; cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--glass-border); transition: background .2s;
+    }
+    .ab-card-header:hover { background: rgba(255,255,255,.03); }
+    .ab-card-header-left { display: flex; align-items: center; gap: 12px; }
+    .ab-card-icon {
+      width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(59,130,246,.22), rgba(6,182,212,.14));
+      color: var(--primary); border: 1px solid rgba(59,130,246,.25);
+    }
+    .ab-card-title { font-size: .95rem; font-weight: 600; color: var(--text); }
+    .ab-card-subtitle { font-size: .76rem; color: var(--text-secondary); margin-top: 2px; }
+    .ab-chevron { color: var(--text-secondary); transition: transform .3s; font-size: .85rem; }
+    .ab-card.collapsed .ab-chevron { transform: rotate(-90deg); }
+    .ab-card-body { padding: 22px; }
+    .ab-card.collapsed .ab-card-body { display: none; }
+
+    .sec-desc { font-size: .8rem; color: var(--text-secondary); margin-bottom: 16px; padding: 9px 13px; background: rgba(255,255,255,.03); border-radius: 10px; border-left: 3px solid rgba(59,130,246,.4); line-height: 1.6; }
+    .field-label-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+    .field-label-row label { font-size: .82rem; color: var(--text-secondary); font-weight: 500; }
+    .char-counter { font-size: .74rem; color: var(--text-secondary); font-family: var(--font-mono); }
+    .char-counter.warn { color: #f97316; }
+    .char-counter.over { color: var(--danger); }
+
+    .field-hint { font-size: .74rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.5; }
+    .field-hint code { background: rgba(255,255,255,.08); padding: 1px 5px; border-radius: 4px; font-size: .74rem; }
+
+    .photo-preview-wrap { display: flex; align-items: center; gap: 18px; margin-top: 12px; flex-wrap: wrap; }
+    .photo-circle {
+      width: 86px; height: 86px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--glass-border); background: rgba(255,255,255,.06);
+      display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 1.8rem; flex-shrink: 0; overflow: hidden;
+    }
+    .photo-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-info { font-size: .78rem; color: var(--text-secondary); line-height: 1.7; }
+
+    .profile-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .profile-form-grid .full { grid-column: 1/-1; }
+
+    .phrase-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      border-radius: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+    }
+    .phrase-item-text { flex: 1; font-family: var(--font-mono); font-size: .84rem; color: #f1f5f9; }
+    .phrase-item-len { font-size: .72rem; color: var(--text-secondary); font-family: var(--font-mono); }
+    .phrase-btn { border: none; border-radius: 7px; padding: 5px 8px; cursor: pointer; font-size: .75rem; }
+    .phrase-btn.up, .phrase-btn.dn { background: rgba(255,255,255,.08); color: #cbd5e1; }
+    .phrase-btn.rm { background: rgba(251,113,133,.14); color: #fca5a5; }
+
+    .chip-preview-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; min-height: 30px; }
+    .chip-preview { padding: 4px 11px; border-radius: 999px; font-size: .75rem; font-weight: 500; background: rgba(59,130,246,.15); color: #93c5fd; border: 1px solid rgba(59,130,246,.3); }
+
+    .hero-live-preview {
+      display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(140px, .6fr); gap: 20px; align-items: center;
+      padding: 24px; border: 1px solid rgba(59,130,246,.25); border-radius: 14px;
+      background: linear-gradient(135deg, rgba(59,130,246,.09), rgba(6,182,212,.05)), rgba(255,255,255,.025);
+    }
+    .preview-eyebrow { color: var(--primary); font: 600 .7rem var(--font-mono); letter-spacing: 1px; margin-bottom: 6px; }
+    .preview-name { margin: 0; color: var(--text); font: 700 clamp(1.3rem, 2.5vw, 1.85rem) var(--font-heading); }
+    .preview-title { color: var(--secondary); font: 500 .82rem var(--font-mono); margin: 4px 0 10px; }
+    .preview-bio { color: var(--text-secondary); font-size: .78rem; line-height: 1.6; margin: 0 0 12px; }
+    .preview-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .preview-chip { padding: 3px 9px; border: 1px solid rgba(59,130,246,.28); border-radius: 999px; background: rgba(59,130,246,.12); color: #93c5fd; font-size: .68rem; }
+    .preview-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .preview-action { padding: 6px 12px; border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-secondary); font-size: .72rem; }
+    .preview-action.primary { border-color: rgba(59,130,246,.45); background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; }
+    .profile-preview-photo { width: 118px; aspect-ratio: 1; margin-left: auto; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-muted); font-size: 2rem; box-shadow: 0 0 0 8px rgba(59,130,246,.06); }
+    .profile-preview-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .save-bar {
+      position: sticky; bottom: 0; z-index: 30;
+      background: rgba(3,7,18,.88); backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border); border-radius: 12px;
+      padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 18px;
+    }
+    .save-bar-msg { font-size: .78rem; color: var(--text-secondary); }
+
+    .about-nav { position: sticky; top: 58px; z-index: 25; display: flex; gap: 6px; overflow-x: auto; padding: 7px; margin: 0 0 18px; background: rgba(8,13,27,.88); border: 1px solid var(--glass-border); border-radius: 12px; backdrop-filter: blur(16px); scrollbar-width: none; }
+    .about-nav a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 8px; color: var(--text-secondary); font-size: .75rem; white-space: nowrap; text-decoration: none; }
+    .about-nav a:hover { color: var(--text); background: rgba(255,255,255,.08); }
+    .about-nav a i { color: var(--primary); font-size: .75rem; }
+
+    @media(max-width:700px){
+      .profile-form-grid, .hero-live-preview { grid-template-columns: 1fr; }
+      .profile-preview-photo { margin: 0 auto; grid-row: 1; }
+    }
+  </style>
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
+<div class="admin-shell">
+  <div th:replace="~{admin/fragments/sidebar :: sidebar(active='hero')}"></div>
+  <div class="admin-main">
+    <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Hero Section Management', unread=0)}"></div>
+    <div class="admin-content">
+      <div style="max-width: 1280px; margin: 0 auto;">
+
+        <!-- Workspace Tabs -->
+        <div class="workspace-tabs-strip">
+          <a th:href="@{/admin/hero}" class="tab-pill active"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>1. Hero Section</span></a>
+          <a th:href="@{/admin/about}" class="tab-pill"><i class="fa-solid fa-user"></i> <span>2. About Section</span></a>
+        </div>
+
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:18px;">
+          <div>
+            <div style="color:var(--primary); font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px;">Landing Page &amp; Top Fold</div>
+            <h1 style="font-size:clamp(1.35rem,2.5vw,1.9rem); margin:0; letter-spacing:-.02em;">Hero Section Settings</h1>
+            <p style="max-width:640px; color:var(--text-secondary); font-size:.82rem; line-height:1.6; margin:6px 0 0;">
+              Manage your landing headline, typewriter dynamic animated phrases, profile photo, tech stack strip, social links, and credibility stats bar.
+            </p>
+          </div>
+          <div style="display:flex; gap:9px; flex-wrap:wrap;">
+            <a th:href="@{/}" target="_blank" class="glass-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> View live site</a>
+            <button type="button" onclick="document.getElementById('heroForm').requestSubmit();" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Hero</button>
+          </div>
+        </div>
+
+        <div class="alert success" th:if="${successMessage}">
+          <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+          <button type="button" class="alert-close">×</button>
+        </div>
+        <div class="alert error" th:if="${errorMessage}">
+          <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+          <button type="button" class="alert-close">×</button>
+        </div>
+
+        <nav class="about-nav" aria-label="Hero anchors">
+          <a href="#sec-profile"><i class="fa-solid fa-id-badge"></i> Profile &amp; Photo</a>
+          <a href="#sec-typewriter"><i class="fa-solid fa-keyboard"></i> Typewriter Animation</a>
+          <a href="#sec-techstack"><i class="fa-solid fa-layer-group"></i> Tech Stack</a>
+          <a href="#sec-social"><i class="fa-solid fa-share-nodes"></i> Social Links</a>
+          <a href="#sec-quickstats"><i class="fa-solid fa-chart-simple"></i> Credibility Stats</a>
+        </nav>
+
+        <form id="heroForm" th:action="@{/admin/hero/save}" th:object="${about}" method="post" enctype="multipart/form-data">
+          <input type="hidden" th:field="*{id}"/>
+          <div class="hero-sections">
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 1 · PROFILE & HERO HEADLINE
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-profile">
+              <div class="ab-card-header" onclick="toggleSection('sec-profile')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-id-badge"></i></div>
+                  <div>
+                    <div class="ab-card-title">Profile &amp; Headline</div>
+                    <div class="ab-card-subtitle">Hero eyebrow, full name, professional title, elevator pitch, and profile photo</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">These are the very first details employers, recruiters, and visitors see when opening your portfolio.</p>
+
+                <!-- Profile Photo -->
+                <div class="form-group" style="margin-bottom:20px;">
+                  <div class="field-label-row"><label>Hero Profile Photo</label></div>
+                  <div class="file-drop" style="cursor:pointer;" onclick="document.getElementById('photoFileInput').click();">
+                    <input type="file" id="photoFileInput" name="photoFile" accept="image/*" style="display:none"/>
+                    <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Click to select or replace profile photo</div>
+                  </div>
+                  <div class="photo-preview-wrap">
+                    <div class="photo-circle" id="photoCircle">
+                      <img th:if="*{profileImage}" th:src="@{*{profileImage}}" id="photoPreviewImg" alt="Profile"/>
+                      <i th:unless="*{profileImage}" class="fa-solid fa-user" id="photoPreviewIcon"></i>
+                    </div>
+                    <div class="photo-info">
+                      Recommended: square image, at least 300×300 px (JPG, PNG, WebP).<br>
+                      <span id="photoFileName" style="color:var(--primary);"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="profile-form-grid">
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="fullName">Full Name</label>
+                      <span class="char-counter" id="cc-fullName"></span>
+                    </div>
+                    <input class="glass-input" id="fullName" th:field="*{fullName}" placeholder="e.g. Prince Gupt" maxlength="80" required />
+                  </div>
+
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="title">Professional Headline / Role</label>
+                      <span class="char-counter" id="cc-title"></span>
+                    </div>
+                    <input class="glass-input" id="title" th:field="*{title}" placeholder="e.g. Full Stack Developer | Java + Spring Boot" maxlength="100"/>
+                  </div>
+
+                  <div class="form-group full">
+                    <div class="field-label-row">
+                      <label for="heroEyebrow">Hero Eyebrow Text</label>
+                      <span class="char-counter" id="cc-heroEyebrow"></span>
+                    </div>
+                    <input class="glass-input" id="heroEyebrow" th:field="*{heroEyebrow}" placeholder="// Hello, I'm" maxlength="60"/>
+                    <span class="field-hint">Monospace greeting line displayed above your full name.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <div class="field-label-row">
+                      <label for="bio">Hero Elevator Pitch (Short Bio)</label>
+                      <span class="char-counter" id="cc-bio"></span>
+                    </div>
+                    <textarea class="glass-textarea" id="bio" th:field="*{bio}" rows="3" placeholder="Passionate Computer Science student and software developer specializing in high-performance backends and intuitive user interfaces..."></textarea>
+                    <span class="field-hint">Short 2-3 sentence introduction displayed in the hero section. Detailed background story is managed in the About Section.</span>
+                  </div>
+                </div>
+
+                <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--glass-border);">
+                  <div style="color:var(--text-muted); font:600 .66rem var(--font-mono); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:10px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Live Hero Simulation</div>
+                  <div class="hero-live-preview">
+                    <div>
+                      <div class="preview-eyebrow" id="prevEyebrow">// Hello, I'm</div>
+                      <h3 class="preview-name" id="prevName">Prince Gupt</h3>
+                      <div class="preview-title" id="prevTitle">Full Stack Developer</div>
+                      <p class="preview-bio" id="prevBio">Short elevator pitch preview will appear here.</p>
+                      <div class="preview-chips" id="prevChips">
+                        <span class="preview-chip">Java</span><span class="preview-chip">Spring Boot</span><span class="preview-chip">React</span>
+                      </div>
+                      <div class="preview-actions">
+                        <span class="preview-action primary">View Projects</span>
+                        <span class="preview-action">Preview Resume</span>
+                      </div>
+                    </div>
+                    <div class="profile-preview-photo" id="prevPhoto">
+                      <img th:if="*{profileImage}" th:src="@{*{profileImage}}" alt="Prince"/>
+                      <i th:unless="*{profileImage}" class="fa-solid fa-user"></i>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 2 · TYPEWRITER ANIMATION & BUTTONS
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-typewriter">
+              <div class="ab-card-header" onclick="toggleSection('sec-typewriter')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-keyboard"></i></div>
+                  <div>
+                    <div class="ab-card-title">Typewriter Animation &amp; CTA Buttons</div>
+                    <div class="ab-card-subtitle">Dynamic rotating phrases, animation speed, and hero action buttons</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">These animated phrases cycle automatically in the hero header. Separate each phrase with <code>|</code>.</p>
+
+                <div class="form-group full">
+                  <div class="field-label-row"><label for="heroPhrasesInput">Rotating Typed Phrases (Pipe-separated)</label></div>
+                  <textarea class="glass-textarea" id="heroPhrasesInput" th:field="*{heroPhrases}" rows="2"
+                    placeholder="Full Stack Developer|Java + Spring Boot Enthusiast|React Developer|Final Year CSE Student"></textarea>
+                  <span class="field-hint">Phrases will type and delete in sequence. Use short punchy roles (&le; 50 characters).</span>
+                  <div id="heroPhraseList" style="margin-top:10px; display:flex; flex-direction:column; gap:6px;"></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px; margin-top:14px;">
+                  <div class="form-group">
+                    <label for="heroTypingSpeed">Typing Speed <span style="color:var(--text-muted); font-size:0.75rem;">(ms/char)</span></label>
+                    <input class="glass-input" id="heroTypingSpeed" type="number" min="20" max="200" th:field="*{heroTypingSpeed}" placeholder="75"/>
+                    <span class="field-hint">Lower = faster. Recommended: 60-90.</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="heroDeletingSpeed">Deleting Speed <span style="color:var(--text-muted); font-size:0.75rem;">(ms/char)</span></label>
+                    <input class="glass-input" id="heroDeletingSpeed" type="number" min="10" max="150" th:field="*{heroDeletingSpeed}" placeholder="35"/>
+                    <span class="field-hint">Recommended: 25-45.</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="heroPauseDuration">Pause Duration <span style="color:var(--text-muted); font-size:0.75rem;">(ms)</span></label>
+                    <input class="glass-input" id="heroPauseDuration" type="number" min="300" max="5000" th:field="*{heroPauseDuration}" placeholder="1600"/>
+                    <span class="field-hint">Hold before deleting. Recommended: 1500.</span>
+                  </div>
+                </div>
+
+                <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--glass-border);">
+                  <div style="color:var(--text); font-size:0.86rem; font-weight:600; margin-bottom:10px;"><i class="fa-solid fa-bullseye" style="color:var(--primary); margin-right:6px;"></i> Call-to-Action Buttons</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                    <div class="form-group">
+                      <label for="heroPrimaryCtaLabel">Primary Button Label</label>
+                      <input class="glass-input" id="heroPrimaryCtaLabel" th:field="*{heroPrimaryCtaLabel}" placeholder="View Projects"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="heroPrimaryCtaLink">Primary Button Destination</label>
+                      <input class="glass-input" id="heroPrimaryCtaLink" th:field="*{heroPrimaryCtaLink}" placeholder="#projects"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="heroSecondaryCtaLabel">Secondary Button Label</label>
+                      <input class="glass-input" id="heroSecondaryCtaLabel" th:field="*{heroSecondaryCtaLabel}" placeholder="Download Resume"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="heroSecondaryCtaLink">Secondary Button Destination</label>
+                      <input class="glass-input" id="heroSecondaryCtaLink" th:field="*{heroSecondaryCtaLink}" placeholder="/resume/download"/>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 3 · TECH STACK STRIP
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-techstack">
+              <div class="ab-card-header" onclick="toggleSection('sec-techstack')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-layer-group"></i></div>
+                  <div>
+                    <div class="ab-card-title">Hero Tech Stack Strip</div>
+                    <div class="ab-card-subtitle">Quick technology pill badges shown under the hero intro</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Enter your core technologies separated by <code>|</code>. These appear as styled pill chips immediately below your hero intro.</p>
+
+                <div class="form-group">
+                  <label for="heroTechStackInput">Tech Stack Badges (Pipe-separated)</label>
+                  <input class="glass-input" id="heroTechStackInput" th:field="*{heroTechStack}" placeholder="Java | Spring Boot | REST APIs | MySQL | React | Docker"/>
+                  <span class="field-hint">e.g. <code>Java | Spring Boot | REST APIs | MySQL | React</code></span>
+                </div>
+
+                <div style="margin-top:12px;">
+                  <div style="font-size:.76rem; color:var(--text-secondary); margin-bottom:6px;">Live badge preview:</div>
+                  <div class="chip-preview-row" id="techChipPreview"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 4 · SOCIAL PROFILES
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-social">
+              <div class="ab-card-header" onclick="toggleSection('sec-social')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                  <div>
+                    <div class="ab-card-title">Social Profiles &amp; Links</div>
+                    <div class="ab-card-subtitle">Hero social icons (GitHub, LinkedIn, WhatsApp, Email)</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Provide direct links to your developer profiles and primary channels. Blank links will be automatically hidden.</p>
+
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px;">
+                  <div class="form-group">
+                    <label for="githubUrl"><i class="fa-brands fa-github" style="color:var(--primary); margin-right:6px;"></i> GitHub Profile URL</label>
+                    <input class="glass-input" id="githubUrl" type="url" th:field="*{githubUrl}" placeholder="https://github.com/princegupt1234"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="linkedinUrl"><i class="fa-brands fa-linkedin" style="color:#0a66c2; margin-right:6px;"></i> LinkedIn Profile URL</label>
+                    <input class="glass-input" id="linkedinUrl" type="url" th:field="*{linkedinUrl}" placeholder="https://linkedin.com/in/prince-gupta"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="whatsappUrl"><i class="fa-brands fa-whatsapp" style="color:#25d366; margin-right:6px;"></i> WhatsApp Link</label>
+                    <input class="glass-input" id="whatsappUrl" type="url" th:field="*{whatsappUrl}" placeholder="https://wa.me/919999999999"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="email"><i class="fa-solid fa-envelope" style="color:#f59e0b; margin-right:6px;"></i> Primary Email Address</label>
+                    <input class="glass-input" id="email" type="email" th:field="*{email}" placeholder="prince@example.com"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 5 · QUICK CREDIBILITY STATS
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-quickstats">
+              <div class="ab-card-header" onclick="toggleSection('sec-quickstats')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                  <div>
+                    <div class="ab-card-title">Quick Credibility Stats Bar</div>
+                    <div class="ab-card-subtitle">Numbers counter strip displayed right below Hero (Projects, DSA, Experience)</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Highlight your credibility at a glance. Enter key metrics separated by <code>|</code> in the format <code>Number::Label::FontAwesome-Icon</code>.</p>
+                
+                <div class="form-group" style="margin-bottom:16px;">
+                  <div class="toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="quickStatsVisible">
+                      <input type="checkbox" id="quickStatsVisible" name="quickStatsVisible" value="true" th:checked="*{quickStatsVisible != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="quickStatsVisible" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Show Quick Stats on Portfolio</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Renders credibility counters directly below the hero section.</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="quickStatsInput">Stats Items (Pipe-separated)</label>
+                  </div>
+                  <textarea class="glass-textarea" id="quickStatsInput" th:field="*{quickStats}" rows="3"
+                    placeholder="15+ :: Projects Built :: fa-solid fa-code | 350+ :: LeetCode Problems :: fa-solid fa-laptop-code | 99.9% :: API Uptime :: fa-solid fa-server | Final Year :: B.Tech CSE :: fa-solid fa-graduation-cap"></textarea>
+                  <span class="field-hint">Format: <code>Number::Label::IconClass</code> separated by <code>|</code>. Icons from FontAwesome.</span>
+                </div>
+
+                <div style="margin-top:16px;">
+                  <div style="font-size:.78rem; color:var(--text-secondary); margin-bottom:8px;">Live stats preview:</div>
+                  <div class="quick-stats-preview-grid" id="quickStatsPreviewGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Sticky Save Bar -->
+          <div class="save-bar">
+            <div class="save-bar-msg">Press <kbd style="background:rgba(255,255,255,.1); padding:2px 6px; border-radius:4px; font-family:var(--font-mono); font-size:.74rem;">Ctrl + S</kbd> to save anytime.</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <a th:href="@{/admin/dashboard}" class="glass-btn">Cancel</a>
+              <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Hero Section</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/admin.js(v='6')}"></script>
+<script>
+  function toggleSection(id) {
+    const card = document.getElementById(id);
+    if (card) card.classList.toggle('collapsed');
+  }
+
+  // Live char counters
+  function wireCounter(inputId, counterId, max) {
+    const inp = document.getElementById(inputId);
+    const cc = document.getElementById(counterId);
+    if (!inp || !cc) return;
+    function update() {
+      const len = inp.value.length;
+      cc.textContent = len + ' / ' + max;
+      cc.className = 'char-counter' + (len > max ? ' over' : len > max * 0.85 ? ' warn' : '');
+    }
+    inp.addEventListener('input', update);
+    update();
+  }
+  wireCounter('fullName', 'cc-fullName', 80);
+  wireCounter('title', 'cc-title', 100);
+  wireCounter('heroEyebrow', 'cc-heroEyebrow', 60);
+  wireCounter('bio', 'cc-bio', 300);
+
+  // Live simulation updates
+  function updateHeroPreview() {
+    const eb = document.getElementById('prevEyebrow');
+    const nm = document.getElementById('prevName');
+    const tt = document.getElementById('prevTitle');
+    const bi = document.getElementById('prevBio');
+    const ch = document.getElementById('prevChips');
+
+    const inpEb = document.getElementById('heroEyebrow');
+    const inpNm = document.getElementById('fullName');
+    const inpTt = document.getElementById('title');
+    const inpBi = document.getElementById('bio');
+    const inpTs = document.getElementById('heroTechStackInput');
+
+    if (eb && inpEb) eb.textContent = inpEb.value.trim() || "// Hello, I'm";
+    if (nm && inpNm) nm.textContent = inpNm.value.trim() || "Prince Gupt";
+    if (tt && inpTt) tt.textContent = inpTt.value.trim() || "Full Stack Developer";
+    if (bi && inpBi) bi.textContent = inpBi.value.trim() || "Passionate software developer...";
+
+    if (ch && inpTs) {
+      ch.innerHTML = '';
+      const chips = inpTs.value.split('|').map(c => c.trim()).filter(Boolean);
+      chips.slice(0, 6).forEach(c => {
+        const span = document.createElement('span');
+        span.className = 'preview-chip';
+        span.textContent = c;
+        ch.appendChild(span);
+      });
+    }
+  }
+  ['heroEyebrow', 'fullName', 'title', 'bio', 'heroTechStackInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateHeroPreview);
+  });
+  updateHeroPreview();
+
+  // Tech chip preview
+  function updateTechChips() {
+    const inp = document.getElementById('heroTechStackInput');
+    const row = document.getElementById('techChipPreview');
+    if (!inp || !row) return;
+    row.innerHTML = '';
+    const list = inp.value.split('|').map(s => s.trim()).filter(Boolean);
+    list.forEach(item => {
+      const chip = document.createElement('span');
+      chip.className = 'chip-preview';
+      chip.textContent = item;
+      row.appendChild(chip);
+    });
+  }
+  const techInp = document.getElementById('heroTechStackInput');
+  if (techInp) { techInp.addEventListener('input', updateTechChips); updateTechChips(); }
+
+  // Quick stats live cards preview
+  function updateQuickStatsPreview() {
+    const inp = document.getElementById('quickStatsInput');
+    const grid = document.getElementById('quickStatsPreviewGrid');
+    if (!inp || !grid) return;
+    grid.innerHTML = '';
+    const val = inp.value || '';
+    val.split('|').map(s => s.trim()).filter(Boolean).forEach(part => {
+      const segs = part.split('::').map(p => p.trim());
+      const num = segs[0] || '10+';
+      const lbl = segs[1] || 'Metric';
+      const ico = segs[2] || 'fa-solid fa-chart-simple';
+
+      const card = document.createElement('div');
+      card.style.cssText = 'padding:14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid var(--glass-border); display:flex; align-items:center; gap:12px;';
+      card.innerHTML = '<div style="width:36px; height:36px; border-radius:9px; background:rgba(59,130,246,.15); color:var(--primary); display:flex; align-items:center; justify-content:center;"><i class="' + ico + '"></i></div>' +
+                       '<div><div style="font-weight:700; font-size:1.1rem; color:var(--text);">' + num + '</div>' +
+                       '<div style="font-size:0.75rem; color:var(--text-secondary);">' + lbl + '</div></div>';
+      grid.appendChild(card);
+    });
+  }
+  const qsInp = document.getElementById('quickStatsInput');
+  if (qsInp) { qsInp.addEventListener('input', updateQuickStatsPreview); updateQuickStatsPreview(); }
+
+  // Photo file upload preview
+  const photoFileInput = document.getElementById('photoFileInput');
+  if (photoFileInput) {
+    photoFileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('photoFileName').textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const circle = document.getElementById('photoCircle');
+        const prevPhoto = document.getElementById('prevPhoto');
+        if (circle) circle.innerHTML = '<img src="' + evt.target.result + '" alt="Photo" style="width:100%;height:100%;object-fit:cover;"/>';
+        if (prevPhoto) prevPhoto.innerHTML = '<img src="' + evt.target.result + '" alt="Photo" style="width:100%;height:100%;object-fit:cover;"/>';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Typewriter phrases helper
+  function updatePhraseList() {
+    const inp = document.getElementById('heroPhrasesInput');
+    const container = document.getElementById('heroPhraseList');
+    if (!inp || !container) return;
+    container.innerHTML = '';
+    const phrases = inp.value.split('|').map(p => p.trim()).filter(Boolean);
+    phrases.forEach((phrase, idx) => {
+      const row = document.createElement('div');
+      row.className = 'phrase-item';
+      row.innerHTML = '<span class="phrase-item-text">' + phrase + '</span>' +
+                      '<span class="phrase-item-len">' + phrase.length + ' ch</span>' +
+                      '<button type="button" class="phrase-btn up" title="Move Up"><i class="fa-solid fa-arrow-up"></i></button>' +
+                      '<button type="button" class="phrase-btn dn" title="Move Down"><i class="fa-solid fa-arrow-down"></i></button>' +
+                      '<button type="button" class="phrase-btn rm" title="Remove"><i class="fa-solid fa-xmark"></i></button>';
+      row.querySelector('.up').onclick = () => {
+        if (idx > 0) {
+          const tmp = phrases[idx];
+          phrases[idx] = phrases[idx - 1];
+          phrases[idx - 1] = tmp;
+          inp.value = phrases.join('|');
+          updatePhraseList();
+        }
+      };
+      row.querySelector('.dn').onclick = () => {
+        if (idx < phrases.length - 1) {
+          const tmp = phrases[idx];
+          phrases[idx] = phrases[idx + 1];
+          phrases[idx + 1] = tmp;
+          inp.value = phrases.join('|');
+          updatePhraseList();
+        }
+      };
+      row.querySelector('.rm').onclick = () => {
+        phrases.splice(idx, 1);
+        inp.value = phrases.join('|');
+        updatePhraseList();
+      };
+      container.appendChild(row);
+    });
+  }
+  const phrasesInp = document.getElementById('heroPhrasesInput');
+  if (phrasesInp) { phrasesInp.addEventListener('input', updatePhraseList); updatePhraseList(); }
+
+  // Keyboard shortcut Ctrl+S
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      document.getElementById('heroForm').requestSubmit();
+    }
+  });
+</script>
+</body>
+</html>

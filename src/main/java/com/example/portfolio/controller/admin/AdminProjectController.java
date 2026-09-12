@@ -66,6 +66,7 @@ public class AdminProjectController {
     @PostMapping("/save")
     public String save(@ModelAttribute Project project,
                         @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                        @RequestParam(value = "archImageFile", required = false) MultipartFile archImageFile,
                         RedirectAttributes redirectAttributes) {
         if (project.getFeatured() == null) {
             project.setFeatured(project.getId() == null ? false : projectRepository.findById(project.getId())
@@ -84,6 +85,16 @@ public class AdminProjectController {
             projectRepository.findById(project.getId()).ifPresent(existing -> {
                 if (project.getImageUrl() == null || project.getImageUrl().isBlank()) {
                     project.setImageUrl(existing.getImageUrl());
+                }
+            });
+        }
+        if (archImageFile != null && !archImageFile.isEmpty()) {
+            project.setArchitectureImageUrl(fileStorageService.store(archImageFile, "projects"));
+        } else if (project.getId() != null) {
+            // keep existing architecture image if no new file uploaded
+            projectRepository.findById(project.getId()).ifPresent(existing -> {
+                if (project.getArchitectureImageUrl() == null || project.getArchitectureImageUrl().isBlank()) {
+                    project.setArchitectureImageUrl(existing.getArchitectureImageUrl());
                 }
             });
         }

@@ -106,6 +106,24 @@ public class AboutInfo {
     private Boolean availabilityVisible = false;
 
     @Column(columnDefinition = "TEXT")
+    private String quickStats;
+    private Boolean quickStatsVisible = true;
+
+    @Column(columnDefinition = "TEXT")
+    private String workPreference;
+
+    @Column(columnDefinition = "TEXT")
+    private String preferredLocations;
+
+    @Column(columnDefinition = "TEXT")
+    private String languagesSpoken;
+
+    @Column(columnDefinition = "TEXT")
+    private String calendlyUrl;
+
+    private Boolean terminalEnabled = true;
+
+    @Column(columnDefinition = "TEXT")
     private String footerTagline;
 
     @Column(columnDefinition = "TEXT")
@@ -185,6 +203,20 @@ public class AboutInfo {
     public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
     public Boolean getAvailabilityVisible() { return availabilityVisible; }
     public void setAvailabilityVisible(Boolean availabilityVisible) { this.availabilityVisible = availabilityVisible; }
+    public String getQuickStats() { return quickStats; }
+    public void setQuickStats(String quickStats) { this.quickStats = quickStats; }
+    public Boolean getQuickStatsVisible() { return quickStatsVisible; }
+    public void setQuickStatsVisible(Boolean quickStatsVisible) { this.quickStatsVisible = quickStatsVisible; }
+    public String getWorkPreference() { return workPreference; }
+    public void setWorkPreference(String workPreference) { this.workPreference = workPreference; }
+    public String getPreferredLocations() { return preferredLocations; }
+    public void setPreferredLocations(String preferredLocations) { this.preferredLocations = preferredLocations; }
+    public String getLanguagesSpoken() { return languagesSpoken; }
+    public void setLanguagesSpoken(String languagesSpoken) { this.languagesSpoken = languagesSpoken; }
+    public String getCalendlyUrl() { return calendlyUrl; }
+    public void setCalendlyUrl(String calendlyUrl) { this.calendlyUrl = calendlyUrl; }
+    public Boolean getTerminalEnabled() { return terminalEnabled; }
+    public void setTerminalEnabled(Boolean terminalEnabled) { this.terminalEnabled = terminalEnabled; }
     public String getFooterTagline() { return footerTagline; }
     public void setFooterTagline(String footerTagline) { this.footerTagline = footerTagline; }
     public String getFooterSub() { return footerSub; }

@@ -139,9 +139,43 @@ public class DataInitializer implements CommandLineRunner {
             info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA problem solving, and exploring React + Next.js for modern frontends.");
             info.setAvailabilityText("Open to opportunities");
             info.setAvailabilityVisible(true);
+            info.setQuickStats("10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery & Testing::fa-solid fa-circle-check");
+            info.setQuickStatsVisible(true);
+            info.setWorkPreference("Full-time (Remote / Hybrid / On-site)");
+            info.setPreferredLocations("Bengaluru, Delhi NCR, Pune, Remote");
+            info.setLanguagesSpoken("English (Professional), Hindi (Native)");
+            info.setTerminalEnabled(true);
             info.setFooterTagline("Full Stack Developer");
             info.setFooterSub("Building clean, scalable software with Java & Spring Boot.");
             aboutInfoRepository.save(info);
+        } else {
+            aboutInfoRepository.findAll().stream().findFirst().ifPresent(info -> {
+                boolean changed = false;
+                if (info.getQuickStats() == null || info.getQuickStats().isBlank()) {
+                    info.setQuickStats("10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery & Testing::fa-solid fa-circle-check");
+                    info.setQuickStatsVisible(true);
+                    changed = true;
+                }
+                if (info.getWorkPreference() == null || info.getWorkPreference().isBlank()) {
+                    info.setWorkPreference("Full-time (Remote / Hybrid / On-site)");
+                    changed = true;
+                }
+                if (info.getPreferredLocations() == null || info.getPreferredLocations().isBlank()) {
+                    info.setPreferredLocations("Bengaluru, Delhi NCR, Pune, Remote");
+                    changed = true;
+                }
+                if (info.getLanguagesSpoken() == null || info.getLanguagesSpoken().isBlank()) {
+                    info.setLanguagesSpoken("English (Professional), Hindi (Native)");
+                    changed = true;
+                }
+                if (info.getTerminalEnabled() == null) {
+                    info.setTerminalEnabled(true);
+                    changed = true;
+                }
+                if (changed) {
+                    aboutInfoRepository.save(info);
+                }
+            });
         }
     }
 
@@ -274,6 +308,7 @@ public class DataInitializer implements CommandLineRunner {
             p1.setFeatured(true);
             p1.setStatus("Completed");
             p1.setTags("Full Stack,Node.js,MongoDB");
+            p1.setEngineeringHighlight("Engineered real-time billing calculations with optimistic cart state & MongoDB indexing");
             p1.setSortOrder(1);
             p1.setVisible(true);
             projectRepository.save(p1);
@@ -288,6 +323,7 @@ public class DataInitializer implements CommandLineRunner {
             p2.setFeatured(true);
             p2.setStatus("Completed");
             p2.setTags("Full Stack,PHP,MySQL");
+            p2.setEngineeringHighlight("Designed normalized relational schema with session authentication and transactional booking flow");
             p2.setSortOrder(2);
             p2.setVisible(true);
             projectRepository.save(p2);
@@ -302,9 +338,25 @@ public class DataInitializer implements CommandLineRunner {
             p3.setFeatured(false);
             p3.setStatus("Live");
             p3.setTags("Frontend,Next.js");
+            p3.setEngineeringHighlight("Static site generation with strict TypeScript types, modern glass design, and Netlify CI/CD");
             p3.setSortOrder(3);
             p3.setVisible(true);
             projectRepository.save(p3);
+        } else {
+            projectRepository.findAll().forEach(p -> {
+                if (p.getEngineeringHighlight() == null || p.getEngineeringHighlight().isBlank()) {
+                    if (p.getTitle().contains("POS")) {
+                        p.setEngineeringHighlight("Engineered real-time billing calculations with optimistic cart state & MongoDB indexing");
+                        projectRepository.save(p);
+                    } else if (p.getTitle().contains("Travel")) {
+                        p.setEngineeringHighlight("Designed normalized relational schema with session authentication and transactional booking flow");
+                        projectRepository.save(p);
+                    } else if (p.getTitle().contains("Portfolio")) {
+                        p.setEngineeringHighlight("Static site generation with strict TypeScript types, modern glass design, and Netlify CI/CD");
+                        projectRepository.save(p);
+                    }
+                }
+            });
         }
     }
 

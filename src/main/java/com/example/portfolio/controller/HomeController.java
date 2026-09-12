@@ -206,4 +206,26 @@ public class HomeController {
         Files.copy(filePath, response.getOutputStream());
         response.getOutputStream().flush();
     }
+
+    @GetMapping("/resume/preview")
+    public void previewResume(HttpServletResponse response) throws IOException {
+        Optional<Resume> active = resumeRepository.findByActiveTrue();
+        if (active.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No resume uploaded yet");
+            return;
+        }
+        Resume resume = active.get();
+        String relativePath = resume.getFileUrl().replaceFirst("^/uploads/", "");
+        Path filePath = Path.of(uploadDir, relativePath);
+
+        if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resume file not found on server");
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "inline; filename=\"Prince_Gupt_Resume.pdf\"");
+        Files.copy(filePath, response.getOutputStream());
+        response.getOutputStream().flush();
+    }
 }

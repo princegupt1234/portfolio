@@ -8,7 +8,8 @@
     </div>
     <ul class="admin-nav">
         <li><a th:href="@{/admin/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
-        <li><a th:href="@{/admin/about}" th:classappend="${active == 'about'} ? 'active'"><i class="fa-solid fa-user"></i> <span>About &amp; Hero</span></a></li>
+        <li><a th:href="@{/admin/hero}" th:classappend="${active == 'hero'} ? 'active'"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Hero Section</span></a></li>
+        <li><a th:href="@{/admin/about}" th:classappend="${active == 'about'} ? 'active'"><i class="fa-solid fa-user"></i> <span>About Section</span></a></li>
         <li><a th:href="@{/admin/skills}" th:classappend="${active == 'skills'} ? 'active'"><i class="fa-solid fa-layer-group"></i> <span>Skills</span></a></li>
         <li><a th:href="@{/admin/experience}" th:classappend="${active == 'experience'} ? 'active'"><i class="fa-solid fa-briefcase"></i> <span>Experience</span></a></li>
         <li><a th:href="@{/admin/projects}" th:classappend="${active == 'projects'} ? 'active'"><i class="fa-solid fa-diagram-project"></i> <span>Projects</span></a></li>

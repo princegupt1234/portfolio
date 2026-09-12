@@ -35,6 +35,15 @@ public class Project {
     private String status = "Live"; // Live, In Progress, Completed
     private String tags; // comma separated
 
+    @Column(columnDefinition = "TEXT")
+    private String engineeringHighlight;
+
+    @Column(columnDefinition = "TEXT")
+    private String demoVideoUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String architectureImageUrl;
+
     private Long viewCount = 0L;
     private Integer sortOrder = 0;
     @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
@@ -62,6 +71,12 @@ public class Project {
     public void setStatus(String status) { this.status = status; }
     public String getTags() { return tags; }
     public void setTags(String tags) { this.tags = tags; }
+    public String getEngineeringHighlight() { return engineeringHighlight; }
+    public void setEngineeringHighlight(String engineeringHighlight) { this.engineeringHighlight = engineeringHighlight; }
+    public String getDemoVideoUrl() { return demoVideoUrl; }
+    public void setDemoVideoUrl(String demoVideoUrl) { this.demoVideoUrl = demoVideoUrl; }
+    public String getArchitectureImageUrl() { return architectureImageUrl; }
+    public void setArchitectureImageUrl(String architectureImageUrl) { this.architectureImageUrl = architectureImageUrl; }
     public Long getViewCount() { return viewCount; }
     public void setViewCount(Long viewCount) { this.viewCount = viewCount; }
     public Integer getSortOrder() { return sortOrder; }

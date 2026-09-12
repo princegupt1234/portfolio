@@ -184,4 +184,242 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 4000);
   }
+
+  /* ---------- Theme Switcher ---------- */
+  function initTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', current);
+    updateThemeIcon(current);
+  }
+
+  function updateThemeIcon(theme) {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const icon = btn.querySelector('i');
+    if (!icon) return;
+    if (theme === 'light') {
+      icon.className = 'fa-solid fa-sun';
+      btn.setAttribute('title', 'Switch to Dark Mode');
+    } else {
+      icon.className = 'fa-solid fa-moon';
+      btn.setAttribute('title', 'Switch to Light Mode');
+    }
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    updateThemeIcon(next);
+  }
+
+  const themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+  }
+  initTheme();
+
+  /* ---------- Resume Preview Modal ---------- */
+  window.openResumeModal = function() {
+    const modal = document.getElementById('resumeModal');
+    const iframe = document.getElementById('resumeIframe');
+    if (!modal) return;
+    if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src.endsWith('/'))) {
+      iframe.src = '/resume/preview';
+    }
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeResumeModal = function() {
+    const modal = document.getElementById('resumeModal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  };
+
+  /* ---------- Architecture Diagram Lightbox ---------- */
+  window.openArchModal = function(url, title) {
+    const modal = document.getElementById('archModal');
+    const img = document.getElementById('archModalImg');
+    const titleEl = document.getElementById('archModalTitle');
+    if (!modal || !url) return;
+    if (img) img.src = url;
+    if (titleEl && title) titleEl.textContent = title + ' — Architecture';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeArchModal = function() {
+    const modal = document.getElementById('archModal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  };
+
+  /* ---------- Interactive Developer CLI Terminal ---------- */
+  const cliHistory = [];
+  let historyIndex = -1;
+
+  window.toggleCliTerminal = function() {
+    const drawer = document.getElementById('cliDrawer');
+    if (!drawer) return;
+    if (drawer.classList.contains('open')) {
+      window.closeCliTerminal();
+    } else {
+      window.openCliTerminal();
+    }
+  };
+
+  window.openCliTerminal = function() {
+    const drawer = document.getElementById('cliDrawer');
+    const input = document.getElementById('cliInput');
+    if (!drawer) return;
+    drawer.classList.add('open');
+    if (input) setTimeout(() => input.focus(), 150);
+  };
+
+  window.closeCliTerminal = function() {
+    const drawer = document.getElementById('cliDrawer');
+    if (drawer) drawer.classList.remove('open');
+  };
+
+  const cliInput = document.getElementById('cliInput');
+  const cliBody = document.getElementById('cliBody');
+
+  if (cliInput && cliBody) {
+    cliInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const raw = this.value.trim();
+        this.value = '';
+        if (!raw) return;
+        cliHistory.push(raw);
+        historyIndex = cliHistory.length;
+        handleCliCommand(raw);
+      } else if (e.key === 'ArrowUp') {
+        if (historyIndex > 0) {
+          historyIndex--;
+          this.value = cliHistory[historyIndex];
+        }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (historyIndex < cliHistory.length - 1) {
+          historyIndex++;
+          this.value = cliHistory[historyIndex];
+        } else {
+          historyIndex = cliHistory.length;
+          this.value = '';
+        }
+        e.preventDefault();
+      }
+    });
+  }
+
+  function handleCliCommand(cmd) {
+    const clean = cmd.trim().toLowerCase();
+    printCliLine('<span style="color:var(--primary);font-weight:700;">prince@dev:~$</span> ' + escHtml(cmd));
+
+    switch(clean) {
+      case 'help':
+        printCliLine(
+          'Available commands:<br>' +
+          '  <strong style="color:#38bdf8;">about</strong>       - Overview &amp; career objective<br>' +
+          '  <strong style="color:#38bdf8;">skills</strong>      - Core technologies &amp; tools<br>' +
+          '  <strong style="color:#38bdf8;">projects</strong>    - Featured engineering projects<br>' +
+          '  <strong style="color:#38bdf8;">exp</strong>         - Work experience &amp; internships<br>' +
+          '  <strong style="color:#38bdf8;">education</strong>   - Degrees and college details<br>' +
+          '  <strong style="color:#38bdf8;">contact</strong>     - Email, phone, socials &amp; scheduler<br>' +
+          '  <strong style="color:#38bdf8;">resume</strong>      - Open in-browser resume preview<br>' +
+          '  <strong style="color:#38bdf8;">theme</strong>       - Toggle between dark &amp; light mode<br>' +
+          '  <strong style="color:#38bdf8;">clear</strong>       - Clear terminal screen<br>' +
+          '  <strong style="color:#38bdf8;">exit</strong>        - Close terminal'
+        );
+        break;
+      case 'about':
+        const bioEl = document.querySelector('.hero-intro') || document.querySelector('#about p');
+        printCliLine(bioEl ? escHtml(bioEl.textContent) : 'Full Stack Developer with expertise in Java, Spring Boot, MySQL, and React.');
+        break;
+      case 'skills':
+        const skillNames = Array.from(document.querySelectorAll('.skill-head strong')).map(el => el.textContent);
+        printCliLine(skillNames.length ? 'Skills: ' + escHtml(skillNames.join(' • ')) : 'Java, Spring Boot, REST APIs, MySQL, React, JavaScript, HTML5, CSS3, Docker, Git');
+        break;
+      case 'projects':
+        const projTitles = Array.from(document.querySelectorAll('.project-title')).map(el => el.textContent);
+        printCliLine(projTitles.length ? 'Projects:<br>' + projTitles.map(t => '  • ' + escHtml(t)).join('<br>') : 'Projects built with Java, Spring Boot, Node.js, and React.');
+        break;
+      case 'exp':
+      case 'experience':
+        const roles = Array.from(document.querySelectorAll('.exp-item h3')).map(el => el.textContent);
+        printCliLine(roles.length ? 'Experience:<br>' + roles.map(r => '  • ' + escHtml(r)).join('<br>') : 'Full Stack Developer Intern @ Codveda Technologies');
+        break;
+      case 'education':
+      case 'edu':
+        const edus = Array.from(document.querySelectorAll('.timeline-item h4')).map(el => el.textContent);
+        printCliLine(edus.length ? 'Education:<br>' + edus.map(e => '  • ' + escHtml(e)).join('<br>') : 'B.Tech in Computer Science & Engineering');
+        break;
+      case 'contact':
+        const emailLink = document.querySelector('a[href^="mailto:"]');
+        const emailVal = emailLink ? emailLink.getAttribute('href').replace('mailto:', '') : 'prince@example.com';
+        const locItem = Array.from(document.querySelectorAll('.info-grid > div')).find(d => d.textContent.includes('Location'));
+        const locVal = locItem ? (locItem.querySelector('.value') ? locItem.querySelector('.value').textContent : '') : '';
+        const ghLink = document.querySelector('a[href*="github.com"]');
+        const liLink = document.querySelector('a[href*="linkedin.com"]');
+        printCliLine(
+          'Email: ' + escHtml(emailVal) +
+          (locVal ? '<br>Location: ' + escHtml(locVal) : '') +
+          (ghLink ? '<br>GitHub: ' + escHtml(ghLink.getAttribute('href')) : '') +
+          (liLink ? '<br>LinkedIn: ' + escHtml(liLink.getAttribute('href')) : '')
+        );
+        break;
+      case 'resume':
+        printCliLine('Opening in-browser resume preview...');
+        window.openResumeModal();
+        break;
+      case 'theme':
+        toggleTheme();
+        printCliLine('Theme toggled to ' + document.documentElement.getAttribute('data-theme') + ' mode.');
+        break;
+      case 'clear':
+        if (cliBody) cliBody.innerHTML = '';
+        break;
+      case 'exit':
+      case 'quit':
+        window.closeCliTerminal();
+        break;
+      case 'sudo':
+        printCliLine('<span style="color:#ef4444;">prince is already a superuser. Permission granted.</span>');
+        break;
+      default:
+        printCliLine('<span style="color:#ef4444;">Command not recognized: ' + escHtml(cmd) + '. Type <strong>help</strong> for a list of commands.</span>');
+    }
+    if (cliBody) cliBody.scrollTop = cliBody.scrollHeight;
+  }
+
+  function printCliLine(html) {
+    if (!cliBody) return;
+    const div = document.createElement('div');
+    div.className = 'cli-output';
+    div.innerHTML = html;
+    cliBody.appendChild(div);
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ---------- Global key shortcuts ---------- */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      window.closeResumeModal();
+      window.closeArchModal();
+      window.closeCliTerminal();
+    }
+    if (e.ctrlKey && (e.key === '`' || e.key === '~')) {
+      e.preventDefault();
+      window.toggleCliTerminal();
+    }
+  });
 });

@@ -10,8 +10,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-    <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/public.css(v='5')}">
+    <link rel="stylesheet" th:href="@{/css/theme.css(v='8')}">
+    <link rel="stylesheet" th:href="@{/css/public.css(v='8')}">
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch(e) {}
+        })();
+    </script>
 </head>
 <body>
 
@@ -24,7 +32,7 @@
 
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar">
-    <a href="#home" class="logo">Prince<span class="gradient-text">.</span></a>
+    <a href="#home" class="logo"><span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span></a>
     <ul class="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#skills">Skills</a></li>
@@ -33,8 +41,13 @@
         <li><a href="#coding">Coding</a></li>
         <li><a href="#certificates">Certificates</a></li>
         <li><a href="#contact">Contact</a></li>
+        <li class="mobile-nav-resume" style="display:none;"><a th:href="@{/resume/download}" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-file-arrow-down" style="margin-right:6px;"></i> Download Resume</a></li>
     </ul>
-    <a th:href="@{/resume/download}" class="glass-btn primary nav-resume-btn">Download Resume</a>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        <button type="button" class="glass-btn nav-resume-btn" onclick="openResumeModal()" title="Preview Resume in browser" style="gap:6px;"><i class="fa-solid fa-eye"></i> View</button>
+        <a th:href="@{/resume/download}" class="glass-btn primary nav-resume-btn"><i class="fa-solid fa-download"></i> Resume</a>
+    </div>
     <button class="nav-toggle"><i class="fa-solid fa-bars"></i></button>
 </nav>
 
@@ -62,6 +75,9 @@
                 <a class="glass-btn primary" href="#projects">
                     <i class="fa-solid fa-diagram-project"></i> View Projects
                 </a>
+                <button type="button" class="glass-btn" onclick="openResumeModal()">
+                    <i class="fa-solid fa-eye"></i> Preview Resume
+                </button>
                 <a class="glass-btn" th:href="@{/resume/download}">
                     <i class="fa-solid fa-download"></i> Download Resume
                 </a>
@@ -89,6 +105,21 @@
     <div class="scroll-cue">Scroll<div class="dot"></div></div>
 </section>
 
+<!-- ===================== QUICK CREDIBILITY STATS ===================== -->
+<section class="quick-stats-section" id="quick-stats" th:if="${about.quickStatsVisible != false and about.quickStats != null and !#strings.isEmpty(about.quickStats)}">
+    <div class="quick-stats-grid" data-reveal>
+        <div class="quick-stat-card" th:each="stat : ${#strings.arraySplit(about.quickStats, '|')}">
+            <th:block th:with="parts=${#strings.arraySplit(stat, '::')}">
+                <div class="quick-stat-icon"><i th:class="${parts.length > 2 ? parts[2].trim() : 'fa-solid fa-chart-simple'}"></i></div>
+                <div class="quick-stat-content">
+                    <div class="quick-stat-number" th:text="${parts[0].trim()}">10+</div>
+                    <div class="quick-stat-label" th:text="${parts.length > 1 ? parts[1].trim() : 'Metric'}">Metric</div>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</section>
+
 <!-- ===================== ABOUT ===================== -->
 <section class="section" id="about">
     <div class="container">
@@ -102,6 +133,9 @@
                     <div th:if="${about.location}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
                     <div th:if="${about.availabilityVisible == true}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
                     <div th:if="${about.phone}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
+                    <div th:if="${about.workPreference}"><div class="label">Work Preference</div><div class="value" th:text="${about.workPreference}"></div></div>
+                    <div th:if="${about.preferredLocations}"><div class="label">Preferred Locations</div><div class="value" th:text="${about.preferredLocations}"></div></div>
+                    <div th:if="${about.languagesSpoken}"><div class="label">Languages</div><div class="value" th:text="${about.languagesSpoken}"></div></div>
                 </div>
             </div>
             <div class="glass-card" data-reveal>
@@ -178,6 +212,9 @@
                         <div class="project-meta-row"><span class="project-featured-badge">⭐ Featured</span></div>
                         <h3 class="project-title" th:text="${project.title}">Title</h3>
                         <p class="project-desc" th:text="${project.description}">Description</p>
+                        <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(project.engineeringHighlight)}">
+                            <i class="fa-solid fa-bolt"></i> <span th:text="${project.engineeringHighlight}"></span>
+                        </div>
                         <div class="project-tech">
                             <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
                         </div>
@@ -188,6 +225,12 @@
                             <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
                                 <i class="fa-brands fa-github"></i> GitHub
                             </a>
+                            <a th:if="${project.demoVideoUrl}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
+                                <i class="fa-solid fa-circle-play"></i> Demo
+                            </a>
+                            <button type="button" th:if="${project.architectureImageUrl}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
+                                <i class="fa-solid fa-sitemap"></i> Architecture
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -208,6 +251,9 @@
                         <div class="project-meta-row"></div>
                         <h3 class="project-title" th:text="${project.title}">Title</h3>
                         <p class="project-desc" th:text="${project.description}">Description</p>
+                        <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(project.engineeringHighlight)}">
+                            <i class="fa-solid fa-bolt"></i> <span th:text="${project.engineeringHighlight}"></span>
+                        </div>
                         <div class="project-tech">
                             <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
                         </div>
@@ -218,6 +264,12 @@
                             <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
                                 <i class="fa-brands fa-github"></i> GitHub
                             </a>
+                            <a th:if="${project.demoVideoUrl}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
+                                <i class="fa-solid fa-circle-play"></i> Demo
+                            </a>
+                            <button type="button" th:if="${project.architectureImageUrl}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
+                                <i class="fa-solid fa-sitemap"></i> Architecture
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -700,6 +752,14 @@ function zoomCert(dir) {
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square connect-link-arrow"></i>
                     </a>
+                    <a th:if="${about.calendlyUrl != null and !#strings.isEmpty(about.calendlyUrl)}" th:href="@{${about.calendlyUrl}}" target="_blank" class="connect-link" style="border:1px solid rgba(59,130,246,0.35); background:rgba(59,130,246,0.09);">
+                        <div class="connect-link-icon" style="background:rgba(59,130,246,0.22); color:var(--primary);"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div>
+                            <div class="connect-link-label">Direct Meeting</div>
+                            <div class="connect-link-val">Schedule a 1-on-1 Call</div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square connect-link-arrow"></i>
+                    </a>
                 </div>
             </div>
 
@@ -732,16 +792,88 @@ function zoomCert(dir) {
     </div>
 </section>
 
+<!-- ===================== IN-BROWSER RESUME PREVIEW MODAL ===================== -->
+<div id="resumeModal" class="doc-modal" onclick="if(event.target===this)closeResumeModal()">
+    <div class="doc-modal-content">
+        <div class="doc-modal-header">
+            <div class="doc-modal-title">
+                <i class="fa-solid fa-file-pdf" style="color:#ef4444; font-size:1.1rem;"></i>
+                <span><span th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</span> — Resume Preview</span>
+            </div>
+            <div class="doc-modal-actions">
+                <a th:href="@{/resume/download}" class="glass-btn primary" style="padding:6px 14px; font-size:0.78rem;">
+                    <i class="fa-solid fa-download"></i> Download PDF
+                </a>
+                <button type="button" class="glass-btn" onclick="closeResumeModal()" style="width:34px; height:34px; padding:0; border-radius:8px; font-size:1rem; cursor:pointer;" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="doc-modal-body">
+            <iframe id="resumeIframe" src="" title="Resume Preview"></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== ARCHITECTURE DIAGRAM MODAL ===================== -->
+<div id="archModal" class="doc-modal" onclick="if(event.target===this)closeArchModal()">
+    <div class="doc-modal-content" style="max-width:860px; height:auto; max-height:86vh;">
+        <div class="doc-modal-header">
+            <div class="doc-modal-title">
+                <i class="fa-solid fa-sitemap" style="color:var(--primary); font-size:1.1rem;"></i>
+                <span id="archModalTitle">System Architecture</span>
+            </div>
+            <div class="doc-modal-actions">
+                <button type="button" class="glass-btn" onclick="closeArchModal()" style="width:34px; height:34px; padding:0; border-radius:8px; font-size:1rem; cursor:pointer;" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div style="padding:20px; overflow:auto; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.35);">
+            <img id="archModalImg" src="" alt="Architecture Diagram" style="max-width:100%; max-height:72vh; object-fit:contain; border-radius:10px;" />
+        </div>
+    </div>
+</div>
+
+<!-- ===================== INTERACTIVE DEVELOPER CLI TERMINAL ===================== -->
+<th:block th:if="${about.terminalEnabled != false}">
+    <button type="button" id="cliLaunchBtn" class="cli-launcher" onclick="toggleCliTerminal()" title="Toggle Developer CLI (or press Ctrl + ~)">
+        <i class="fa-solid fa-terminal" style="color:var(--primary);"></i> <span>CLI</span>
+    </button>
+    <div id="cliDrawer" class="cli-drawer">
+        <div class="cli-header">
+            <div class="cli-header-left">
+                <span class="cli-dot red" onclick="closeCliTerminal()" style="cursor:pointer;" title="Close"></span>
+                <span class="cli-dot yellow"></span>
+                <span class="cli-dot green"></span>
+                <span style="margin-left:8px; font-weight:600;"><i class="fa-solid fa-terminal"></i> dev@prince-portfolio: ~</span>
+            </div>
+            <div style="display:flex; align-items:center;">
+                <span style="font-size:0.72rem; color:var(--text-muted); margin-right:12px;">Type <code style="color:var(--primary);">help</code> for commands</span>
+                <button type="button" onclick="closeCliTerminal()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.9rem;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+        <div class="cli-body" id="cliBody">
+            <div class="cli-output" style="color:var(--primary); font-weight:600;" th:text="'Welcome to ' + (${about.fullName} ?: 'Prince') + '\'s Developer CLI [v2.0.0]'">Welcome to Prince's Developer CLI [v2.0.0]</div>
+            <div class="cli-output" style="color:var(--text-secondary); font-size:0.78rem; margin-bottom:12px;">Type <strong>help</strong> to see all interactive commands, or explore <strong>about</strong>, <strong>skills</strong>, <strong>projects</strong>, <strong>contact</strong>.</div>
+        </div>
+        <div class="cli-prompt-line">
+            <span class="cli-prompt-sym">prince@dev:~$</span>
+            <input type="text" id="cliInput" class="cli-input" placeholder="try 'help', 'about', 'skills', 'projects', 'contact'..." autocomplete="off" spellcheck="false" />
+        </div>
+    </div>
+</th:block>
+
 <!-- ===================== FOOTER ===================== -->
 <footer>
     <div class="footer-inner">
         <div class="footer-brand">
-            <a href="#home" class="logo">Prince<span class="gradient-text">.</span></a>
+            <a href="#home" class="logo"><span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span></a>
             <p class="footer-tagline" th:text="${about.footerTagline} ?: (${about.title} ?: 'Full Stack Developer')"></p>
             <p class="footer-sub" th:text="${about.footerSub} ?: 'Building clean, scalable software with Java &amp; Spring Boot.'">Building clean, scalable software with Java &amp; Spring Boot.</p>
         </div>
         <div class="footer-copy">
-            <p>&copy; <span id="year"></span> Prince Gupt</p>
+            <p>&copy; <span id="year"></span> <span th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</span></p>
             <p class="footer-copy-sub">All rights reserved.</p>
         </div>
         <nav class="footer-nav">
@@ -767,7 +899,7 @@ document.querySelectorAll('.exp-desc').forEach(el => {
     }
 });
 </script>
-<script th:src="@{/js/main.js}" defer></script>
+<script th:src="@{/js/main.js(v='8')}" defer></script>
 <script>
 (function() {
   var v = null;
