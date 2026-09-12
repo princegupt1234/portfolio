@@ -113,4 +113,38 @@ class AdminAboutControllerTest {
         ));
         verify(dataVersionService).bump();
     }
+
+    @Test
+    void savesWorkPreferencesAndSeparateTogglesAndRedirects() throws Exception {
+        AboutInfo existing = new AboutInfo();
+        existing.setId(1L);
+        when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
+
+        mockMvc.perform(post("/admin/about/save")
+                        .param("workPreferencesSectionVisible", "true")
+                        .param("availabilityVisible", "true")
+                        .param("availabilityText", "Actively interviewing")
+                        .param("workPreference", "Full-time (Remote)")
+                        // workPreferenceVisible is unchecked -> omitted
+                        .param("preferredLocations", "Bengaluru, Remote")
+                        .param("preferredLocationsVisible", "true")
+                        .param("languagesSpoken", "English, Hindi")
+                        // languagesSpokenVisible is unchecked -> omitted
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/about"));
+
+        verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
+                Boolean.TRUE.equals(info.getWorkPreferencesSectionVisible()) &&
+                Boolean.TRUE.equals(info.getAvailabilityVisible()) &&
+                Boolean.FALSE.equals(info.getWorkPreferenceVisible()) &&
+                Boolean.TRUE.equals(info.getPreferredLocationsVisible()) &&
+                Boolean.FALSE.equals(info.getLanguagesSpokenVisible()) &&
+                "Actively interviewing".equals(info.getAvailabilityText()) &&
+                "Full-time (Remote)".equals(info.getWorkPreference()) &&
+                "Bengaluru, Remote".equals(info.getPreferredLocations()) &&
+                "English, Hindi".equals(info.getLanguagesSpoken())
+        ));
+        verify(dataVersionService).bump();
+    }
 }

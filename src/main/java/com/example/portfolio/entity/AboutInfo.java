@@ -103,7 +103,9 @@ public class AboutInfo {
 
     @Column(columnDefinition = "TEXT")
     private String availabilityText;
-    private Boolean availabilityVisible = false;
+    private Boolean availabilityVisible = true;
+
+    private Boolean workPreferencesSectionVisible = true;
 
     @Column(columnDefinition = "TEXT")
     private String quickStats;
@@ -111,12 +113,15 @@ public class AboutInfo {
 
     @Column(columnDefinition = "TEXT")
     private String workPreference;
+    private Boolean workPreferenceVisible = true;
 
     @Column(columnDefinition = "TEXT")
     private String preferredLocations;
+    private Boolean preferredLocationsVisible = true;
 
     @Column(columnDefinition = "TEXT")
     private String languagesSpoken;
+    private Boolean languagesSpokenVisible = true;
 
     @Column(columnDefinition = "TEXT")
     private String calendlyUrl;
@@ -221,16 +226,24 @@ public class AboutInfo {
     public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
     public Boolean getAvailabilityVisible() { return availabilityVisible; }
     public void setAvailabilityVisible(Boolean availabilityVisible) { this.availabilityVisible = availabilityVisible; }
+    public Boolean getWorkPreferencesSectionVisible() { return workPreferencesSectionVisible; }
+    public void setWorkPreferencesSectionVisible(Boolean workPreferencesSectionVisible) { this.workPreferencesSectionVisible = workPreferencesSectionVisible; }
     public String getQuickStats() { return quickStats; }
     public void setQuickStats(String quickStats) { this.quickStats = quickStats; }
     public Boolean getQuickStatsVisible() { return quickStatsVisible; }
     public void setQuickStatsVisible(Boolean quickStatsVisible) { this.quickStatsVisible = quickStatsVisible; }
     public String getWorkPreference() { return workPreference; }
     public void setWorkPreference(String workPreference) { this.workPreference = workPreference; }
+    public Boolean getWorkPreferenceVisible() { return workPreferenceVisible; }
+    public void setWorkPreferenceVisible(Boolean workPreferenceVisible) { this.workPreferenceVisible = workPreferenceVisible; }
     public String getPreferredLocations() { return preferredLocations; }
     public void setPreferredLocations(String preferredLocations) { this.preferredLocations = preferredLocations; }
+    public Boolean getPreferredLocationsVisible() { return preferredLocationsVisible; }
+    public void setPreferredLocationsVisible(Boolean preferredLocationsVisible) { this.preferredLocationsVisible = preferredLocationsVisible; }
     public String getLanguagesSpoken() { return languagesSpoken; }
     public void setLanguagesSpoken(String languagesSpoken) { this.languagesSpoken = languagesSpoken; }
+    public Boolean getLanguagesSpokenVisible() { return languagesSpokenVisible; }
+    public void setLanguagesSpokenVisible(Boolean languagesSpokenVisible) { this.languagesSpokenVisible = languagesSpokenVisible; }
     public String getCalendlyUrl() { return calendlyUrl; }
     public void setCalendlyUrl(String calendlyUrl) { this.calendlyUrl = calendlyUrl; }
     public Boolean getTerminalEnabled() { return terminalEnabled; }

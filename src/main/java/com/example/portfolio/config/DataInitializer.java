@@ -142,6 +142,11 @@ public class DataInitializer implements CommandLineRunner {
             info.setQuickStats("10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery & Testing::fa-solid fa-circle-check");
             info.setQuickStatsVisible(true);
             info.setWorkPreference("Full-time (Remote / Hybrid / On-site)");
+            info.setWorkPreferencesSectionVisible(true);
+            info.setAvailabilityVisible(true);
+            info.setWorkPreferenceVisible(true);
+            info.setPreferredLocationsVisible(true);
+            info.setLanguagesSpokenVisible(true);
             info.setPreferredLocations("Bengaluru, Delhi NCR, Pune, Remote");
             info.setLanguagesSpoken("English (Professional), Hindi (Native)");
             info.setTerminalEnabled(true);
@@ -149,16 +154,36 @@ public class DataInitializer implements CommandLineRunner {
             info.setFooterSub("Building clean, scalable software with Java & Spring Boot.");
             info.setRecruiterPitchEnabled(true);
             info.setRecruiterTargetRole("Target: Software Engineer / Backend Developer (SDE-1)");
-            info.setRecruiterMetrics("B.Tech CSE :: Target: SDE-1 / Backend | 350+ :: DSA & Algorithmic Solved | Production-Ready :: Spring Boot & REST APIs");
+            info.setRecruiterMetrics("B.Tech CSE :: Target: SDE-1 / Backend | LeetCode & DSA :: Active Problem Solving | Production-Ready :: Spring Boot & REST APIs");
             info.setRecruiterHighlights("Core Backend Mastery :: Proficient in Java 17+, Spring Boot 3, Spring Data JPA/Hibernate, Spring Security (JWT & RBAC), and MySQL relational database indexing. :: fa-solid fa-server | Architecture & Clean Code :: Hands-on expertise with MVC architecture, RESTful API design principles, DTO patterns, exception handling, and Maven builds. :: fa-solid fa-layer-group | Full-Stack Versatility :: Modern interactive UI with HTML5/CSS3/JavaScript & React. Strong CLI, Docker, Git workflow, and fast ramp-up capability. :: fa-solid fa-bolt-lightning");
-            info.setRecruiterPitchCopyText("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234");
+            info.setRecruiterPitchCopyText("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234");
             info.setAiChatEnabled(true);
-            info.setAiChatWelcomeMessage("👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java & Spring Boot mastery, featured projects, 350+ LeetCode DSA record, or hiring availability!");
-            info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode 350+ :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
+            info.setAiChatWelcomeMessage("👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java & Spring Boot mastery, featured projects, LeetCode problem solving, or hiring availability!");
+            info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode & DSA :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
             aboutInfoRepository.save(info);
         } else {
             aboutInfoRepository.findAll().stream().findFirst().ifPresent(info -> {
                 boolean changed = false;
+                if (info.getWorkPreferencesSectionVisible() == null) {
+                    info.setWorkPreferencesSectionVisible(true);
+                    changed = true;
+                }
+                if (info.getAvailabilityVisible() == null) {
+                    info.setAvailabilityVisible(true);
+                    changed = true;
+                }
+                if (info.getWorkPreferenceVisible() == null) {
+                    info.setWorkPreferenceVisible(true);
+                    changed = true;
+                }
+                if (info.getPreferredLocationsVisible() == null) {
+                    info.setPreferredLocationsVisible(true);
+                    changed = true;
+                }
+                if (info.getLanguagesSpokenVisible() == null) {
+                    info.setLanguagesSpokenVisible(true);
+                    changed = true;
+                }
                 if (info.getQuickStats() == null || info.getQuickStats().isBlank()) {
                     info.setQuickStats("10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery & Testing::fa-solid fa-circle-check");
                     info.setQuickStatsVisible(true);
@@ -189,7 +214,10 @@ public class DataInitializer implements CommandLineRunner {
                     changed = true;
                 }
                 if (info.getRecruiterMetrics() == null || info.getRecruiterMetrics().isBlank()) {
-                    info.setRecruiterMetrics("B.Tech CSE :: Target: SDE-1 / Backend | 350+ :: DSA & Algorithmic Solved | Production-Ready :: Spring Boot & REST APIs");
+                    info.setRecruiterMetrics("B.Tech CSE :: Target: SDE-1 / Backend | LeetCode & DSA :: Active Problem Solving | Production-Ready :: Spring Boot & REST APIs");
+                    changed = true;
+                } else if (info.getRecruiterMetrics().contains("350+")) {
+                    info.setRecruiterMetrics(info.getRecruiterMetrics().replace("350+ :: DSA & Algorithmic Solved", "LeetCode & DSA :: Active Problem Solving").replace("350+", "Active"));
                     changed = true;
                 }
                 if (info.getRecruiterHighlights() == null || info.getRecruiterHighlights().isBlank()) {
@@ -197,7 +225,10 @@ public class DataInitializer implements CommandLineRunner {
                     changed = true;
                 }
                 if (info.getRecruiterPitchCopyText() == null || info.getRecruiterPitchCopyText().isBlank()) {
-                    info.setRecruiterPitchCopyText("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234");
+                    info.setRecruiterPitchCopyText("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234");
+                    changed = true;
+                } else if (info.getRecruiterPitchCopyText().contains("350+")) {
+                    info.setRecruiterPitchCopyText(info.getRecruiterPitchCopyText().replace("350+ LeetCode DSA solved. ", "").replace("350+", ""));
                     changed = true;
                 }
                 if (info.getAiChatEnabled() == null) {
@@ -205,11 +236,17 @@ public class DataInitializer implements CommandLineRunner {
                     changed = true;
                 }
                 if (info.getAiChatWelcomeMessage() == null || info.getAiChatWelcomeMessage().isBlank()) {
-                    info.setAiChatWelcomeMessage("👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java & Spring Boot mastery, featured projects, 350+ LeetCode DSA record, or hiring availability!");
+                    info.setAiChatWelcomeMessage("👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java & Spring Boot mastery, featured projects, LeetCode problem solving, or hiring availability!");
+                    changed = true;
+                } else if (info.getAiChatWelcomeMessage().contains("350+")) {
+                    info.setAiChatWelcomeMessage(info.getAiChatWelcomeMessage().replace("350+ LeetCode DSA record", "LeetCode problem solving").replace("350+", ""));
                     changed = true;
                 }
                 if (info.getAiChatPromptChips() == null || info.getAiChatPromptChips().isBlank()) {
-                    info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode 350+ :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
+                    info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode & DSA :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
+                    changed = true;
+                } else if (info.getAiChatPromptChips().contains("350+")) {
+                    info.setAiChatPromptChips(info.getAiChatPromptChips().replace("LeetCode 350+", "LeetCode & DSA").replace("350+", ""));
                     changed = true;
                 }
                 if (changed) {

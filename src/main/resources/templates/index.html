@@ -136,11 +136,11 @@
                 <div class="info-grid" style="margin-top:24px;">
                     <div th:if="${about.email}"><div class="label">Email</div><div class="value" th:text="${about.email}"></div></div>
                     <div th:if="${about.location}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
-                    <div th:if="${about.availabilityVisible == true}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.availabilityVisible != false)}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
                     <div th:if="${about.phone}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
-                    <div th:if="${about.workPreference}"><div class="label">Work Preference</div><div class="value" th:text="${about.workPreference}"></div></div>
-                    <div th:if="${about.preferredLocations}"><div class="label">Preferred Locations</div><div class="value" th:text="${about.preferredLocations}"></div></div>
-                    <div th:if="${about.languagesSpoken}"><div class="label">Languages</div><div class="value" th:text="${about.languagesSpoken}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.workPreferenceVisible != false) and !#strings.isEmpty(about.workPreference)}"><div class="label">Work Preference</div><div class="value" th:text="${about.workPreference}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.preferredLocationsVisible != false) and !#strings.isEmpty(about.preferredLocations)}"><div class="label">Preferred Locations</div><div class="value" th:text="${about.preferredLocations}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.languagesSpokenVisible != false) and !#strings.isEmpty(about.languagesSpoken)}"><div class="label">Languages</div><div class="value" th:text="${about.languagesSpoken}"></div></div>
                 </div>
             </div>
             <div class="glass-card" data-reveal>
@@ -285,7 +285,7 @@
                 </div>
             </div>
 
-            <!-- LeetCode Profile Card, backed by the GitHub solutions repository -->
+            <!-- LeetCode Profile Card, backed by live LeetCode API -->
             <div class="glass-card coding-profile-card leetcode-card">
                 <div class="cp-header">
                     <div class="cp-platform-icon leetcode-icon"><i class="fa-solid fa-code"></i></div>
@@ -293,7 +293,7 @@
                         <div class="cp-platform-name leetcode-name">LeetCode</div>
                         <div class="cp-username" th:text="'@' + (${about.githubUsername} ?: 'princegupt1234')">@princegupt1234</div>
                     </div>
-                    <a th:href="'https://leetcode.com/' + (${about.githubUsername} ?: 'princegupt1234')" target="_blank" rel="noopener" class="glass-btn leetcode-btn cp-profile-btn">
+                    <a th:href="'https://leetcode.com/u/' + (${about.githubUsername} ?: 'princegupt1234') + '/'" target="_blank" rel="noopener" class="glass-btn leetcode-btn cp-profile-btn">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Profile
                     </a>
                 </div>
@@ -675,7 +675,7 @@ function zoomCert(dir) {
 
             <!-- Left: Let's Connect panel -->
             <div class="glass-card contact-connect-panel" data-reveal>
-                <div class="connect-availability" th:if="${about.availabilityVisible == true}">
+                <div class="connect-availability" th:if="${about.availabilityVisible != false}">
                     <span class="avail-dot"></span>
                     <span class="avail-text" th:text="${about.availabilityText} ?: 'Available for opportunities'">Available for opportunities</span>
                 </div>
@@ -845,8 +845,8 @@ function zoomCert(dir) {
                     <div class="rec-metric-lbl">Target: SDE-1 / Backend</div>
                 </div>
                 <div class="recruiter-metric-item">
-                    <div class="rec-metric-val">350+</div>
-                    <div class="rec-metric-lbl">DSA &amp; Algorithmic Solved</div>
+                    <div class="rec-metric-val" th:text="${leetcodeRepo != null and leetCodeRepo.available and leetCodeRepo.solved > 0 ? leetCodeRepo.solved + ' Solved' : 'LeetCode &amp; DSA'}">LeetCode &amp; DSA</div>
+                    <div class="rec-metric-lbl">Active Problem Solving</div>
                 </div>
                 <div class="recruiter-metric-item">
                     <div class="rec-metric-val">Production-Ready</div>
@@ -1003,7 +1003,7 @@ function zoomCert(dir) {
         <div class="ai-chat-chips" th:unless="${about.aiChatPromptChips != null and !#strings.isEmpty(about.aiChatPromptChips)}">
             <button type="button" class="ai-chip" onclick="sendQuickAiQuery('What are Prince\'s core backend skills?')">Core Backend</button>
             <button type="button" class="ai-chip" onclick="sendQuickAiQuery('Tell me about your top projects')">Top Projects</button>
-            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('What is your problem solving and LeetCode record?')">LeetCode 350+</button>
+            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('What is your problem solving and LeetCode record?')">LeetCode &amp; DSA</button>
             <button type="button" class="ai-chip" onclick="sendQuickAiQuery('Are you available for immediate hiring?')">Availability</button>
             <button type="button" class="ai-chip" onclick="sendQuickAiQuery('How do I contact Prince or schedule an interview?')">Contact Info</button>
         </div>
@@ -1017,7 +1017,7 @@ function zoomCert(dir) {
                 </div>
                 <div class="ai-msg-bubble" th:unless="${about.aiChatWelcomeMessage != null and !#strings.isEmpty(about.aiChatWelcomeMessage)}">
                     👋 <strong>Hello!</strong> I am Prince's interactive AI assistant.<br><br>
-                    Ask me anything about Prince's <strong>Java &amp; Spring Boot</strong> mastery, featured projects, <strong>350+ LeetCode DSA record</strong>, or hiring availability!
+                    Ask me anything about Prince's <strong>Java &amp; Spring Boot</strong> mastery, featured projects, <strong>LeetCode &amp; DSA problem solving</strong>, or hiring availability!
                 </div>
             </div>
         </div>

@@ -11,6 +11,36 @@ class LeetCodeRepositoryStatsServiceTest {
     private final LeetCodeRepositoryStatsService service = new LeetCodeRepositoryStatsService();
 
     @Test
+    void parsesLeetCodeGraphQLResponseSuccessfully() {
+        String json = """
+                {"data":{"matchedUser":{"submitStatsGlobal":{"acSubmissionNum":[{"difficulty":"All","count":7,"submissions":8},{"difficulty":"Easy","count":5,"submissions":6},{"difficulty":"Medium","count":2,"submissions":2},{"difficulty":"Hard","count":0,"submissions":0}]}}}}
+                """;
+
+        LeetCodeRepositoryStatsService.LeetCodeRepositoryStats stats = service.parseResponse(json);
+
+        assertTrue(stats.available());
+        assertEquals(7, stats.solved());
+        assertEquals(5, stats.easy());
+        assertEquals(2, stats.medium());
+        assertEquals(0, stats.hard());
+    }
+
+    @Test
+    void parsesLeetCodeRestProxyResponseSuccessfully() {
+        String json = """
+                {"totalSolved":7,"totalQuestions":3361,"easySolved":5,"totalEasy":836,"mediumSolved":2,"totalMedium":1745,"hardSolved":0,"totalHard":780}
+                """;
+
+        LeetCodeRepositoryStatsService.LeetCodeRepositoryStats stats = service.parseResponse(json);
+
+        assertTrue(stats.available());
+        assertEquals(7, stats.solved());
+        assertEquals(5, stats.easy());
+        assertEquals(2, stats.medium());
+        assertEquals(0, stats.hard());
+    }
+
+    @Test
     void computesSolvedFromEasyMediumHardWhenSolvedKeyIsAbsent() {
         String json = """
                 {"leetcode":{"easy":3,"hard":1,"medium":2,"shas":{}}}

@@ -228,7 +228,7 @@
                   <div style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:6px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary); margin-right:4px;"></i> Quick Insert Presets (click to add):</div>
                   <div style="display:flex; flex-wrap:wrap; gap:6px;">
                     <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('15+', 'Projects Built', 'fa-solid fa-folder-open')">+ 15+ Projects</button>
-                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('350+', 'DSA Problems Solved', 'fa-solid fa-code')">+ 350+ DSA</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('LeetCode &amp; DSA', 'Active Problem Solving', 'fa-solid fa-code')">+ DSA / LeetCode</button>
                     <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('1+ Yrs', 'Hands-on Dev', 'fa-solid fa-laptop-code')">+ 1+ Yrs Dev</button>
                     <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('100%', 'Delivery &amp; Testing', 'fa-solid fa-circle-check')">+ 100% Delivery</button>
                     <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addStatPreset('Production-Ready', 'Spring Boot &amp; REST', 'fa-solid fa-server')">+ Spring Boot</button>
@@ -341,43 +341,97 @@
                   <div class="ab-card-icon"><i class="fa-solid fa-briefcase"></i></div>
                   <div>
                     <div class="ab-card-title">Work Preferences &amp; Availability Badges</div>
-                    <div class="ab-card-subtitle">Availability pill badge, target employment types, preferred locations, and languages</div>
+                    <div class="ab-card-subtitle">Master toggle and separate visibility controls for availability, work mode, locations, and languages</div>
                   </div>
                 </div>
                 <i class="fa-solid fa-chevron-down ab-chevron"></i>
               </div>
               <div class="ab-card-body">
-                <p class="sec-desc">Helps recruiters instantly see your current job search status, relocation readiness, and work modes.</p>
+                <p class="sec-desc">Control your job search status, relocation readiness, and work modes. Use the common master switch to control the whole section, or individual toggles to show/hide specific items on your live portfolio.</p>
 
-                <div class="form-grid">
-                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
-                    <label class="toggle-switch" for="availabilityVisible">
-                      <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible == true}"/>
-                      <span class="toggle-slider"></span>
-                    </label>
-                    <label for="availabilityVisible" style="cursor:pointer; margin:0;">
-                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Display Availability Badge on Portfolio</strong>
-                      <span style="color:var(--text-secondary); font-size:0.78rem;">Shows an animated green indicator in About and Contact sections.</span>
-                    </label>
+                <!-- Common Master Section Toggle -->
+                <div class="toggle-group" style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; margin-bottom:18px; border-radius:12px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25);">
+                  <div>
+                    <strong style="color:var(--text); font-size:0.92rem; display:block;"><i class="fa-solid fa-layer-group" style="color:var(--primary); margin-right:6px;"></i> Common Section Visibility</strong>
+                    <span style="color:var(--text-secondary); font-size:0.78rem;">Master toggle: Display Work Preferences &amp; Availability section on live portfolio</span>
                   </div>
+                  <label class="toggle-switch" for="workPreferencesSectionVisible" style="flex-shrink:0; margin:0; cursor:pointer;">
+                    <input type="checkbox" id="workPreferencesSectionVisible" name="workPreferencesSectionVisible" value="true" th:checked="*{workPreferencesSectionVisible != false}"/>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
 
-                  <div class="form-group">
-                    <label for="availabilityText">Availability Badge Text</label>
+                <!-- Individual Items with Separate Toggles -->
+                <div class="form-grid">
+                  <!-- 1. Availability Badge -->
+                  <div class="form-group" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                      <div>
+                        <label for="availabilityText" style="font-weight:600; font-size:0.86rem; margin:0; display:block; color:var(--text);"><i class="fa-solid fa-circle-dot" style="color:#10b981; font-size:0.75rem; margin-right:5px;"></i> Availability Badge</label>
+                        <span style="color:var(--text-secondary); font-size:0.74rem;">Live status indicator badge</span>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:500;">Visible</span>
+                        <label class="toggle-switch" for="availabilityVisible" style="margin:0; cursor:pointer;">
+                          <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible != false}"/>
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
                     <input class="glass-input" id="availabilityText" th:field="*{availabilityText}" placeholder="Available for Opportunities / Open to work"/>
                   </div>
 
-                  <div class="form-group">
-                    <label for="workPreference">Work Preference</label>
+                  <!-- 2. Work Preference -->
+                  <div class="form-group" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                      <div>
+                        <label for="workPreference" style="font-weight:600; font-size:0.86rem; margin:0; display:block; color:var(--text);"><i class="fa-solid fa-briefcase" style="color:var(--primary); font-size:0.78rem; margin-right:5px;"></i> Work Preference</label>
+                        <span style="color:var(--text-secondary); font-size:0.74rem;">Employment type &amp; work mode</span>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:500;">Visible</span>
+                        <label class="toggle-switch" for="workPreferenceVisible" style="margin:0; cursor:pointer;">
+                          <input type="checkbox" id="workPreferenceVisible" name="workPreferenceVisible" value="true" th:checked="*{workPreferenceVisible != false}"/>
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
                     <input class="glass-input" id="workPreference" th:field="*{workPreference}" placeholder="Open to Full-Time / Internships (Remote &amp; Hybrid)"/>
                   </div>
 
-                  <div class="form-group">
-                    <label for="preferredLocations">Preferred Locations</label>
+                  <!-- 3. Preferred Locations -->
+                  <div class="form-group" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                      <div>
+                        <label for="preferredLocations" style="font-weight:600; font-size:0.86rem; margin:0; display:block; color:var(--text);"><i class="fa-solid fa-location-dot" style="color:var(--primary); font-size:0.78rem; margin-right:5px;"></i> Preferred Locations</label>
+                        <span style="color:var(--text-secondary); font-size:0.74rem;">Target cities or remote readiness</span>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:500;">Visible</span>
+                        <label class="toggle-switch" for="preferredLocationsVisible" style="margin:0; cursor:pointer;">
+                          <input type="checkbox" id="preferredLocationsVisible" name="preferredLocationsVisible" value="true" th:checked="*{preferredLocationsVisible != false}"/>
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
                     <input class="glass-input" id="preferredLocations" th:field="*{preferredLocations}" placeholder="e.g. Bangalore, Delhi NCR, Remote"/>
                   </div>
 
-                  <div class="form-group">
-                    <label for="languagesSpoken">Languages Spoken</label>
+                  <!-- 4. Languages Spoken -->
+                  <div class="form-group" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                      <div>
+                        <label for="languagesSpoken" style="font-weight:600; font-size:0.86rem; margin:0; display:block; color:var(--text);"><i class="fa-solid fa-language" style="color:var(--primary); font-size:0.78rem; margin-right:5px;"></i> Languages Spoken</label>
+                        <span style="color:var(--text-secondary); font-size:0.74rem;">Communication languages</span>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:500;">Visible</span>
+                        <label class="toggle-switch" for="languagesSpokenVisible" style="margin:0; cursor:pointer;">
+                          <input type="checkbox" id="languagesSpokenVisible" name="languagesSpokenVisible" value="true" th:checked="*{languagesSpokenVisible != false}"/>
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
                     <input class="glass-input" id="languagesSpoken" th:field="*{languagesSpoken}" placeholder="e.g. English (Professional), Hindi (Native)"/>
                   </div>
                 </div>
@@ -521,7 +575,7 @@
                       <label for="recruiterMetrics"><i class="fa-solid fa-chart-line" style="color:#10b981; margin-right:6px;"></i> 3 Key Metric Counters (Pipe-separated)</label>
                     </div>
                     <textarea class="glass-textarea" id="recruiterMetrics" th:field="*{recruiterMetrics}" rows="2"
-                      placeholder="B.Tech CSE :: Target: SDE-1 / Backend | 350+ :: DSA &amp; Algorithmic Solved | Production-Ready :: Spring Boot &amp; REST APIs"></textarea>
+                      placeholder="B.Tech CSE :: Target: SDE-1 / Backend | LeetCode &amp; DSA :: Active Problem Solving | Production-Ready :: Spring Boot &amp; REST APIs"></textarea>
                     <span class="field-hint">Format: <code>Value :: Label</code> separated by <code>|</code>.</span>
                   </div>
 
@@ -539,15 +593,15 @@
                       <label for="recruiterPitchCopyText"><i class="fa-regular fa-copy" style="color:var(--primary); margin-right:6px;"></i> 1-Click Clipboard Pitch Text</label>
                     </div>
                     <textarea class="glass-textarea" id="recruiterPitchCopyText" th:field="*{recruiterPitchCopyText}" rows="3"
-                      placeholder="Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234"></textarea>
-                    <span class="field-hint">The exact text copied to the clipboard when clicking "Copy Pitch" inside the modal.</span>
+                      placeholder="Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234"></textarea>
+                    <span class="field-hint">The exact text copied to the clipboard when clicking &quot;Copy Pitch&quot; inside the modal.</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ═══════════════════════════════════════════════
-                 CARD 6 · "ASK PRINCE AI" CHATBOT WIDGET
+                 CARD 6 · &quot;ASK PRINCE AI&quot; CHATBOT WIDGET
             ═══════════════════════════════════════════════ -->
             <div class="ab-card" id="sec-aichat">
               <div class="ab-card-header" onclick="toggleSection('sec-aichat')">
@@ -571,21 +625,21 @@
                     </label>
                     <label for="aiChatEnabled" style="cursor:pointer; margin:0;">
                       <strong style="color:var(--text); font-size:0.9rem; display:block;">Enable Floating AI Assistant Widget</strong>
-                      <span style="color:var(--text-secondary); font-size:0.78rem;">Displays the floating "Ask AI" button on the bottom right of the portfolio.</span>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Displays the floating &quot;Ask AI&quot; button on the bottom right of the portfolio.</span>
                     </label>
                   </div>
 
                   <div class="form-group full">
                     <label for="aiChatWelcomeMessage"><i class="fa-solid fa-comment-dots" style="color:#a855f7; margin-right:6px;"></i> Welcome Message</label>
                     <textarea class="glass-textarea" id="aiChatWelcomeMessage" th:field="*{aiChatWelcomeMessage}" rows="3"
-                      placeholder="👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java &amp; Spring Boot mastery, featured projects, 350+ LeetCode DSA record, or hiring availability!"></textarea>
+                      placeholder="👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java &amp; Spring Boot mastery, featured projects, LeetCode problem solving, or hiring availability!"></textarea>
                     <span class="field-hint">The opening message shown inside the chat bubble before any user query.</span>
                   </div>
 
                   <div class="form-group full">
                     <label for="aiChatPromptChips"><i class="fa-solid fa-tags" style="color:#a855f7; margin-right:6px;"></i> Quick Suggestion Prompt Chips (Pipe-separated)</label>
                     <textarea class="glass-textarea" id="aiChatPromptChips" th:field="*{aiChatPromptChips}" rows="3"
-                      placeholder="Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode 350+ :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?"></textarea>
+                      placeholder="Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode &amp; DSA :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?"></textarea>
                     <span class="field-hint">Format: <code>ButtonLabel :: PromptQuestion</code> separated by <code>|</code>.</span>
                   </div>
                 </div>

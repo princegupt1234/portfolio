@@ -20,7 +20,7 @@ window.copyRecruiterPitch = function() {
   const customPitch = modal ? modal.getAttribute('data-pitch') : null;
   const pitchText = (customPitch && customPitch.trim())
     ? customPitch.trim()
-    : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
+    : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
   navigator.clipboard.writeText(pitchText).then(() => {
     const btn = document.getElementById('pitchCopyBtn');
     if (btn) {
@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const customPitch = modal ? modal.getAttribute('data-pitch') : null;
     const pitchText = (customPitch && customPitch.trim())
       ? customPitch.trim()
-      : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
+      : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
     
     function showCopiedFeedback() {
       const btn = document.getElementById('pitchCopyBtn');
@@ -799,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
         } else {
-          statText += '  • <strong>15+</strong> Projects Built<br>  • <strong>350+</strong> LeetCode Problems Solved<br>  • <strong>1+ Yrs</strong> Hands-on Development';
+          statText += '  • <strong>10+</strong> Projects Built<br>  • <strong>LeetCode &amp; DSA</strong> Active Problem Solving<br>  • <strong>1+ Yrs</strong> Hands-on Development';
         }
         printCliLine(statText);
         break;
@@ -972,7 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="ai-msg-avatar"><i class="fa-solid fa-robot"></i></div>
           <div class="ai-msg-bubble">
             👋 <strong>Hello!</strong> I am Prince's interactive AI assistant.<br><br>
-            Ask me anything about Prince's <strong>Java &amp; Spring Boot</strong> mastery, featured projects, <strong>350+ LeetCode DSA record</strong>, or hiring availability!
+            Ask me anything about Prince's <strong>Java &amp; Spring Boot</strong> mastery, featured projects, <strong>LeetCode &amp; DSA problem solving</strong>, or hiring availability!
           </div>
         </div>
       `;

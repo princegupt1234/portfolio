@@ -67,6 +67,10 @@ public class AdminAboutController {
         try {
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS availability_text VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS availability_visible BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS work_preferences_section_visible BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS work_preference_visible BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS preferred_locations_visible BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS languages_spoken_visible BIT(1) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS footer_tagline VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS footer_sub TEXT NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS quick_stats TEXT NULL").executeUpdate();
@@ -114,7 +118,11 @@ public class AdminAboutController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute AboutInfo form,
+                        @RequestParam(value = "workPreferencesSectionVisible", required = false) String workPreferencesSectionVisibleParam,
                         @RequestParam(value = "availabilityVisible", required = false) String availabilityVisibleParam,
+                        @RequestParam(value = "workPreferenceVisible", required = false) String workPreferenceVisibleParam,
+                        @RequestParam(value = "preferredLocationsVisible", required = false) String preferredLocationsVisibleParam,
+                        @RequestParam(value = "languagesSpokenVisible", required = false) String languagesSpokenVisibleParam,
                         @RequestParam(value = "terminalEnabled", required = false) String terminalEnabledParam,
                         @RequestParam(value = "recruiterPitchEnabled", required = false) String recruiterPitchEnabledParam,
                         @RequestParam(value = "aiChatEnabled", required = false) String aiChatEnabledParam,
@@ -126,11 +134,15 @@ public class AdminAboutController {
         existing.setCareerObjective(form.getCareerObjective());
         existing.setLocation(form.getLocation());
         existing.setPhone(form.getPhone());
+        existing.setWorkPreferencesSectionVisible("true".equals(workPreferencesSectionVisibleParam));
         existing.setAvailabilityText(form.getAvailabilityText());
         existing.setAvailabilityVisible("true".equals(availabilityVisibleParam));
         existing.setWorkPreference(form.getWorkPreference());
+        existing.setWorkPreferenceVisible("true".equals(workPreferenceVisibleParam));
         existing.setPreferredLocations(form.getPreferredLocations());
+        existing.setPreferredLocationsVisible("true".equals(preferredLocationsVisibleParam));
         existing.setLanguagesSpoken(form.getLanguagesSpoken());
+        existing.setLanguagesSpokenVisible("true".equals(languagesSpokenVisibleParam));
         existing.setCalendlyUrl(form.getCalendlyUrl());
         existing.setTerminalEnabled("true".equals(terminalEnabledParam));
         existing.setFooterTagline(form.getFooterTagline());
