@@ -10,8 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-    <link rel="stylesheet" th:href="@{/css/theme.css(v='8')}">
-    <link rel="stylesheet" th:href="@{/css/public.css(v='8')}">
+    <link rel="stylesheet" th:href="@{/css/theme.css(v='9')}">
+    <link rel="stylesheet" th:href="@{/css/public.css(v='9')}">
     <script>
         (function() {
             try {
@@ -838,55 +838,141 @@ function zoomCert(dir) {
 <!-- ===================== INTERACTIVE DEVELOPER CLI TERMINAL ===================== -->
 <th:block th:if="${about.terminalEnabled != false}">
     <button type="button" id="cliLaunchBtn" class="cli-launcher" onclick="toggleCliTerminal()" title="Toggle Developer CLI (or press Ctrl + ~)">
-        <i class="fa-solid fa-terminal" style="color:var(--primary);"></i> <span>CLI</span>
+        <span class="cli-ping"></span>
+        <i class="fa-solid fa-terminal" style="color:var(--primary);"></i> <span>&gt;_ CLI</span>
     </button>
-    <div id="cliDrawer" class="cli-drawer">
+    <div id="cliDrawer" class="cli-drawer" onclick="handleCliDrawerClick(event)">
         <div class="cli-header">
             <div class="cli-header-left">
-                <span class="cli-dot red" onclick="closeCliTerminal()" style="cursor:pointer;" title="Close"></span>
-                <span class="cli-dot yellow"></span>
-                <span class="cli-dot green"></span>
+                <span class="cli-dot red" onclick="closeCliTerminal()" style="cursor:pointer;" title="Close Terminal"></span>
+                <span class="cli-dot yellow" onclick="toggleCliMaximize()" style="cursor:pointer;" title="Toggle Size"></span>
+                <span class="cli-dot green" onclick="toggleCliMaximize()" style="cursor:pointer;" title="Toggle Size"></span>
                 <span style="margin-left:8px; font-weight:600;"><i class="fa-solid fa-terminal"></i> dev@prince-portfolio: ~</span>
             </div>
-            <div style="display:flex; align-items:center;">
-                <span style="font-size:0.72rem; color:var(--text-muted); margin-right:12px;">Type <code style="color:var(--primary);">help</code> for commands</span>
-                <button type="button" onclick="closeCliTerminal()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.9rem;"><i class="fa-solid fa-xmark"></i></button>
+            <div class="cli-header-actions">
+                <button type="button" class="cli-hdr-btn" onclick="toggleCliMaximize()" id="cliMaxBtn" title="Maximize/Restore"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                <button type="button" class="cli-hdr-btn" onclick="closeCliTerminal()" title="Close (Esc)"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
+        <div class="cli-chips-bar">
+            <span class="cli-chip-label">Quick:</span>
+            <button type="button" class="cli-chip" onclick="execCliCommand('help')">help</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('about')">about</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('skills')">skills</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('projects')">projects</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('exp')">exp</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('edu')">edu</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('certs')">certs</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('contact')">contact</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('resume')">resume</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('theme')">theme</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('ls')">ls</button>
+            <button type="button" class="cli-chip danger" onclick="execCliCommand('clear')">clear</button>
+        </div>
         <div class="cli-body" id="cliBody">
-            <div class="cli-output" style="color:var(--primary); font-weight:600;" th:text="'Welcome to ' + (${about.fullName} ?: 'Prince') + '\'s Developer CLI [v2.0.0]'">Welcome to Prince's Developer CLI [v2.0.0]</div>
-            <div class="cli-output" style="color:var(--text-secondary); font-size:0.78rem; margin-bottom:12px;">Type <strong>help</strong> to see all interactive commands, or explore <strong>about</strong>, <strong>skills</strong>, <strong>projects</strong>, <strong>contact</strong>.</div>
+            <div class="cli-output" style="color:var(--primary); font-weight:700; font-size:0.92rem;" th:text="'⚡ ' + (${about.fullName} ?: 'Prince') + ' Developer Shell [v2.5.0]'">⚡ Prince Developer Shell [v2.5.0]</div>
+            <div class="cli-output" style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:12px;">
+                Type <span class="cli-cmd-tag" onclick="execCliCommand('help')">help</span> to view all commands, or click any quick chip above. You can also type <span class="cli-cmd-tag" onclick="execCliCommand('skills')">skills</span>, <span class="cli-cmd-tag" onclick="execCliCommand('projects')">projects</span>, <span class="cli-cmd-tag" onclick="execCliCommand('contact')">contact</span>, <span class="cli-cmd-tag" onclick="execCliCommand('ls')">ls</span>, <span class="cli-cmd-tag" onclick="execCliCommand('resume')">resume</span>.
+            </div>
         </div>
         <div class="cli-prompt-line">
             <span class="cli-prompt-sym">prince@dev:~$</span>
-            <input type="text" id="cliInput" class="cli-input" placeholder="try 'help', 'about', 'skills', 'projects', 'contact'..." autocomplete="off" spellcheck="false" />
+            <input type="text" id="cliInput" class="cli-input" placeholder="Type a command or 'help' (Tab to autocomplete)..." autocomplete="off" spellcheck="false" />
         </div>
     </div>
 </th:block>
 
-<!-- ===================== FOOTER ===================== -->
-<footer>
-    <div class="footer-inner">
-        <div class="footer-brand">
-            <a href="#home" class="logo"><span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span></a>
-            <p class="footer-tagline" th:text="${about.footerTagline} ?: (${about.title} ?: 'Full Stack Developer')"></p>
-            <p class="footer-sub" th:text="${about.footerSub} ?: 'Building clean, scalable software with Java &amp; Spring Boot.'">Building clean, scalable software with Java &amp; Spring Boot.</p>
+<!-- ===================== MODERN REDESIGNED FOOTER ===================== -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <!-- Main 4-Column Grid -->
+        <div class="footer-top">
+            <!-- Brand & Tagline -->
+            <div class="footer-col brand-col">
+                <a href="#home" class="logo">
+                    <span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span>
+                </a>
+                <p class="footer-tagline" th:text="${about.footerTagline} ?: (${about.title} ?: 'Full Stack Developer')">Full Stack Developer</p>
+                <p class="footer-bio" th:text="${about.footerSub} ?: 'Building clean, scalable, high-performance software with Java &amp; Spring Boot.'">Building clean, scalable, high-performance software with Java &amp; Spring Boot.</p>
+                <div class="footer-status-pill" th:if="${about.availabilityVisible != false}">
+                    <span class="status-dot"></span>
+                    <span th:text="${about.availabilityText} ?: 'Available for SDE Roles &amp; Internships'">Available for SDE Roles &amp; Internships</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="footer-col">
+                <h4 class="footer-col-title"><i class="fa-solid fa-compass"></i> Explore</h4>
+                <ul class="footer-links">
+                    <li><a href="#home"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
+                    <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About Me</a></li>
+                    <li><a href="#skills"><i class="fa-solid fa-chevron-right"></i> Skills &amp; Stack</a></li>
+                    <li><a href="#experience"><i class="fa-solid fa-chevron-right"></i> Experience</a></li>
+                    <li><a href="#projects"><i class="fa-solid fa-chevron-right"></i> Projects</a></li>
+                    <li><a href="#coding"><i class="fa-solid fa-chevron-right"></i> Coding Profiles</a></li>
+                    <li><a href="#certificates"><i class="fa-solid fa-chevron-right"></i> Certifications</a></li>
+                    <li><a href="#contact"><i class="fa-solid fa-chevron-right"></i> Contact Me</a></li>
+                </ul>
+            </div>
+
+            <!-- Interactive Features -->
+            <div class="footer-col">
+                <h4 class="footer-col-title"><i class="fa-solid fa-layer-group"></i> Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="javascript:void(0)" onclick="openResumeModal()"><i class="fa-solid fa-eye"></i> View Resume</a></li>
+                    <li><a th:href="@{/resume/download}"><i class="fa-solid fa-file-arrow-down"></i> Download Resume</a></li>
+                    <li th:if="${about.terminalEnabled != false}"><a href="javascript:void(0)" onclick="openCliTerminal()"><i class="fa-solid fa-terminal"></i> Interactive CLI</a></li>
+                    <li><a href="javascript:void(0)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i> Switch Theme</a></li>
+                    <li th:if="${about.calendlyUrl}"><a th:href="${about.calendlyUrl}" target="_blank" rel="noopener"><i class="fa-solid fa-calendar-check"></i> Book 1:1 Call</a></li>
+                    <li><a th:href="@{/login}"><i class="fa-solid fa-lock"></i> Admin Portal</a></li>
+                </ul>
+            </div>
+
+            <!-- Connect & Socials -->
+            <div class="footer-col connect-col">
+                <h4 class="footer-col-title"><i class="fa-solid fa-paper-plane"></i> Get in Touch</h4>
+                <p class="footer-location" th:if="${about.location}">
+                    <i class="fa-solid fa-location-dot" style="color:var(--primary);"></i>
+                    <span th:text="${about.location}">Lucknow, Uttar Pradesh</span>
+                </p>
+                <p class="footer-email" th:if="${about.email}">
+                    <i class="fa-solid fa-envelope" style="color:var(--primary);"></i>
+                    <a th:href="'mailto:' + ${about.email}" th:text="${about.email}">princegupt3052@gmail.com</a>
+                </p>
+                <div class="footer-socials">
+                    <a th:if="${about.githubUrl}" th:href="${about.githubUrl}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub" class="footer-social-btn">
+                        <i class="fa-brands fa-github"></i>
+                    </a>
+                    <a th:if="${about.linkedinUrl}" th:href="${about.linkedinUrl}" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn" class="footer-social-btn">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                    <a th:if="${about.whatsappUrl}" th:href="${about.whatsappUrl}" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="footer-social-btn">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                    <a th:if="${about.email}" th:href="'mailto:' + ${about.email}" aria-label="Email" title="Email" class="footer-social-btn">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="footer-copy">
-            <p>&copy; <span id="year"></span> <span th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</span></p>
-            <p class="footer-copy-sub">All rights reserved.</p>
+
+        <!-- Bottom Copyright & Tech Stack Info -->
+        <div class="footer-bottom">
+            <div class="footer-copy-text">
+                &copy; <span id="year"></span> <strong th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</strong>. All rights reserved.
+            </div>
+            <div class="footer-tech-tag">
+                <span>Engineered with</span>
+                <span class="tech-pill"><i class="fa-brands fa-java" style="color:#f97316;"></i> Java &amp; Spring Boot</span>
+            </div>
+            <a href="#home" class="footer-back-to-top" title="Scroll to top of page">
+                <span>Back to top</span> <i class="fa-solid fa-arrow-up"></i>
+            </a>
         </div>
-        <nav class="footer-nav">
-            <a href="#about">About</a>
-            <a href="#skills">Skills</a>
-            <a href="#projects">Projects</a>
-            <a href="#coding">Coding</a>
-            <a href="#contact">Contact</a>
-        </nav>
     </div>
 </footer>
 
-<a href="#home" class="glass-btn back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+<a href="#home" class="glass-btn back-to-top" aria-label="Back to top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
 
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -899,7 +985,7 @@ document.querySelectorAll('.exp-desc').forEach(el => {
     }
 });
 </script>
-<script th:src="@{/js/main.js(v='8')}" defer></script>
+<script th:src="@{/js/main.js(v='9')}" defer></script>
 <script>
 (function() {
   var v = null;
