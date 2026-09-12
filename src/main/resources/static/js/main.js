@@ -447,12 +447,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const cliHistory = [];
   let historyIndex = -1;
 
+  let customCliCommands = [];
+  try {
+    const el = document.getElementById('customCliCommandsData');
+    if (el && el.textContent.trim()) {
+      const parsed = JSON.parse(el.textContent.trim());
+      if (Array.isArray(parsed)) customCliCommands = parsed;
+    }
+  } catch(e) {}
+
   const ALL_CLI_COMMANDS = [
     'help', 'about', 'skills', 'projects', 'exp', 'edu', 'certs',
-    'contact', 'resume', 'theme', 'socials', 'github', 'linkedin',
-    'whatsapp', 'email', 'stats', 'currently', 'ls', 'cat', 'pwd',
-    'whoami', 'date', 'echo', 'clear', 'history', 'sudo', 'exit'
+    'contact', 'resume', 'download', 'hire', 'leetcode', 'dsa',
+    'arch', 'source', 'repo', 'system', 'neofetch', 'matrix', 'ping',
+    'curl', 'joke', 'stats', 'currently', 'ls', 'cat', 'pwd',
+    'whoami', 'date', 'echo', 'clear', 'history', 'sudo', 'exit',
+    'theme', 'socials', 'github', 'linkedin', 'whatsapp', 'email'
   ];
+  customCliCommands.forEach(c => {
+    if (c.cmd && !ALL_CLI_COMMANDS.includes(c.cmd.toLowerCase())) {
+      ALL_CLI_COMMANDS.push(c.cmd.toLowerCase());
+    }
+  });
 
   window.toggleCliTerminal = function() {
     const drawer = document.getElementById('cliDrawer');
@@ -562,31 +578,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
     printCliLine('<span style="color:var(--primary);font-weight:700;">prince@dev:~$</span> ' + escHtml(raw));
 
+    // 1. Check Custom Commands Configured via Admin Panel
+    const customMatch = customCliCommands.find(c => c.cmd && c.cmd.toLowerCase() === clean);
+    if (customMatch) {
+      printCliLine(customMatch.output || 'No output configured for custom command.');
+      if (cliBody) {
+        setTimeout(() => { cliBody.scrollTop = cliBody.scrollHeight; }, 20);
+      }
+      return;
+    }
+
     switch(clean) {
       case 'help':
       case '?':
       case 'commands':
+        let customChipsHtml = '';
+        if (customCliCommands && customCliCommands.length > 0) {
+          customChipsHtml = '<div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><strong style="color:#f59e0b; font-size:0.78rem;">✨ Custom Admin Commands:</strong><div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:4px 12px; margin-top:4px;">' +
+            customCliCommands.map(c => '<div><span class="cli-cmd-tag" onclick="execCliCommand(\'' + escHtml(c.cmd) + '\')">' + escHtml(c.cmd) + '</span> - ' + escHtml(c.desc || 'Custom command') + '</div>').join('') +
+            '</div></div>';
+        }
+
         printCliLine(
-          '<div style="margin:4px 0 8px; color:var(--text); font-weight:600;">⚡ Available Commands (click to execute):</div>' +
-          '<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:6px 16px; font-size:0.8rem;">' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'about\')">about</span> - Career narrative &amp; background</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'skills\')">skills</span> - Stack &amp; technologies</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'projects\')">projects</span> - Engineering projects</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'exp\')">exp</span> - Experience &amp; internships</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'edu\')">edu</span> - College &amp; degrees</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'certs\')">certs</span> - Verified certifications</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'contact\')">contact</span> - Email, phone, socials &amp; scheduler</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'resume\')">resume</span> - Open live resume viewer</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'stats\')">stats</span> - Project &amp; coding metrics</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'socials\')">socials</span> - GitHub, LinkedIn, WhatsApp</div>' +
+          '<div style="margin:4px 0 8px; color:var(--text); font-weight:700; font-size:0.88rem;">⚡ Prince Gupt Interactive Developer CLI [v2.6]</div>' +
+          '<div style="color:var(--text-secondary); font-size:0.78rem; margin-bottom:10px;">Click any command tag below or type with Tab autocomplete:</div>' +
+          
+          '<div style="margin-bottom:8px;"><strong style="color:var(--primary); font-size:0.78rem;">💼 Career &amp; Hiring:</strong>' +
+          '<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:4px 12px; margin-top:4px;">' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'hire\')">hire</span> - Instant recruiter pitch &amp; availability</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'about\')">about</span> - Background story &amp; narrative</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'skills\')">skills</span> - Core stack &amp; technical proficiencies</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'projects\')">projects</span> - Production-ready portfolio builds</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'exp\')">exp</span> - Hands-on experience &amp; internships</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'edu\')">edu</span> - Degree, college &amp; coursework</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'certs\')">certs</span> - Verified certifications &amp; links</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'resume\')">resume</span> - Open interactive resume modal</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'download\')">download</span> - Direct ATS resume PDF download</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'contact\')">contact</span> - Email, socials &amp; meeting scheduler</div>' +
+          '</div></div>' +
+
+          '<div style="margin-bottom:8px;"><strong style="color:#10b981; font-size:0.78rem;">🚀 Engineering &amp; Architecture:</strong>' +
+          '<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:4px 12px; margin-top:4px;">' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'leetcode\')">leetcode</span> - Live LeetCode stats &amp; DSA topics</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'arch\')">arch</span> - System design &amp; architecture diagram</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'source\')">source</span> - Portfolio open-source GitHub repo</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'stats\')">stats</span> - Quick credibility metrics</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'socials\')">socials</span> - GitHub, LinkedIn, WhatsApp links</div>' +
+          '</div></div>' +
+
+          '<div style="margin-bottom:8px;"><strong style="color:#a855f7; font-size:0.78rem;">💻 System &amp; Utilities:</strong>' +
+          '<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:4px 12px; margin-top:4px;">' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'system\')">system</span> - Neofetch-style system report</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'ping\')">ping</span> - Simulated network latency check</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'curl\')">curl</span> - Inspect HTTP response headers</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'matrix\')">matrix</span> - Digital rain hacker terminal effect</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'joke\')">joke</span> - Developer humor &amp; quotes</div>' +
           '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'theme\')">theme</span> - Toggle dark / light mode</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'ls\')">ls</span> - List directory files</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'whoami\')">whoami</span> - Display current user</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'date\')">date</span> - Print current timestamp</div>' +
-          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'history\')">history</span> - Previous commands</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'ls\')">ls</span> - List directory layout</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'cat\')">cat</span> - View virtual file contents</div>' +
+          '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'history\')">history</span> - Previous command history</div>' +
           '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'clear\')">clear</span> - Clear terminal window</div>' +
           '  <div><span class="cli-cmd-tag" onclick="execCliCommand(\'exit\')">exit</span> - Close terminal drawer</div>' +
-          '</div>'
+          '</div></div>' +
+          customChipsHtml
         );
         break;
 
@@ -893,6 +947,177 @@ document.addEventListener('DOMContentLoaded', () => {
 
       case 'sudo':
         printCliLine('<span style="color:#22c55e;">✔ prince is already root superuser. All privileges granted.</span>');
+        break;
+
+      case 'leetcode':
+      case 'dsa':
+      case 'algo':
+        let lcSolved = '7+';
+        let lcEasy = '5';
+        let lcMed = '2';
+        let lcHard = '0';
+        const lcSolvedEl = document.getElementById('lcSolvedCount');
+        const lcEasyEl = document.getElementById('lcEasyCount');
+        const lcMedEl = document.getElementById('lcMedCount');
+        const lcHardEl = document.getElementById('lcHardCount');
+        if (lcSolvedEl) lcSolved = lcSolvedEl.textContent.trim();
+        if (lcEasyEl) lcEasy = lcEasyEl.textContent.trim();
+        if (lcMedEl) lcMed = lcMedEl.textContent.trim();
+        if (lcHardEl) lcHard = lcHardEl.textContent.trim();
+
+        printCliLine(
+          '<div style="color:#f59e0b; font-weight:700; margin-bottom:6px;"><i class="fa-solid fa-code"></i> LeetCode &amp; Algorithmic Problem Solving:</div>' +
+          '<div style="margin-bottom:8px; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(245,158,11,0.25); border-radius:8px;">' +
+          '  <div><strong>Handle:</strong> <a href="https://leetcode.com/u/princegupt1234/" target="_blank" style="color:#38bdf8;">@princegupt1234</a></div>' +
+          '  <div style="margin-top:4px;"><strong>Total Solved:</strong> <span style="color:#10b981; font-weight:700;">' + escHtml(lcSolved) + '</span> problems</div>' +
+          '  <div style="margin-top:2px; font-size:0.8rem; color:var(--text-secondary);">' +
+          '    <span style="color:#22c55e;">Easy: ' + escHtml(lcEasy) + '</span> • ' +
+          '    <span style="color:#eab308;">Medium: ' + escHtml(lcMed) + '</span> • ' +
+          '    <span style="color:#ef4444;">Hard: ' + escHtml(lcHard) + '</span>' +
+          '  </div>' +
+          '  <div style="margin-top:6px; font-size:0.78rem; color:#94a3b8;">Focus Areas: Arrays, Strings, Hash Tables, Two Pointers, Sliding Window, Trees, DP.</div>' +
+          '  <div style="margin-top:6px;"><a href="https://leetcode.com/u/princegupt1234/" target="_blank" rel="noopener" class="cli-link-btn" style="background:#f59e0b; border-color:#f59e0b; color:#000;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live LeetCode Profile</a></div>' +
+          '</div>'
+        );
+        break;
+
+      case 'hire':
+      case 'pitch':
+      case 'recruiter':
+        printCliLine(
+          '<div style="color:var(--success); font-weight:700; margin-bottom:6px;">💼 Recruiter Executive Summary (Prince Gupt):</div>' +
+          '<div style="padding:10px 14px; background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.25); border-radius:8px; font-size:0.82rem; line-height:1.5;">' +
+          '  <div><strong>🎯 Target Roles:</strong> Software Development Engineer 1 (SDE-1) / Backend Java Developer</div>' +
+          '  <div><strong>⏱️ Notice Period:</strong> <span style="color:#34d399; font-weight:700;">Immediate Joiner (0-day notice)</span></div>' +
+          '  <div><strong>📍 Locations:</strong> Bengaluru, Delhi NCR, Pune, or Remote (Immediate relocation ready)</div>' +
+          '  <div><strong>🛠️ Core Stack:</strong> Java 17+, Spring Boot 3, Spring Data JPA, MySQL, REST APIs, React</div>' +
+          '  <div><strong>🎓 Education:</strong> B.Tech in Computer Science &amp; Engineering (BIET Lucknow)</div>' +
+          '  <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">' +
+          '    <button type="button" onclick="execCliCommand(\'resume\')" class="cli-link-btn" style="background:var(--primary); color:#fff; border-color:var(--primary);"><i class="fa-solid fa-file-pdf"></i> View Resume</button>' +
+          '    <a href="mailto:princegupt3052@gmail.com" class="cli-link-btn" style="background:#10b981; color:#fff; border-color:#10b981;"><i class="fa-solid fa-envelope"></i> Email Prince</a>' +
+          '    <a href="https://linkedin.com/in/prince-gupt-175289322" target="_blank" class="cli-link-btn" style="background:#0a66c2; color:#fff; border-color:#0a66c2;"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>' +
+          '  </div>' +
+          '</div>'
+        );
+        break;
+
+      case 'arch':
+      case 'architecture':
+      case 'design':
+        printCliLine(
+          '<div style="color:var(--primary); font-weight:700; margin-bottom:6px;">🏗️ Portfolio &amp; System Architecture:</div>' +
+          '<div style="padding:10px 14px; background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.25); border-radius:8px; font-size:0.8rem; line-height:1.6;">' +
+          '  <div><span style="color:#60a5fa; font-weight:600;">[Presentation]</span> Server-Side Thymeleaf 3, Aurora Glassmorphism CSS, Vanilla ES6+ JS &amp; React components</div>' +
+          '  <div><span style="color:#34d399; font-weight:600;">[Application]</span> Spring Boot 3.3.x, Spring MVC REST Controllers, Spring Security RBAC + BCrypt</div>' +
+          '  <div><span style="color:#fbbf24; font-weight:600;">[Persistence]</span> Spring Data JPA / Hibernate, MySQL 8 (Indexed queries &amp; connection pool)</div>' +
+          '  <div><span style="color:#c084fc; font-weight:600;">[Infrastructure]</span> Dockerized JVM container hosted on Render PaaS with automated GitHub CD pipeline</div>' +
+          '  <div><span style="color:#f87171; font-weight:600;">[Security]</span> Honeypot bot trap, in-memory IP rate limiter, safe fallback caching</div>' +
+          '</div>'
+        );
+        break;
+
+      case 'source':
+      case 'repo':
+      case 'github-repo':
+        printCliLine(
+          '<div style="color:var(--primary); font-weight:700; margin-bottom:4px;">📂 Open Source Repository:</div>' +
+          '<div>The complete source code for this portfolio is available on GitHub:</div>' +
+          '<div style="margin-top:6px;"><a href="https://github.com/princegupt1234/portfolio" target="_blank" rel="noopener" class="cli-link-btn" style="background:#24292f; border-color:#444; color:#fff;"><i class="fa-brands fa-github"></i> github.com/princegupt1234/portfolio</a></div>'
+        );
+        break;
+
+      case 'download':
+      case 'download-resume':
+        printCliLine('📄 Triggering direct download for Prince Gupt\'s ATS Resume PDF...');
+        const dl = document.createElement('a');
+        dl.href = '/downloads/resume';
+        dl.setAttribute('download', 'Prince_Gupt_Resume.pdf');
+        dl.setAttribute('target', '_blank');
+        document.body.appendChild(dl);
+        dl.click();
+        document.body.removeChild(dl);
+        break;
+
+      case 'system':
+      case 'neofetch':
+      case 'sysinfo':
+        printCliLine(
+          '<pre style="margin:0; font-family:var(--font-mono); font-size:0.76rem; line-height:1.35; color:#93c5fd; overflow-x:auto;">' +
+          '       <span style="color:#60a5fa;">.---.</span>         <span style="color:#f59e0b; font-weight:700;">prince@portfolio-gx88</span>\n' +
+          '      <span style="color:#60a5fa;">/     \\</span>        ---------------------\n' +
+          '     <span style="color:#60a5fa;">| () () |</span>       <span style="color:#34d399;">OS:</span> Prince-Dev-OS 2026 x86_64\n' +
+          '      <span style="color:#60a5fa;">\\  _  /</span>        <span style="color:#34d399;">Host:</span> Spring Boot 3.3.x on Render Cloud\n' +
+          '       <span style="color:#60a5fa;">/`--`\\</span>        <span style="color:#34d399;">Kernel:</span> OpenJDK 17.0.12 (HotSpot 64-Bit Server VM)\n' +
+          '      <span style="color:#60a5fa;">/ |  | \\</span>       <span style="color:#34d399;">Uptime:</span> 24/7 (Keep-Alive Health Monitored)\n' +
+          '     <span style="color:#60a5fa;">/  |  |  \\</span>      <span style="color:#34d399;">Shell:</span> Prince Developer Shell v2.6.0\n' +
+          '    <span style="color:#60a5fa;">|___|__|___|</span>     <span style="color:#34d399;">Theme:</span> Aurora Glassmorphism (Dark / Light)\n' +
+          '                     <span style="color:#34d399;">Stack:</span> Java 17 · Spring Boot · MySQL · REST · React\n' +
+          '                     <span style="color:#34d399;">Memory:</span> Optimized JVM Heap / 512MB dyno\n' +
+          '</pre>'
+        );
+        break;
+
+      case 'matrix':
+        printCliLine('<div style="color:#22c55e; font-family:var(--font-mono); font-weight:700;">[SYS_INIT] Entering the Matrix...</div>');
+        const matrixLines = [
+          '01001010 01100001 01110110 01100001  // "Java"',
+          'Wake up, recruiter...',
+          'The Matrix has you.',
+          'Follow the white rabbit 🐇',
+          '01010011 01110000 01110010 01101001 01101110 01100111  // "Spring"',
+          'Knock, knock, Neo.'
+        ];
+        matrixLines.forEach((line, idx) => {
+          setTimeout(() => {
+            printCliLine('<div style="color:#22c55e; font-family:var(--font-mono); font-size:0.78rem;">&gt; ' + escHtml(line) + '</div>');
+            if (cliBody) cliBody.scrollTop = cliBody.scrollHeight;
+          }, (idx + 1) * 350);
+        });
+        break;
+
+      case 'ping':
+        const targetHost = (arg || 'portfolio-gx88.onrender.com').replace(/https?:\/\//, '').split('/')[0];
+        printCliLine('PING ' + escHtml(targetHost) + ' (127.0.0.1): 56 data bytes');
+        setTimeout(() => { printCliLine('64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=14.2 ms'); if (cliBody) cliBody.scrollTop = cliBody.scrollHeight; }, 150);
+        setTimeout(() => { printCliLine('64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=16.8 ms'); if (cliBody) cliBody.scrollTop = cliBody.scrollHeight; }, 300);
+        setTimeout(() => {
+          printCliLine(
+            '<div style="color:var(--text-secondary); font-size:0.78rem; margin-top:4px;">' +
+            '--- ' + escHtml(targetHost) + ' ping statistics ---<br>' +
+            '2 packets transmitted, 2 received, 0% packet loss, min/avg/max = 14.2/15.5/16.8 ms' +
+            '</div>'
+          );
+          if (cliBody) cliBody.scrollTop = cliBody.scrollHeight;
+        }, 450);
+        break;
+
+      case 'curl':
+        printCliLine(
+          '<pre style="margin:0; font-family:var(--font-mono); font-size:0.76rem; color:#a7f3d0;">' +
+          'HTTP/2 200 OK\n' +
+          'date: ' + new Date().toUTCString() + '\n' +
+          'content-type: text/html;charset=UTF-8\n' +
+          'server: Spring-Boot/3.3.x (Java 17)\n' +
+          'x-powered-by: Spring MVC &amp; Thymeleaf\n' +
+          'x-content-type-options: nosniff\n' +
+          'x-frame-options: DENY\n' +
+          'cache-control: no-cache, no-store, max-age=0, must-revalidate\n' +
+          'status: 200 OK' +
+          '</pre>'
+        );
+        break;
+
+      case 'joke':
+        const jokes = [
+          'Why do Java developers wear glasses? Because they don\'t C#!',
+          'There are 10 types of people in the world: those who understand binary, and those who don\'t.',
+          'A SQL query walks into a bar, walks up to two tables and asks: "Can I join you?"',
+          '!false — it\'s funny because it\'s true.',
+          'Why did the developer quit his job? Because he didn\'t get arrays.',
+          'Hardware: The part of a computer that you can kick; Software: The part you can only curse at.'
+        ];
+        const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+        printCliLine('<div style="color:#f59e0b; font-weight:600;">😄 ' + escHtml(randomJoke) + '</div>');
         break;
 
       default:

@@ -172,6 +172,7 @@ public class DataInitializer implements CommandLineRunner {
             info.setPwaShortName("Prince Portfolio");
             info.setPwaThemeColor("#0a0f1d");
             info.setPwaBackgroundColor("#060913");
+            info.setCustomCliCommands("[{\"cmd\":\"blog\",\"desc\":\"Read technical articles & notes\",\"output\":\"<div style=\\\"color:var(--primary); font-weight:700;\\\">📝 Engineering Blog:</div><div>Check out technical writeups on Java 17+, Spring Boot internals, and DSA patterns!</div>\"},{\"cmd\":\"coffee\",\"desc\":\"Buy Prince a coffee / sponsor\",\"output\":\"☕ Thank you for the support! Connect with Prince at princegupt3052@gmail.com.\"},{\"cmd\":\"discord\",\"desc\":\"Join developer community\",\"output\":\"💬 Connect with developer communities and join coding discussions on GitHub: https://github.com/princegupt1234\"}]");
             aboutInfoRepository.save(info);
         } else {
             aboutInfoRepository.findAll().stream().findFirst().ifPresent(info -> {
@@ -307,6 +308,10 @@ public class DataInitializer implements CommandLineRunner {
                 }
                 if (info.getPwaBackgroundColor() == null || info.getPwaBackgroundColor().isBlank()) {
                     info.setPwaBackgroundColor("#060913");
+                    changed = true;
+                }
+                if (info.getCustomCliCommands() == null || info.getCustomCliCommands().isBlank()) {
+                    info.setCustomCliCommands("[{\"cmd\":\"blog\",\"desc\":\"Read technical articles & notes\",\"output\":\"<div style=\\\"color:var(--primary); font-weight:700;\\\">📝 Engineering Blog:</div><div>Check out technical writeups on Java 17+, Spring Boot internals, and DSA patterns!</div>\"},{\"cmd\":\"coffee\",\"desc\":\"Buy Prince a coffee / sponsor\",\"output\":\"☕ Thank you for the support! Connect with Prince at princegupt3052@gmail.com.\"},{\"cmd\":\"discord\",\"desc\":\"Join developer community\",\"output\":\"💬 Connect with developer communities and join coding discussions on GitHub: https://github.com/princegupt1234\"}]");
                     changed = true;
                 }
                 if (changed) {

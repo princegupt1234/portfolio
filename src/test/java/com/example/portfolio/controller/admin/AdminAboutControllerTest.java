@@ -18,10 +18,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import org.springframework.mock.web.MockMultipartFile;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -159,6 +162,7 @@ class AdminAboutControllerTest {
                         .param("ogTitle", "Prince Gupt | SDE-1")
                         .param("ogDescription", "High performance Java & Spring Boot developer.")
                         .param("ogImageUrl", "https://portfolio-gx88.onrender.com/images/og-preview.png")
+                        .param("customCliCommands", "[{\"cmd\":\"blog\",\"desc\":\"Tech Blog\",\"output\":\"Hello\"}]")
                         .param("contactSpamProtectionEnabled", "true")
                         .param("contactHoneypotEnabled", "true")
                         .param("contactRateLimitSeconds", "45")
@@ -176,6 +180,7 @@ class AdminAboutControllerTest {
                 "Prince Gupt | SDE-1".equals(info.getOgTitle()) &&
                 "High performance Java & Spring Boot developer.".equals(info.getOgDescription()) &&
                 "https://portfolio-gx88.onrender.com/images/og-preview.png".equals(info.getOgImageUrl()) &&
+                "[{\"cmd\":\"blog\",\"desc\":\"Tech Blog\",\"output\":\"Hello\"}]".equals(info.getCustomCliCommands()) &&
                 Boolean.TRUE.equals(info.getContactSpamProtectionEnabled()) &&
                 Boolean.TRUE.equals(info.getContactHoneypotEnabled()) &&
                 Integer.valueOf(45).equals(info.getContactRateLimitSeconds()) &&
@@ -184,6 +189,30 @@ class AdminAboutControllerTest {
                 "Prince App".equals(info.getPwaShortName()) &&
                 "#0a0f1d".equals(info.getPwaThemeColor()) &&
                 "#060913".equals(info.getPwaBackgroundColor())
+        ));
+        verify(dataVersionService).bump();
+    }
+
+    @Test
+    void savesUploadedOgBannerFileAndRedirects() throws Exception {
+        AboutInfo existing = new AboutInfo();
+        existing.setId(1L);
+        when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
+        when(fileStorageService.store(any(), org.mockito.ArgumentMatchers.eq("og"))).thenReturn("/uploads/og/custom-banner.png");
+
+        MockMultipartFile file = new MockMultipartFile("ogImageFile", "banner.png", "image/png", "fake image data".getBytes());
+
+        mockMvc.perform(multipart("/admin/about/save")
+                        .file(file)
+                        .param("ogTagsEnabled", "true")
+                        .param("ogTitle", "Prince Gupt | Custom Title")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/about"));
+
+        verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
+                "/uploads/og/custom-banner.png".equals(info.getOgImageUrl()) &&
+                "Prince Gupt | Custom Title".equals(info.getOgTitle())
         ));
         verify(dataVersionService).bump();
     }

@@ -173,6 +173,7 @@
           <a href="#sec-building"><i class="fa-solid fa-hammer"></i> Currently Building</a>
           <a href="#sec-learning"><i class="fa-solid fa-book-open"></i> What I'm Learning</a>
           <a href="#sec-settings"><i class="fa-solid fa-paper-plane"></i> Contact &amp; Footer</a>
+          <a href="#sec-cli"><i class="fa-solid fa-terminal"></i> CLI Commands</a>
           <a href="#sec-recruiter"><i class="fa-solid fa-bolt"></i> Recruiter Pitch</a>
           <a href="#sec-aichat"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a>
           <a href="#sec-opengraph"><i class="fa-brands fa-linkedin"></i> Social Sharing</a>
@@ -180,7 +181,7 @@
           <a href="#sec-pwa"><i class="fa-solid fa-mobile-screen"></i> Mobile PWA</a>
         </nav>
 
-        <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post">
+        <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post" enctype="multipart/form-data">
           <input type="hidden" th:field="*{id}"/>
           <div class="about-sections">
 
@@ -539,6 +540,100 @@
             </div>
 
             <!-- ═══════════════════════════════════════════════
+                 CARD 4.5 · DEVELOPER CLI TERMINAL & CUSTOM COMMANDS
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-cli">
+              <div class="ab-card-header" onclick="toggleSection('sec-cli')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(59,130,246,0.15); color:var(--primary);"><i class="fa-solid fa-terminal"></i></div>
+                  <div>
+                    <div class="ab-card-title">Developer CLI Terminal &amp; Custom Commands</div>
+                    <div class="ab-card-subtitle">Drawer toggle, 28+ built-in commands overview, and visual custom command manager</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Empower tech recruiters and engineers with an interactive Unix-style terminal right on your portfolio.</p>
+
+                <!-- Built-in Commands Overview Reference -->
+                <div style="margin-bottom:18px; padding:14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                    <strong style="font-size:0.85rem; color:var(--text);"><i class="fa-solid fa-layer-group" style="color:var(--primary); margin-right:6px;"></i> 28+ Built-in Commands (Active Out-of-the-box)</strong>
+                    <span style="font-size:0.72rem; color:var(--text-secondary); font-family:var(--font-mono);">Tab to autocomplete</span>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px; font-size:0.75rem;">
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">help</span>
+                    <span style="font-family:var(--font-mono); background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:3px 8px; border-radius:6px;">leetcode</span>
+                    <span style="font-family:var(--font-mono); background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:3px 8px; border-radius:6px;">hire</span>
+                    <span style="font-family:var(--font-mono); background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:3px 8px; border-radius:6px;">arch</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">about</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">skills</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">projects</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">exp</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">edu</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">certs</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">contact</span>
+                    <span style="font-family:var(--font-mono); background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:3px 8px; border-radius:6px;">resume</span>
+                    <span style="font-family:var(--font-mono); background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:3px 8px; border-radius:6px;">download</span>
+                    <span style="font-family:var(--font-mono); background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:3px 8px; border-radius:6px;">source</span>
+                    <span style="font-family:var(--font-mono); background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.25); padding:3px 8px; border-radius:6px;">system</span>
+                    <span style="font-family:var(--font-mono); background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.25); padding:3px 8px; border-radius:6px;">matrix</span>
+                    <span style="font-family:var(--font-mono); background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.25); padding:3px 8px; border-radius:6px;">ping</span>
+                    <span style="font-family:var(--font-mono); background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.25); padding:3px 8px; border-radius:6px;">curl</span>
+                    <span style="font-family:var(--font-mono); background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.25); padding:3px 8px; border-radius:6px;">joke</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">stats</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">socials</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">theme</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">ls</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">cat</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">whoami</span>
+                    <span style="font-family:var(--font-mono); background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); padding:3px 8px; border-radius:6px;">date</span>
+                    <span style="font-family:var(--font-mono); background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); padding:3px 8px; border-radius:6px;">clear</span>
+                    <span style="font-family:var(--font-mono); background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); padding:3px 8px; border-radius:6px;">exit</span>
+                  </div>
+                </div>
+
+                <!-- Custom CLI Commands Builder -->
+                <div style="margin-bottom:14px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <div>
+                      <label style="font-weight:600; font-size:0.88rem; color:var(--text); display:block;"><i class="fa-solid fa-terminal" style="color:var(--primary); margin-right:6px;"></i> Custom CLI Commands Builder</label>
+                      <span style="font-size:0.75rem; color:var(--text-secondary);">Define your own commands. Visitors typing these commands will see your customized responses or links.</span>
+                    </div>
+                    <button type="button" class="glass-btn" onclick="addCustomCliCommandRow()" style="padding:5px 12px; font-size:0.78rem; gap:6px;">
+                      <i class="fa-solid fa-plus" style="color:var(--primary);"></i> Add Custom Command
+                    </button>
+                  </div>
+
+                  <div id="cliCommandsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div style="margin-bottom:14px; padding:10px 14px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid var(--glass-border);">
+                  <div style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:6px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary); margin-right:4px;"></i> Quick Insert Presets (click to add):</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addCustomCliPreset('blog', 'Read my technical articles &amp; engineering notes', 'Check out my latest Spring Boot &amp; Java articles on Medium / Dev.to!')">+ blog</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addCustomCliPreset('coffee', 'Buy Prince a coffee or sponsor', '☕ Thank you for supporting open source! Reach out at princegupt3052@gmail.com.')">+ coffee</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addCustomCliPreset('discord', 'Join developer Discord community', 'Join the developer community for coding discussions: https://discord.gg/example')">+ discord</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addCustomCliPreset('services', 'Freelance &amp; consulting services', 'Available for: Custom Backend Architecture, Spring Boot API Development, Database Optimization.')">+ services</button>
+                    <button type="button" class="glass-btn" style="padding:3px 8px; font-size:0.72rem;" onclick="addCustomCliPreset('faq', 'Frequently asked hiring questions', 'Q: Notice period? Immediate (0 days). Q: Relocation? Ready to relocate across India or work remote.')">+ faq</button>
+                  </div>
+                </div>
+
+                <!-- Hidden sync textarea -->
+                <div class="form-group" style="margin-top:14px;">
+                  <div class="field-label-row">
+                    <label for="customCliCommandsInput"><i class="fa-solid fa-code" style="margin-right:6px; color:var(--text-secondary);"></i> Custom Commands JSON Storage</label>
+                    <span style="font-size:0.72rem; color:var(--text-secondary);">Format: JSON array of <code>{cmd, desc, output}</code></span>
+                  </div>
+                  <textarea class="glass-textarea" id="customCliCommandsInput" th:field="*{customCliCommands}" rows="3"
+                    placeholder='[{"cmd":"blog","desc":"Read technical articles","output":"..."}]'></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
                  CARD 5 · RECRUITER 30-SECOND PITCH MODAL
             ═══════════════════════════════════════════════ -->
             <div class="ab-card" id="sec-recruiter">
@@ -691,9 +786,27 @@
                   </div>
 
                   <div class="form-group full">
-                    <label for="ogImageUrl"><i class="fa-solid fa-image" style="color:var(--primary); margin-right:6px;"></i> Social Preview Banner Image URL</label>
+                    <label style="display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:0.86rem; color:var(--text); margin-bottom:6px;">
+                      <span><i class="fa-solid fa-image" style="color:var(--primary); margin-right:6px;"></i> Social Preview Banner Image</span>
+                      <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:normal;">Standard: 1200 x 630 px</span>
+                    </label>
+
+                    <!-- Direct File Upload + Reset Toolbar -->
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; padding:12px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                      <input type="file" id="ogImageFileInput" name="ogImageFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleOgFileSelect(this)"/>
+                      <label for="ogImageFileInput" class="glass-btn primary" style="cursor:pointer; margin:0; padding:7px 14px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload New Banner Image
+                      </label>
+                      <button type="button" class="glass-btn" onclick="resetOgBannerToDefault()" style="padding:7px 12px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-rotate-left" style="color:#f59e0b;"></i> Reset to Default Banner
+                      </button>
+                      <span id="ogFileNameBadge" style="font-size:0.78rem; color:var(--text-secondary); font-style:italic;">No new file chosen</span>
+                    </div>
+
+                    <!-- Manual URL / Stored Path input -->
+                    <label for="ogImageUrl" style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:4px; display:block;">Or specify Banner URL / Stored Path:</label>
                     <input class="glass-input" id="ogImageUrl" th:field="*{ogImageUrl}" placeholder="https://portfolio-gx88.onrender.com/images/og-preview.png"/>
-                    <span class="field-hint">Must be an absolute URL (e.g. <code>https://portfolio-gx88.onrender.com/images/og-preview.png</code>). Standard size: 1200x630.</span>
+                    <span class="field-hint">Supports uploaded files, relative paths (e.g. <code>/uploads/og/...</code>), or external URLs.</span>
                   </div>
 
                   <!-- Live LinkedIn / WhatsApp Card Simulation -->
@@ -701,7 +814,7 @@
                     <label style="font-size:0.84rem; font-weight:600; color:var(--text); margin-bottom:8px; display:block;"><i class="fa-brands fa-linkedin" style="color:#0a66c2; margin-right:6px;"></i> Live Social Share Preview (What recruiters see)</label>
                     <div style="max-width:580px; border-radius:14px; background:#0e131f; border:1px solid rgba(255,255,255,0.1); overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.3);">
                       <div style="width:100%; aspect-ratio:1.91/1; background:#1e293b; overflow:hidden; position:relative;">
-                        <img id="ogPreviewImg" th:src="@{/images/og-preview.png}" style="width:100%; height:100%; object-fit:cover;" />
+                        <img id="ogPreviewImg" th:src="${!#strings.isEmpty(about.ogImageUrl) ? about.ogImageUrl : '/images/og-preview.png'}" style="width:100%; height:100%; object-fit:cover;" />
                       </div>
                       <div style="padding:14px 16px; background:rgba(255,255,255,0.02);">
                         <div style="color:var(--text-secondary); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">portfolio-gx88.onrender.com</div>
@@ -1176,6 +1289,145 @@
     const initialItems = parseStats();
     renderRows(initialItems);
     updatePreview();
+  })();
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Open Graph Banner File Selection & Reset
+  window.handleOgFileSelect = function(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const badge = document.getElementById('ogFileNameBadge');
+      if (badge) {
+        badge.innerHTML = '<span style="color:#34d399; font-weight:600;"><i class="fa-solid fa-circle-check"></i> ' + escHtml(file.name) + '</span> (' + Math.round(file.size / 1024) + ' KB ready to upload)';
+      }
+      const prevImg = document.getElementById('ogPreviewImg');
+      if (prevImg) {
+        prevImg.src = URL.createObjectURL(file);
+      }
+      const urlInput = document.getElementById('ogImageUrl');
+      if (urlInput) {
+        urlInput.value = '';
+      }
+    }
+  };
+
+  window.resetOgBannerToDefault = function() {
+    const fileInp = document.getElementById('ogImageFileInput');
+    if (fileInp) fileInp.value = '';
+    const badge = document.getElementById('ogFileNameBadge');
+    if (badge) {
+      badge.innerHTML = '<span style="color:#f59e0b;"><i class="fa-solid fa-rotate-left"></i> Restored to default banner</span>';
+    }
+    const urlInput = document.getElementById('ogImageUrl');
+    if (urlInput) {
+      urlInput.value = 'https://portfolio-gx88.onrender.com/images/og-preview.png';
+    }
+    const prevImg = document.getElementById('ogPreviewImg');
+    if (prevImg) {
+      prevImg.src = '/images/og-preview.png';
+    }
+  };
+
+  // Custom CLI Commands Visual Builder Logic
+  (function() {
+    const rawInput = document.getElementById('customCliCommandsInput');
+    const container = document.getElementById('cliCommandsContainer');
+    if (!rawInput || !container) return;
+
+    function parseCommands() {
+      const val = rawInput.value.trim();
+      if (!val) return [];
+      try {
+        const parsed = JSON.parse(val);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function syncJson(items) {
+      rawInput.value = JSON.stringify(items);
+    }
+
+    function renderRows(items) {
+      container.innerHTML = '';
+      if (items.length === 0) {
+        container.innerHTML = '<div style="padding:14px; text-align:center; color:var(--text-secondary); background:rgba(255,255,255,0.02); border-radius:10px; border:1px dashed var(--glass-border); font-size:0.8rem;">No custom commands defined yet. Click "+ Add Custom Command" or select a quick preset below.</div>';
+        return;
+      }
+
+      items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:grid; grid-template-columns:140px 200px 1fr 38px; gap:10px; align-items:start; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px; padding:10px 12px;';
+        
+        row.innerHTML = `
+          <div>
+            <label style="font-size:0.72rem; color:var(--primary); font-weight:600; display:block; margin-bottom:4px; font-family:var(--font-mono);">&gt; Command</label>
+            <input type="text" class="glass-input" style="font-family:var(--font-mono); font-size:0.82rem; padding:6px 10px;" value="${escHtml(item.cmd || '')}" placeholder="e.g. blog" oninput="updateCliCmd(${index}, 'cmd', this.value)" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem; color:var(--text-secondary); display:block; margin-bottom:4px;">Help Description</label>
+            <input type="text" class="glass-input" style="font-size:0.82rem; padding:6px 10px;" value="${escHtml(item.desc || '')}" placeholder="Short summary" oninput="updateCliCmd(${index}, 'desc', this.value)" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem; color:var(--text-secondary); display:block; margin-bottom:4px;">Output / Response (Plain text or HTML)</label>
+            <textarea class="glass-textarea" style="font-size:0.82rem; padding:6px 10px; min-height:42px;" rows="1" placeholder="What the terminal prints..." oninput="updateCliCmd(${index}, 'output', this.value)">${escHtml(item.output || '')}</textarea>
+          </div>
+          <div style="padding-top:20px;">
+            <button type="button" class="stat-del-btn" onclick="removeCliCmd(${index})" title="Delete Command" style="width:34px; height:34px;">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    window.updateCliCmd = function(index, key, value) {
+      const items = parseCommands();
+      if (items[index]) {
+        items[index][key] = value;
+        syncJson(items);
+      }
+    };
+
+    window.addCustomCliCommandRow = function() {
+      const items = parseCommands();
+      items.push({ cmd: '', desc: '', output: '' });
+      syncJson(items);
+      renderRows(items);
+      const inputs = container.querySelectorAll('input');
+      if (inputs.length) inputs[inputs.length - 2].focus();
+    };
+
+    window.addCustomCliPreset = function(cmd, desc, output) {
+      const items = parseCommands();
+      const existing = items.find(it => it.cmd && it.cmd.toLowerCase() === cmd.toLowerCase());
+      if (existing) {
+        existing.desc = desc;
+        existing.output = output;
+      } else {
+        items.push({ cmd, desc, output });
+      }
+      syncJson(items);
+      renderRows(items);
+    };
+
+    window.removeCliCmd = function(index) {
+      const items = parseCommands();
+      items.splice(index, 1);
+      syncJson(items);
+      renderRows(items);
+    };
+
+    rawInput.addEventListener('input', function() {
+      renderRows(parseCommands());
+    });
+
+    renderRows(parseCommands());
   })();
 
   // Live Social Card Simulator update

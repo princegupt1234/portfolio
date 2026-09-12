@@ -92,6 +92,7 @@ public class AdminAboutController {
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_short_name VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_theme_color VARCHAR(50) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_background_color VARCHAR(50) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS custom_cli_commands TEXT NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS engineering_highlight TEXT NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS demo_video_url VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS architecture_image_url VARCHAR(255) NULL").executeUpdate();
@@ -140,6 +141,7 @@ public class AdminAboutController {
                         @RequestParam(value = "aiChatEnabled", required = false) String aiChatEnabledParam,
                         @RequestParam(value = "quickStatsVisible", required = false) String quickStatsVisibleParam,
                         @RequestParam(value = "ogTagsEnabled", required = false) String ogTagsEnabledParam,
+                        @RequestParam(value = "ogImageFile", required = false) MultipartFile ogImageFile,
                         @RequestParam(value = "contactSpamProtectionEnabled", required = false) String contactSpamProtectionEnabledParam,
                         @RequestParam(value = "contactHoneypotEnabled", required = false) String contactHoneypotEnabledParam,
                         @RequestParam(value = "pwaEnabled", required = false) String pwaEnabledParam,
@@ -163,6 +165,11 @@ public class AdminAboutController {
         existing.setTerminalEnabled("true".equals(terminalEnabledParam));
         existing.setFooterTagline(form.getFooterTagline());
         existing.setFooterSub(form.getFooterSub());
+
+        // Developer CLI Custom Commands
+        if (form.getCustomCliCommands() != null) {
+            existing.setCustomCliCommands(form.getCustomCliCommands());
+        }
 
         // Quick Credibility Stats
         if (form.getQuickStats() != null) {
@@ -190,7 +197,14 @@ public class AdminAboutController {
         existing.setOgTagsEnabled("true".equals(ogTagsEnabledParam));
         existing.setOgTitle(form.getOgTitle());
         existing.setOgDescription(form.getOgDescription());
-        existing.setOgImageUrl(form.getOgImageUrl());
+        if (ogImageFile != null && !ogImageFile.isEmpty()) {
+            String storedPath = fileStorageService.store(ogImageFile, "og");
+            if (storedPath != null) {
+                existing.setOgImageUrl(storedPath);
+            }
+        } else if (form.getOgImageUrl() != null) {
+            existing.setOgImageUrl(form.getOgImageUrl().trim());
+        }
 
         // Contact Spam Protection & Rate Limiting
         existing.setContactSpamProtectionEnabled("true".equals(contactSpamProtectionEnabledParam));

@@ -127,6 +127,8 @@ public class AboutInfo {
     private String calendlyUrl;
 
     private Boolean terminalEnabled = true;
+    @Column(columnDefinition = "TEXT")
+    private String customCliCommands;
 
     @Column(columnDefinition = "TEXT")
     private String footerTagline;
@@ -269,6 +271,8 @@ public class AboutInfo {
     public void setCalendlyUrl(String calendlyUrl) { this.calendlyUrl = calendlyUrl; }
     public Boolean getTerminalEnabled() { return terminalEnabled; }
     public void setTerminalEnabled(Boolean terminalEnabled) { this.terminalEnabled = terminalEnabled; }
+    public String getCustomCliCommands() { return customCliCommands; }
+    public void setCustomCliCommands(String customCliCommands) { this.customCliCommands = customCliCommands; }
     public String getFooterTagline() { return footerTagline; }
     public void setFooterTagline(String footerTagline) { this.footerTagline = footerTagline; }
     public String getFooterSub() { return footerSub; }

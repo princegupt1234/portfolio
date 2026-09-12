@@ -19,7 +19,7 @@
         <meta property="og:url" content="https://portfolio-gx88.onrender.com/">
         <meta property="og:title" th:content="${!#strings.isEmpty(about.ogTitle) ? about.ogTitle : (about.fullName + ' | ' + about.title)}">
         <meta property="og:description" th:content="${!#strings.isEmpty(about.ogDescription) ? about.ogDescription : (!#strings.isEmpty(about.careerObjective) ? about.careerObjective : about.bio)}">
-        <meta property="og:image" th:content="${!#strings.isEmpty(about.ogImageUrl) ? about.ogImageUrl : 'https://portfolio-gx88.onrender.com/images/og-preview.png'}">
+        <meta property="og:image" th:content="${!#strings.isEmpty(about.ogImageUrl) ? (about.ogImageUrl.startsWith('http') ? about.ogImageUrl : ('https://portfolio-gx88.onrender.com' + about.ogImageUrl)) : 'https://portfolio-gx88.onrender.com/images/og-preview.png'}">
         <meta property="og:image:width" content="1200">
         <meta property="og:image:height" content="630">
         <meta property="og:image:type" content="image/png">
@@ -28,7 +28,7 @@
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" th:content="${!#strings.isEmpty(about.ogTitle) ? about.ogTitle : (about.fullName + ' | ' + about.title)}">
         <meta name="twitter:description" th:content="${!#strings.isEmpty(about.ogDescription) ? about.ogDescription : (!#strings.isEmpty(about.careerObjective) ? about.careerObjective : about.bio)}">
-        <meta name="twitter:image" th:content="${!#strings.isEmpty(about.ogImageUrl) ? about.ogImageUrl : 'https://portfolio-gx88.onrender.com/images/og-preview.png'}">
+        <meta name="twitter:image" th:content="${!#strings.isEmpty(about.ogImageUrl) ? (about.ogImageUrl.startsWith('http') ? about.ogImageUrl : ('https://portfolio-gx88.onrender.com' + about.ogImageUrl)) : 'https://portfolio-gx88.onrender.com/images/og-preview.png'}">
     </th:block>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -971,16 +971,15 @@ function zoomCert(dir) {
         <div class="cli-chips-bar">
             <span class="cli-chip-label">Quick:</span>
             <button type="button" class="cli-chip" onclick="execCliCommand('help')">help</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('about')">about</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('skills')">skills</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('leetcode')" style="border-color:rgba(16,185,129,0.4); color:#34d399;"><i class="fa-solid fa-code"></i> leetcode</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('hire')" style="border-color:rgba(16,185,129,0.4); color:#34d399;"><i class="fa-solid fa-bolt"></i> hire</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('arch')" style="border-color:rgba(59,130,246,0.4); color:#60a5fa;"><i class="fa-solid fa-network-wired"></i> arch</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('system')" style="border-color:rgba(168,85,247,0.4); color:#c084fc;"><i class="fa-solid fa-desktop"></i> system</button>
             <button type="button" class="cli-chip" onclick="execCliCommand('projects')">projects</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('exp')">exp</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('edu')">edu</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('certs')">certs</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('contact')">contact</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('skills')">skills</button>
             <button type="button" class="cli-chip" onclick="execCliCommand('resume')">resume</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('matrix')">matrix</button>
             <button type="button" class="cli-chip" onclick="execCliCommand('theme')">theme</button>
-            <button type="button" class="cli-chip" onclick="execCliCommand('ls')">ls</button>
             <button type="button" class="cli-chip danger" onclick="execCliCommand('clear')">clear</button>
         </div>
         <div class="cli-body" id="cliBody">
@@ -1165,7 +1164,8 @@ document.querySelectorAll('.exp-desc').forEach(el => {
     }
 });
 </script>
-<script th:src="@{/js/main.js(v='15')}" defer></script>
+<script id="customCliCommandsData" type="application/json" th:text="${about.customCliCommands != null ? about.customCliCommands : '[]'}"></script>
+<script th:src="@{/js/main.js(v='16')}" defer></script>
 <script>
 (function() {
   var v = null;
