@@ -116,6 +116,9 @@ public class AdminAboutController {
     public String save(@ModelAttribute AboutInfo form,
                         @RequestParam(value = "availabilityVisible", required = false) String availabilityVisibleParam,
                         @RequestParam(value = "terminalEnabled", required = false) String terminalEnabledParam,
+                        @RequestParam(value = "recruiterPitchEnabled", required = false) String recruiterPitchEnabledParam,
+                        @RequestParam(value = "aiChatEnabled", required = false) String aiChatEnabledParam,
+                        @RequestParam(value = "blogSectionVisible", required = false) String blogSectionVisibleParam,
                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         AboutInfo existing = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
 
@@ -133,9 +136,26 @@ public class AdminAboutController {
         existing.setFooterTagline(form.getFooterTagline());
         existing.setFooterSub(form.getFooterSub());
 
+        // Recruiter Modal
+        existing.setRecruiterPitchEnabled("true".equals(recruiterPitchEnabledParam));
+        existing.setRecruiterTargetRole(form.getRecruiterTargetRole());
+        existing.setRecruiterMetrics(form.getRecruiterMetrics());
+        existing.setRecruiterHighlights(form.getRecruiterHighlights());
+        existing.setRecruiterPitchCopyText(form.getRecruiterPitchCopyText());
+
+        // AI Chatbot Widget
+        existing.setAiChatEnabled("true".equals(aiChatEnabledParam));
+        existing.setAiChatWelcomeMessage(form.getAiChatWelcomeMessage());
+        existing.setAiChatPromptChips(form.getAiChatPromptChips());
+
+        // Tech Blog Homepage Section
+        existing.setBlogSectionVisible("true".equals(blogSectionVisibleParam));
+        existing.setBlogSectionTitle(form.getBlogSectionTitle());
+        existing.setBlogSectionSubtitle(form.getBlogSectionSubtitle());
+
         aboutInfoRepository.save(existing);
         dataVersionService.bump();
-        redirectAttributes.addFlashAttribute("successMessage", "About Section updated successfully.");
+        redirectAttributes.addFlashAttribute("successMessage", "About & Interactive features updated successfully.");
         return "redirect:/admin/about";
     }
 

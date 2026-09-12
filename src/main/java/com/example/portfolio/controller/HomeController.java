@@ -26,6 +26,7 @@ import com.example.portfolio.repository.ServiceItemRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.AnalyticsService;
+import com.example.portfolio.service.BlogService;
 import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.GithubStatsService;
 import com.example.portfolio.service.LeetCodeRepositoryStatsService;
@@ -69,6 +70,7 @@ public class HomeController {
     private final LeetCodeRepositoryStatsService leetCodeRepositoryStatsService;
     private final MailService mailService;
     private final DataVersionService dataVersionService;
+    private final BlogService blogService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -82,7 +84,8 @@ public class HomeController {
                            ContactMessageRepository contactMessageRepository, ResumeRepository resumeRepository,
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
                            LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
-                           MailService mailService, DataVersionService dataVersionService) {
+                           MailService mailService, DataVersionService dataVersionService,
+                           BlogService blogService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.skillRepository = skillRepository;
@@ -100,6 +103,7 @@ public class HomeController {
         this.leetCodeRepositoryStatsService = leetCodeRepositoryStatsService;
         this.mailService = mailService;
         this.dataVersionService = dataVersionService;
+        this.blogService = blogService;
     }
 
     @GetMapping("/api/data-version")
@@ -145,6 +149,7 @@ public class HomeController {
         model.addAttribute("learningProjects", learningProjects);
         model.addAttribute("github", githubStatsService.fetchStats(about.getGithubUsername()));
         model.addAttribute("leetcodeRepo", leetCodeRepositoryStatsService.fetchStats(about.getGithubUsername()));
+        model.addAttribute("recentBlogs", blogService.getRecentPublished(3));
 
         if (!model.containsAttribute("contactForm")) {
             model.addAttribute("contactForm", new ContactForm());

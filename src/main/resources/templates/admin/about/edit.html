@@ -141,6 +141,9 @@
           <a href="#sec-building"><i class="fa-solid fa-hammer"></i> Currently Building</a>
           <a href="#sec-learning"><i class="fa-solid fa-book-open"></i> What I'm Learning</a>
           <a href="#sec-settings"><i class="fa-solid fa-paper-plane"></i> Contact &amp; Footer</a>
+          <a href="#sec-recruiter"><i class="fa-solid fa-bolt"></i> Recruiter Pitch</a>
+          <a href="#sec-aichat"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a>
+          <a href="#sec-blog"><i class="fa-solid fa-newspaper"></i> Blog Showcase</a>
         </nav>
 
         <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post">
@@ -368,6 +371,166 @@
                   <div class="form-group">
                     <label for="footerSub">Footer Sub-text</label>
                     <input class="glass-input" id="footerSub" th:field="*{footerSub}" placeholder="Building scalable, user-centric web applications."/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 5 · RECRUITER 30-SECOND PITCH MODAL
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-recruiter">
+              <div class="ab-card-header" onclick="toggleSection('sec-recruiter')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;"><i class="fa-solid fa-bolt"></i></div>
+                  <div>
+                    <div class="ab-card-title">Recruiter 30-Second Pitch Modal Controls</div>
+                    <div class="ab-card-subtitle">Enable toggle, target role subtitle, 3 key metrics, 3 core strengths, and clipboard pitch text</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Executive pitch popup designed for recruiters and hiring managers who need a fast candidate snapshot.</p>
+
+                <div class="form-grid">
+                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="recruiterPitchEnabled">
+                      <input type="checkbox" id="recruiterPitchEnabled" name="recruiterPitchEnabled" value="true" th:checked="*{recruiterPitchEnabled != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="recruiterPitchEnabled" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Enable Recruiter 30s Pitch Buttons &amp; Modal</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Shows "30s Brief" buttons in Navbar &amp; Hero section opening the executive summary modal.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="recruiterTargetRole"><i class="fa-solid fa-crosshairs" style="color:var(--primary); margin-right:6px;"></i> Target Role Subtitle</label>
+                    <input class="glass-input" id="recruiterTargetRole" th:field="*{recruiterTargetRole}" placeholder="Target: Software Engineer / Backend Developer (SDE-1)"/>
+                    <span class="field-hint">Displayed under the modal header as your target positioning.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <div class="field-label-row">
+                      <label for="recruiterMetrics"><i class="fa-solid fa-chart-line" style="color:#10b981; margin-right:6px;"></i> 3 Key Metric Counters (Pipe-separated)</label>
+                    </div>
+                    <textarea class="glass-textarea" id="recruiterMetrics" th:field="*{recruiterMetrics}" rows="2"
+                      placeholder="B.Tech CSE :: Target: SDE-1 / Backend | 350+ :: DSA &amp; Algorithmic Solved | Production-Ready :: Spring Boot &amp; REST APIs"></textarea>
+                    <span class="field-hint">Format: <code>Value :: Label</code> separated by <code>|</code>.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <div class="field-label-row">
+                      <label for="recruiterHighlights"><i class="fa-solid fa-layer-group" style="color:#f59e0b; margin-right:6px;"></i> 3 Core Highlights (Pipe-separated)</label>
+                    </div>
+                    <textarea class="glass-textarea" id="recruiterHighlights" th:field="*{recruiterHighlights}" rows="4"
+                      placeholder="Core Backend Mastery :: Proficient in Java 17+, Spring Boot 3, Spring Data JPA/Hibernate, Spring Security (JWT &amp; RBAC), and MySQL relational database indexing. :: fa-solid fa-server | Architecture &amp; Clean Code :: Hands-on expertise with MVC architecture, RESTful API design principles, DTO patterns, exception handling, and Maven builds. :: fa-solid fa-layer-group | Full-Stack Versatility :: Modern interactive UI with HTML5/CSS3/JavaScript &amp; React. Strong CLI, Docker, Git workflow, and fast ramp-up capability. :: fa-solid fa-bolt-lightning"></textarea>
+                    <span class="field-hint">Format: <code>Title :: Description :: FontAwesomeIcon</code> separated by <code>|</code>.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <div class="field-label-row">
+                      <label for="recruiterPitchCopyText"><i class="fa-regular fa-copy" style="color:var(--primary); margin-right:6px;"></i> 1-Click Clipboard Pitch Text</label>
+                    </div>
+                    <textarea class="glass-textarea" id="recruiterPitchCopyText" th:field="*{recruiterPitchCopyText}" rows="3"
+                      placeholder="Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234"></textarea>
+                    <span class="field-hint">The exact text copied to the clipboard when clicking "Copy Pitch" inside the modal.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 6 · "ASK PRINCE AI" CHATBOT WIDGET
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-aichat">
+              <div class="ab-card-header" onclick="toggleSection('sec-aichat')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(168,85,247,0.15); color:#a855f7;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                  <div>
+                    <div class="ab-card-title">&quot;Ask Prince AI&quot; Chatbot Widget Controls</div>
+                    <div class="ab-card-subtitle">Enable toggle, opening welcome message, and interactive quick-prompt chips</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Configures the floating AI chatbot that answers visitor inquiries using Gemini AI or the offline intelligent portfolio engine.</p>
+
+                <div class="form-grid">
+                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="aiChatEnabled">
+                      <input type="checkbox" id="aiChatEnabled" name="aiChatEnabled" value="true" th:checked="*{aiChatEnabled != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="aiChatEnabled" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Enable Floating AI Assistant Widget</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Displays the floating "Ask AI" button on the bottom right of the portfolio.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="aiChatWelcomeMessage"><i class="fa-solid fa-comment-dots" style="color:#a855f7; margin-right:6px;"></i> Welcome Message</label>
+                    <textarea class="glass-textarea" id="aiChatWelcomeMessage" th:field="*{aiChatWelcomeMessage}" rows="3"
+                      placeholder="👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java &amp; Spring Boot mastery, featured projects, 350+ LeetCode DSA record, or hiring availability!"></textarea>
+                    <span class="field-hint">The opening message shown inside the chat bubble before any user query.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="aiChatPromptChips"><i class="fa-solid fa-tags" style="color:#a855f7; margin-right:6px;"></i> Quick Suggestion Prompt Chips (Pipe-separated)</label>
+                    <textarea class="glass-textarea" id="aiChatPromptChips" th:field="*{aiChatPromptChips}" rows="3"
+                      placeholder="Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode 350+ :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?"></textarea>
+                    <span class="field-hint">Format: <code>ButtonLabel :: PromptQuestion</code> separated by <code>|</code>.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 7 · TECH BLOG & NOTES SHOWCASE
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-blog">
+              <div class="ab-card-header" onclick="toggleSection('sec-blog')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(6,182,212,0.15); color:#06b6d4;"><i class="fa-solid fa-newspaper"></i></div>
+                  <div>
+                    <div class="ab-card-title">Tech Blog Homepage Showcase Controls</div>
+                    <div class="ab-card-subtitle">Toggle homepage blog grid visibility, custom section title, and subtitle</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Control how engineering blog posts are presented on your homepage. You can create, edit, or delete full articles in the dedicated Blog Manager.</p>
+
+                <div class="form-grid">
+                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="blogSectionVisible">
+                      <input type="checkbox" id="blogSectionVisible" name="blogSectionVisible" value="true" th:checked="*{blogSectionVisible != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="blogSectionVisible" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Show Blog Showcase Section on Homepage</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">When enabled, the latest published blog articles appear dynamically on the index page.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="blogSectionTitle"><i class="fa-solid fa-heading" style="color:#06b6d4; margin-right:6px;"></i> Blog Section Title</label>
+                    <input class="glass-input" id="blogSectionTitle" th:field="*{blogSectionTitle}" placeholder="Technical Writing &amp; Deep Dives"/>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="blogSectionSubtitle"><i class="fa-solid fa-align-left" style="color:#06b6d4; margin-right:6px;"></i> Blog Section Subtitle</label>
+                    <textarea class="glass-textarea" id="blogSectionSubtitle" th:field="*{blogSectionSubtitle}" rows="2"
+                      placeholder="Architectural patterns, Spring Boot internals, and algorithmic roadmaps."></textarea>
+                  </div>
+
+                  <div class="form-group full" style="margin-top:4px;">
+                    <a th:href="@{/admin/blogs}" class="glass-btn primary" target="_blank" style="display:inline-flex; align-items:center; gap:8px;">
+                      <i class="fa-solid fa-pen-to-square"></i> Open Full Blog Article Manager <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+                    </a>
                   </div>
                 </div>
               </div>

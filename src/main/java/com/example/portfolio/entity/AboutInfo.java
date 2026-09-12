@@ -129,6 +129,31 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String footerSub;
 
+    // ----- Recruiter 30-Second Pitch Modal Controls -----
+    private Boolean recruiterPitchEnabled = true;
+    @Column(columnDefinition = "TEXT")
+    private String recruiterTargetRole;
+    @Column(columnDefinition = "TEXT")
+    private String recruiterMetrics;
+    @Column(columnDefinition = "TEXT")
+    private String recruiterHighlights;
+    @Column(columnDefinition = "TEXT")
+    private String recruiterPitchCopyText;
+
+    // ----- "Ask Prince AI" Chatbot Controls -----
+    private Boolean aiChatEnabled = true;
+    @Column(columnDefinition = "TEXT")
+    private String aiChatWelcomeMessage;
+    @Column(columnDefinition = "TEXT")
+    private String aiChatPromptChips;
+
+    // ----- Tech Blog Section Controls -----
+    private Boolean blogSectionVisible = true;
+    @Column(columnDefinition = "TEXT")
+    private String blogSectionTitle;
+    @Column(columnDefinition = "TEXT")
+    private String blogSectionSubtitle;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getFullName() { return fullName; }
@@ -221,4 +246,29 @@ public class AboutInfo {
     public void setFooterTagline(String footerTagline) { this.footerTagline = footerTagline; }
     public String getFooterSub() { return footerSub; }
     public void setFooterSub(String footerSub) { this.footerSub = footerSub; }
+
+    public Boolean getRecruiterPitchEnabled() { return recruiterPitchEnabled; }
+    public void setRecruiterPitchEnabled(Boolean recruiterPitchEnabled) { this.recruiterPitchEnabled = recruiterPitchEnabled; }
+    public String getRecruiterTargetRole() { return recruiterTargetRole; }
+    public void setRecruiterTargetRole(String recruiterTargetRole) { this.recruiterTargetRole = recruiterTargetRole; }
+    public String getRecruiterMetrics() { return recruiterMetrics; }
+    public void setRecruiterMetrics(String recruiterMetrics) { this.recruiterMetrics = recruiterMetrics; }
+    public String getRecruiterHighlights() { return recruiterHighlights; }
+    public void setRecruiterHighlights(String recruiterHighlights) { this.recruiterHighlights = recruiterHighlights; }
+    public String getRecruiterPitchCopyText() { return recruiterPitchCopyText; }
+    public void setRecruiterPitchCopyText(String recruiterPitchCopyText) { this.recruiterPitchCopyText = recruiterPitchCopyText; }
+
+    public Boolean getAiChatEnabled() { return aiChatEnabled; }
+    public void setAiChatEnabled(Boolean aiChatEnabled) { this.aiChatEnabled = aiChatEnabled; }
+    public String getAiChatWelcomeMessage() { return aiChatWelcomeMessage; }
+    public void setAiChatWelcomeMessage(String aiChatWelcomeMessage) { this.aiChatWelcomeMessage = aiChatWelcomeMessage; }
+    public String getAiChatPromptChips() { return aiChatPromptChips; }
+    public void setAiChatPromptChips(String aiChatPromptChips) { this.aiChatPromptChips = aiChatPromptChips; }
+
+    public Boolean getBlogSectionVisible() { return blogSectionVisible; }
+    public void setBlogSectionVisible(Boolean blogSectionVisible) { this.blogSectionVisible = blogSectionVisible; }
+    public String getBlogSectionTitle() { return blogSectionTitle; }
+    public void setBlogSectionTitle(String blogSectionTitle) { this.blogSectionTitle = blogSectionTitle; }
+    public String getBlogSectionSubtitle() { return blogSectionSubtitle; }
+    public void setBlogSectionSubtitle(String blogSectionSubtitle) { this.blogSectionSubtitle = blogSectionSubtitle; }
 }

@@ -39,7 +39,7 @@ public class SecurityConfig {
                         "/uploads/**", "/webjars/**", "/", "/about", "/skills", "/experience",
                         "/projects", "/projects/**", "/certificates", "/services", "/testimonials",
                         "/contact", "/contact/**", "/resume/download", "/resume/preview", "/api/data-version",
-                        "/api/skills").permitAll()
+                        "/api/skills", "/blog", "/blog/**", "/api/ai/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
@@ -58,7 +58,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/contact/**")
+                .ignoringRequestMatchers("/contact/**", "/api/ai/**")
             )
             .addFilterAfter(new OncePerRequestFilter() {
                 @Override

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${post.title} + ' | ' + (${about.fullName} ?: 'Prince Gupt')">Article | Prince Gupt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css(v='12')}">
+    <!-- Highlight.js for beautiful code blocks in articles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        (function() {
+            try {
+                const saved = localStorage.getItem('theme');
+                const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch(e) {}
+        })();
+    </script>
+    <style>
+        .article-content {
+            font-size: 1.06rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+        .article-content h1, .article-content h2, .article-content h3, .article-content h4 {
+            color: var(--text);
+            font-weight: 700;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        .article-content h2 { font-size: 1.55rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        .article-content h3 { font-size: 1.3rem; }
+        .article-content p { margin-bottom: 20px; color: var(--text); }
+        .article-content ul, .article-content ol {
+            margin-bottom: 24px;
+            padding-left: 28px;
+        }
+        .article-content li { margin-bottom: 8px; }
+        .article-content pre {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 18px;
+            overflow-x: auto;
+            margin: 24px 0;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .article-content code:not(pre code) {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--primary);
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .article-content blockquote {
+            border-left: 4px solid var(--primary);
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: rgba(59, 130, 246, 0.06);
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .article-header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="aurora-bg">
+    <div class="aurora-blob b1"></div>
+    <div class="aurora-blob b2"></div>
+    <div class="aurora-blob b3"></div>
+</div>
+<div class="cursor-glow"></div>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar">
+    <a th:href="@{/}" class="logo">
+        <span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span>
+    </a>
+    <ul class="nav-links">
+        <li><a th:href="@{/}">Home</a></li>
+        <li><a th:href="@{/#projects}">Projects</a></li>
+        <li><a th:href="@{/#skills}">Skills</a></li>
+        <li><a th:href="@{/blog}" style="color:var(--primary); font-weight:600;">Blog</a></li>
+        <li><a th:href="@{/#contact}">Contact</a></li>
+    </ul>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        <a th:href="@{/resume/download}" class="glass-btn primary nav-resume-btn"><i class="fa-solid fa-download"></i> Resume</a>
+    </div>
+</nav>
+
+<main class="container" style="padding-top: 110px; padding-bottom: 80px;">
+    <!-- Breadcrumb & Back -->
+    <div style="margin-bottom: 24px;">
+        <a th:href="@{/blog}" class="glass-btn" style="padding:6px 14px; font-size:0.82rem; gap:6px; border-radius:999px;">
+            <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+    </div>
+
+    <!-- Article Container -->
+    <article class="glass-card" style="max-width: 860px; margin: 0 auto; padding: clamp(24px, 5vw, 52px);">
+        <!-- Tags -->
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+            <span th:each="tag : ${#strings.arraySplit(post.tags, ',')}" class="badge-tag" th:text="${tag.trim()}">Java</span>
+        </div>
+
+        <!-- Title -->
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.7rem); font-weight:800; line-height:1.25; letter-spacing:-0.03em; margin-bottom:20px;" th:text="${post.title}">
+            Article Title
+        </h1>
+
+        <!-- Metadata Row -->
+        <div class="article-header-meta">
+            <span><i class="fa-solid fa-user-pen" style="color:var(--primary);"></i> <strong th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</strong></span>
+            <span><i class="fa-regular fa-clock"></i> <span th:text="${post.readTimeMinutes} ?: 5">5</span> min read</span>
+            <span><i class="fa-regular fa-eye"></i> <span th:text="${post.viewCount} ?: 0">0</span> views</span>
+            <span th:if="${post.createdAt != null}"><i class="fa-regular fa-calendar"></i> <span th:text="${#temporals.format(post.createdAt, 'MMM dd, yyyy')}">Date</span></span>
+        </div>
+
+        <!-- Article Raw Content Container (Rendered by marked.js) -->
+        <div id="rawContent" style="display:none;" th:text="${post.content}"></div>
+        <div id="renderedArticle" class="article-content"></div>
+
+        <!-- Article Action Bar -->
+        <div style="margin-top:48px; padding-top:24px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <div style="font-size:0.9rem; color:var(--text-secondary); display:flex; align-items:center; gap:10px;">
+                <span>Share:</span>
+                <button type="button" class="glass-btn" onclick="copyArticleUrl()" id="shareBtn" style="padding:6px 12px; font-size:0.8rem; gap:6px;">
+                    <i class="fa-regular fa-copy"></i> <span>Copy Link</span>
+                </button>
+            </div>
+            <a th:href="@{/blog}" class="glass-btn primary" style="padding:8px 18px; font-size:0.85rem; border-radius:999px;">
+                More Articles <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Author Card -->
+        <div class="glass-card" style="margin-top:40px; padding:24px; display:flex; gap:20px; align-items:center; background:rgba(255,255,255,0.03);">
+            <div style="width:64px; height:64px; border-radius:50%; overflow:hidden; flex-shrink:0; border:2px solid var(--primary);">
+                <img th:if="${about.profileImage}" th:src="@{${about.profileImage}}" alt="Prince" style="width:100%; height:100%; object-fit:cover;" />
+                <div th:unless="${about.profileImage}" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--primary); color:#fff; font-weight:700;">PG</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:1.05rem;" th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</div>
+                <div style="font-size:0.82rem; color:var(--primary); margin-bottom:6px;" th:text="${about.title} ?: 'Full Stack Software Engineer'">Full Stack Software Engineer</div>
+                <p style="font-size:0.88rem; color:var(--text-secondary); margin:0;" th:text="${about.bio}">Bio snippet</p>
+            </div>
+        </div>
+    </article>
+
+    <!-- Recent Articles Section -->
+    <section style="max-width:860px; margin: 60px auto 0;" th:if="${!#lists.isEmpty(recentPosts)}">
+        <h3 style="font-size:1.3rem; font-weight:700; margin-bottom:20px;">Related &amp; Recent Engineering Notes</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:18px;">
+            <div th:each="r : ${recentPosts}" class="glass-card" style="padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <div style="font-size:0.75rem; color:var(--primary); font-weight:600; margin-bottom:8px;" th:text="${r.tags}">Tags</div>
+                    <h4 style="font-size:0.98rem; font-weight:700; line-height:1.4; margin-bottom:8px;">
+                        <a th:href="@{'/blog/' + ${r.slug}}" style="color:var(--text); text-decoration:none;" th:text="${r.title}">Title</a>
+                    </h4>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-muted); margin-top:14px; border-top:1px solid var(--border-color); padding-top:10px;">
+                    <span th:text="${r.readTimeMinutes} + ' min read'">5 min read</span>
+                    <a th:href="@{'/blog/' + ${r.slug}}" style="color:var(--primary); text-decoration:none; font-weight:600;">Read &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Render Markdown and highlight code
+    document.addEventListener('DOMContentLoaded', () => {
+        const raw = document.getElementById('rawContent');
+        const target = document.getElementById('renderedArticle');
+        if (raw && target) {
+            if (typeof marked !== 'undefined') {
+                target.innerHTML = marked.parse(raw.textContent || '');
+                if (typeof hljs !== 'undefined') {
+                    target.querySelectorAll('pre code').forEach(block => {
+                        hljs.highlightElement(block);
+                    });
+                }
+            } else {
+                target.textContent = raw.textContent;
+            }
+        }
+    });
+
+    function copyArticleUrl() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const btn = document.getElementById('shareBtn');
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981;"></i> <span>Copied!</span>';
+                setTimeout(() => { btn.innerHTML = orig; }, 2200);
+            }
+        });
+    }
+
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            const icon = themeBtn.querySelector('i');
+            if (icon) icon.className = next === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+        });
+    }
+</script>
+</body>
+</html>

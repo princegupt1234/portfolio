@@ -282,6 +282,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  /* ---------- Recruiter 30-Second Pitch Modal ---------- */
+  window.openRecruiterModal = function() {
+    const modal = document.getElementById('recruiterModal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  window.closeRecruiterModal = function() {
+    const modal = document.getElementById('recruiterModal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  };
+
+  window.copyRecruiterPitch = function() {
+    const modal = document.getElementById('recruiterModal');
+    const customPitch = modal ? modal.getAttribute('data-pitch') : null;
+    const pitchText = (customPitch && customPitch.trim())
+      ? customPitch.trim()
+      : ("Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). 350+ LeetCode DSA solved. Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: " + window.location.origin);
+    navigator.clipboard.writeText(pitchText).then(() => {
+      const btn = document.getElementById('pitchCopyBtn');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981;"></i> <span>Copied!</span>';
+        setTimeout(() => { btn.innerHTML = orig; }, 2200);
+      }
+    });
+  };
+
   /* ---------- Interactive Developer CLI Terminal ---------- */
   const cliHistory = [];
   let historyIndex = -1;
@@ -765,6 +798,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       window.closeResumeModal();
       window.closeArchModal();
+      window.closeRecruiterModal();
+      window.closeAiChat();
       window.closeCliTerminal();
     }
     if ((e.ctrlKey || e.metaKey) && (e.key === '`' || e.key === '~')) {
@@ -776,5 +811,170 @@ document.addEventListener('DOMContentLoaded', () => {
       window.toggleCliTerminal();
     }
   });
+
+  /* ===================== "Ask Prince AI" Chatbot Widget ===================== */
+  window.toggleAiChat = function() {
+    const drawer = document.getElementById('aiChatDrawer');
+    if (!drawer) return;
+    if (drawer.classList.contains('open')) {
+      window.closeAiChat();
+    } else {
+      window.openAiChat();
+    }
+  };
+
+  window.openAiChat = function() {
+    const drawer = document.getElementById('aiChatDrawer');
+    if (!drawer) return;
+    drawer.classList.add('open');
+    const input = document.getElementById('aiChatInput');
+    if (input) setTimeout(() => input.focus(), 100);
+  };
+
+  window.closeAiChat = function() {
+    const drawer = document.getElementById('aiChatDrawer');
+    if (drawer) drawer.classList.remove('open');
+  };
+
+  window.clearAiChat = function() {
+    const messages = document.getElementById('aiChatMessages');
+    if (messages) {
+      messages.innerHTML = `
+        <div class="ai-msg bot">
+          <div class="ai-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+          <div class="ai-msg-bubble">
+            👋 <strong>Hello!</strong> I am Prince's interactive AI assistant.<br><br>
+            Ask me anything about Prince's <strong>Java &amp; Spring Boot</strong> mastery, featured projects, <strong>350+ LeetCode DSA record</strong>, or hiring availability!
+          </div>
+        </div>
+      `;
+    }
+  };
+
+  window.sendQuickAiQuery = function(text) {
+    const input = document.getElementById('aiChatInput');
+    if (input) {
+      input.value = text;
+      const form = document.getElementById('aiChatForm');
+      if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+  };
+
+  window.handleAiChatSubmit = function(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('aiChatInput');
+    const messages = document.getElementById('aiChatMessages');
+    const sendBtn = document.getElementById('aiChatSendBtn');
+    if (!input || !messages) return;
+
+    const query = input.value.trim();
+    if (!query) return;
+
+    // Append User Message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'ai-msg user';
+    userMsg.innerHTML = `
+      <div class="ai-msg-avatar"><i class="fa-solid fa-user"></i></div>
+      <div class="ai-msg-bubble">${escHtml(query)}</div>
+    `;
+    messages.appendChild(userMsg);
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    // Show Typing Indicator
+    const typingMsg = document.createElement('div');
+    typingMsg.className = 'ai-msg bot';
+    typingMsg.id = 'aiTypingIndicator';
+    typingMsg.innerHTML = `
+      <div class="ai-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+      <div class="ai-msg-bubble">
+        <div class="ai-typing-indicator">
+          <span class="ai-typing-dot"></span>
+          <span class="ai-typing-dot"></span>
+          <span class="ai-typing-dot"></span>
+        </div>
+      </div>
+    `;
+    messages.appendChild(typingMsg);
+    messages.scrollTop = messages.scrollHeight;
+
+    if (sendBtn) sendBtn.disabled = true;
+
+    // Fetch API
+    fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: query })
+    })
+      .then(res => res.json())
+      .then(data => {
+        const ind = document.getElementById('aiTypingIndicator');
+        if (ind) ind.remove();
+        if (sendBtn) sendBtn.disabled = false;
+
+        const replyText = (data && data.reply) ? data.reply : "I'm sorry, I couldn't process that. Please try asking about Prince's skills, projects, or contact info!";
+        const botMsg = document.createElement('div');
+        botMsg.className = 'ai-msg bot';
+        botMsg.innerHTML = `
+          <div class="ai-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+          <div class="ai-msg-bubble">${formatAiMarkdown(replyText)}</div>
+        `;
+        messages.appendChild(botMsg);
+        messages.scrollTop = messages.scrollHeight;
+      })
+      .catch(err => {
+        const ind = document.getElementById('aiTypingIndicator');
+        if (ind) ind.remove();
+        if (sendBtn) sendBtn.disabled = false;
+
+        const botMsg = document.createElement('div');
+        botMsg.className = 'ai-msg bot';
+        botMsg.innerHTML = `
+          <div class="ai-msg-avatar"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i></div>
+          <div class="ai-msg-bubble" style="border-color:rgba(239,68,68,0.3);">
+            Could not connect right now. You can reach Prince directly via email at <a href="mailto:princegupt3052@gmail.com">princegupt3052@gmail.com</a>.
+          </div>
+        `;
+        messages.appendChild(botMsg);
+        messages.scrollTop = messages.scrollHeight;
+      });
+  };
+
+  function formatAiMarkdown(text) {
+    if (!text) return '';
+    let h = escHtml(text);
+    // Bold: **text**
+    h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Italic: _text_
+    h = h.replace(/_(.*?)_/g, '<em>$1</em>');
+    // Markdown link: [text](url)
+    h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    // Bullet points starting with • or - or *
+    const lines = h.split('\n');
+    let inList = false;
+    let out = [];
+    for (let line of lines) {
+      let trimmed = line.trim();
+      if (trimmed.startsWith('• ') || trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        if (!inList) {
+          out.push('<ul>');
+          inList = true;
+        }
+        out.push('<li>' + trimmed.replace(/^[•\-*]\s*/, '') + '</li>');
+      } else {
+        if (inList) {
+          out.push('</ul>');
+          inList = false;
+        }
+        if (trimmed) {
+          out.push('<p>' + trimmed + '</p>');
+        }
+      }
+    }
+    if (inList) out.push('</ul>');
+    return out.join('');
+  }
 });
 

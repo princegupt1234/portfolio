@@ -40,10 +40,13 @@
         <li><a href="#projects">Projects</a></li>
         <li><a href="#coding">Coding</a></li>
         <li><a href="#certificates">Certificates</a></li>
+        <li th:if="${about.blogSectionVisible != false}"><a th:href="@{/blog}">Blog</a></li>
         <li><a href="#contact">Contact</a></li>
         <li class="mobile-nav-resume" style="display:none;"><a th:href="@{/resume/download}" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-file-arrow-down" style="margin-right:6px;"></i> Download Resume</a></li>
+        <li class="mobile-nav-resume" style="display:none;" th:if="${about.recruiterPitchEnabled != false}"><a href="javascript:void(0)" onclick="openRecruiterModal()" style="color:#f59e0b; font-weight:600;"><i class="fa-solid fa-bolt" style="margin-right:6px;"></i> 30s Recruiter Brief</a></li>
     </ul>
     <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="glass-btn nav-pitch-btn" th:if="${about.recruiterPitchEnabled != false}" onclick="openRecruiterModal()" title="30-Second Recruiter Briefing" style="gap:5px; color:#f59e0b; border-color:rgba(245,158,11,0.35);"><i class="fa-solid fa-bolt"></i> <span class="hide-xs">30s Brief</span></button>
         <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
         <button type="button" class="glass-btn nav-resume-btn" onclick="openResumeModal()" title="Preview Resume in browser" style="gap:6px;"><i class="fa-solid fa-eye"></i> View</button>
         <a th:href="@{/resume/download}" class="glass-btn primary nav-resume-btn"><i class="fa-solid fa-download"></i> Resume</a>
@@ -72,6 +75,9 @@
                 <span>Java</span><span>Spring Boot</span><span>REST APIs</span><span>MySQL</span><span>React</span>
             </div>
             <div class="hero-ctas">
+                <button type="button" class="glass-btn recruiter-pitch-btn" th:if="${about.recruiterPitchEnabled != false}" onclick="openRecruiterModal()" title="Fast 30-Second Candidate Summary for HR &amp; Tech Leads">
+                    <span class="pitch-pulse"></span> <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> Recruiter Brief (30s)
+                </button>
                 <a class="glass-btn primary" href="#projects">
                     <i class="fa-solid fa-diagram-project"></i> View Projects
                 </a>
@@ -703,6 +709,49 @@ function zoomCert(dir) {
     </div>
 </section>
 
+<!-- ===================== TECH BLOG & NOTES ===================== -->
+<section class="section" id="blog" th:if="${about.blogSectionVisible != false and recentBlogs != null and !#lists.isEmpty(recentBlogs)}">
+    <div class="container">
+        <div class="section-tag">Engineering Notes</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:28px;">
+            <div>
+                <h2 class="section-title" data-reveal style="margin-bottom:0;" th:text="${about.blogSectionTitle} ?: 'Technical Writing &amp; Deep Dives'">Technical Writing &amp; Deep Dives</h2>
+                <p class="section-subtitle" data-reveal style="margin-top:6px;" th:text="${about.blogSectionSubtitle} ?: 'Architectural patterns, Spring Boot internals, and algorithmic roadmaps.'">Architectural patterns, Spring Boot internals, and algorithmic roadmaps.</p>
+            </div>
+            <a th:href="@{/blog}" class="glass-btn primary" data-reveal style="padding:8px 18px; font-size:0.85rem; border-radius:999px;">
+                View All Articles <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:24px;">
+            <article class="glass-card" data-reveal th:each="post : ${recentBlogs}" style="padding:26px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.25s ease, box-shadow 0.25s ease;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                            <span th:each="tag : ${#strings.arraySplit(post.tags, ',')}" class="badge-tag" style="font-size:0.75rem;" th:text="${tag.trim()}">Java</span>
+                        </div>
+                        <span th:if="${post.featured}" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:999px; border:1px solid rgba(245,158,11,0.3);">
+                            <i class="fa-solid fa-star"></i> Featured
+                        </span>
+                    </div>
+                    <h3 style="font-size:1.15rem; font-weight:700; line-height:1.4; margin-bottom:10px; letter-spacing:-0.02em;">
+                        <a th:href="@{'/blog/' + ${post.slug}}" style="color:var(--text); text-decoration:none;" th:text="${post.title}">Article Title</a>
+                    </h3>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.55; margin-bottom:16px;" th:text="${post.summary}">
+                        Summary of article...
+                    </p>
+                </div>
+                <div style="border-top:1px solid var(--border-color); padding-top:14px; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-muted);">
+                    <span><i class="fa-regular fa-clock"></i> <span th:text="${post.readTimeMinutes} ?: 5">5</span> min read</span>
+                    <a th:href="@{'/blog/' + ${post.slug}}" class="glass-btn" style="padding:5px 12px; font-size:0.78rem; border-radius:999px;">
+                        Read <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
 <!-- ===================== CONTACT ===================== -->
 <section class="section" id="contact">
     <div class="container">
@@ -835,11 +884,127 @@ function zoomCert(dir) {
     </div>
 </div>
 
+<!-- ===================== RECRUITER 30-SECOND PITCH MODAL ===================== -->
+<th:block th:if="${about.recruiterPitchEnabled != false}">
+<div id="recruiterModal" class="doc-modal" th:attr="data-pitch=${about.recruiterPitchCopyText}" onclick="if(event.target===this)closeRecruiterModal()">
+    <div class="doc-modal-content recruiter-modal-card">
+        <div class="doc-modal-header" style="border-bottom:1px solid var(--border-color); padding:16px 22px;">
+            <div class="doc-modal-title" style="display:flex; align-items:center; gap:10px;">
+                <span class="pitch-badge-icon"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i></span>
+                <div>
+                    <div style="font-weight:700; font-size:1.05rem; letter-spacing:-0.02em;">30-Second Candidate Pitch</div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary);" th:text="${about.recruiterTargetRole} ?: 'Executive snapshot for Recruiters &amp; Tech Leads'">Executive snapshot for Recruiters &amp; Tech Leads</div>
+                </div>
+            </div>
+            <div class="doc-modal-actions">
+                <button type="button" class="glass-btn" onclick="copyRecruiterPitch()" id="pitchCopyBtn" style="padding:6px 12px; font-size:0.78rem; gap:6px;" title="Copy summary to clipboard">
+                    <i class="fa-regular fa-copy"></i> <span>Copy Pitch</span>
+                </button>
+                <button type="button" class="glass-btn" onclick="closeRecruiterModal()" style="width:34px; height:34px; padding:0; border-radius:8px; font-size:1rem; cursor:pointer;" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="recruiter-modal-body">
+            <!-- Candidate Status Banner -->
+            <div class="recruiter-status-banner">
+                <div class="recruiter-status-left">
+                    <span class="pulse-indicator"></span>
+                    <span class="recruiter-status-title" th:text="${about.availabilityText} ?: 'Actively Seeking SDE-1 / Software Engineer / Full Stack Roles'">Actively Seeking SDE-1 / Software Engineer / Full Stack Roles</span>
+                </div>
+                <span class="recruiter-status-badge">Immediate Joining</span>
+            </div>
+
+            <!-- Key Metric Counters -->
+            <div class="recruiter-metrics-grid" th:if="${about.recruiterMetrics != null and !#strings.isEmpty(about.recruiterMetrics)}">
+                <div class="recruiter-metric-item" th:each="m : ${#strings.arraySplit(about.recruiterMetrics, '|')}">
+                    <th:block th:with="parts=${#strings.arraySplit(m, '::')}">
+                        <div class="rec-metric-val" th:text="${parts[0].trim()}">B.Tech CSE</div>
+                        <div class="rec-metric-lbl" th:text="${parts.length > 1 ? parts[1].trim() : ''}">Target: SDE-1 / Backend</div>
+                    </th:block>
+                </div>
+            </div>
+            <div class="recruiter-metrics-grid" th:unless="${about.recruiterMetrics != null and !#strings.isEmpty(about.recruiterMetrics)}">
+                <div class="recruiter-metric-item">
+                    <div class="rec-metric-val">B.Tech CSE</div>
+                    <div class="rec-metric-lbl">Target: SDE-1 / Backend</div>
+                </div>
+                <div class="recruiter-metric-item">
+                    <div class="rec-metric-val">350+</div>
+                    <div class="rec-metric-lbl">DSA &amp; Algorithmic Solved</div>
+                </div>
+                <div class="recruiter-metric-item">
+                    <div class="rec-metric-val">Production-Ready</div>
+                    <div class="rec-metric-lbl">Spring Boot &amp; REST APIs</div>
+                </div>
+            </div>
+
+            <!-- Core Strengths Grid -->
+            <div class="recruiter-highlights-grid" th:if="${about.recruiterHighlights != null and !#strings.isEmpty(about.recruiterHighlights)}">
+                <div class="recruiter-highlight-box" th:each="hl : ${#strings.arraySplit(about.recruiterHighlights, '|')}">
+                    <th:block th:with="parts=${#strings.arraySplit(hl, '::')}">
+                        <div class="rec-hl-hdr">
+                            <i th:class="${parts.length > 2 ? parts[2].trim() : 'fa-solid fa-server'}" style="color:var(--primary);"></i>
+                            <span th:text="${parts[0].trim()}">Core Backend Mastery</span>
+                        </div>
+                        <p th:text="${parts.length > 1 ? parts[1].trim() : ''}">Proficient in Java 17+, Spring Boot 3...</p>
+                    </th:block>
+                </div>
+            </div>
+            <div class="recruiter-highlights-grid" th:unless="${about.recruiterHighlights != null and !#strings.isEmpty(about.recruiterHighlights)}">
+                <div class="recruiter-highlight-box">
+                    <div class="rec-hl-hdr"><i class="fa-solid fa-server" style="color:var(--primary);"></i> <span>Core Backend Mastery</span></div>
+                    <p>Proficient in Java 17+, Spring Boot 3, Spring Data JPA/Hibernate, Spring Security (JWT &amp; RBAC), and MySQL relational database indexing.</p>
+                </div>
+                <div class="recruiter-highlight-box">
+                    <div class="rec-hl-hdr"><i class="fa-solid fa-layer-group" style="color:#10b981;"></i> <span>Architecture &amp; Clean Code</span></div>
+                    <p>Hands-on expertise with MVC architecture, RESTful API design principles, DTO patterns, exception handling, and Maven builds.</p>
+                </div>
+                <div class="recruiter-highlight-box">
+                    <div class="rec-hl-hdr"><i class="fa-solid fa-bolt-lightning" style="color:#f59e0b;"></i> <span>Full-Stack Versatility</span></div>
+                    <p>Modern interactive UI with HTML5/CSS3/JavaScript &amp; React. Strong CLI, Docker, Git workflow, and fast ramp-up capability.</p>
+                </div>
+            </div>
+
+            <!-- What Recruiter Needs Right Now -->
+            <div class="recruiter-quick-details">
+                <div class="rec-detail-row">
+                    <span class="rec-dt-label"><i class="fa-solid fa-location-dot"></i> Location:</span>
+                    <span class="rec-dt-value" th:text="${about.location} ?: 'India (Open to Remote &amp; Relocation)'">India (Open to Remote &amp; Relocation)</span>
+                </div>
+                <div class="rec-detail-row">
+                    <span class="rec-dt-label"><i class="fa-solid fa-envelope"></i> Email:</span>
+                    <span class="rec-dt-value"><a th:href="'mailto:' + ${about.email}" th:text="${about.email}">princegupta@example.com</a></span>
+                </div>
+                <div class="rec-detail-row" th:if="${about.phone}">
+                    <span class="rec-dt-label"><i class="fa-solid fa-phone"></i> Phone:</span>
+                    <span class="rec-dt-value" th:text="${about.phone}">+91 XXXXXXXX</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="recruiter-modal-footer">
+            <a th:href="@{/resume/download}" class="glass-btn primary" style="padding:8px 18px; font-size:0.85rem;">
+                <i class="fa-solid fa-file-arrow-down"></i> Download Resume PDF
+            </a>
+            <button type="button" class="glass-btn" onclick="closeRecruiterModal(); openResumeModal();" style="padding:8px 16px; font-size:0.85rem;">
+                <i class="fa-solid fa-eye"></i> Quick View Resume
+            </button>
+            <a th:if="${about.email}" th:href="'mailto:' + ${about.email} + '?subject=Opportunity%20Interview%20Invitation'" class="glass-btn" style="padding:8px 16px; font-size:0.85rem; border-color:rgba(16,185,129,0.4); color:#10b981;">
+                <i class="fa-solid fa-calendar-check"></i> Request Interview
+            </a>
+        </div>
+    </div>
+</div>
+</th:block>
+
 <!-- ===================== INTERACTIVE DEVELOPER CLI TERMINAL ===================== -->
 <th:block th:if="${about.terminalEnabled != false}">
     <button type="button" id="cliLaunchBtn" class="cli-launcher" onclick="toggleCliTerminal()" title="Toggle Developer CLI (or press Ctrl + ~)">
         <span class="cli-ping"></span>
-        <i class="fa-solid fa-terminal" style="color:var(--primary);"></i> <span>&gt;_ CLI</span>
+        <i class="fa-solid fa-terminal" style="color:var(--primary);"></i> <span>CLI</span>
     </button>
     <div id="cliDrawer" class="cli-drawer" onclick="handleCliDrawerClick(event)">
         <div class="cli-header">
@@ -880,6 +1045,73 @@ function zoomCert(dir) {
             <input type="text" id="cliInput" class="cli-input" placeholder="Type a command or 'help' (Tab to autocomplete)..." autocomplete="off" spellcheck="false" />
         </div>
     </div>
+</th:block>
+
+<!-- ===================== "ASK PRINCE AI" CHATBOT WIDGET ===================== -->
+<th:block th:if="${about.aiChatEnabled != false}">
+<div id="aiChatWidget">
+    <!-- Floating AI Launcher Trigger -->
+    <button type="button" id="aiChatLaunchBtn" class="ai-chat-launcher" onclick="toggleAiChat()" title="Ask Prince's AI Assistant">
+        <span class="ai-ping"></span>
+        <i class="fa-solid fa-wand-magic-sparkles" style="color:#a855f7;"></i> <span>Ask AI</span>
+    </button>
+
+    <!-- AI Chat Popup Drawer -->
+    <div id="aiChatDrawer" class="ai-chat-drawer">
+        <div class="ai-chat-header">
+            <div class="ai-chat-header-left">
+                <div class="ai-chat-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div>
+                    <div class="ai-chat-title">Prince AI Assistant <span class="ai-online-badge">ONLINE</span></div>
+                    <div class="ai-chat-subtitle">Ask anything about skills, projects &amp; hiring</div>
+                </div>
+            </div>
+            <div class="ai-chat-header-actions">
+                <button type="button" class="ai-chat-hdr-btn" onclick="clearAiChat()" title="Reset Conversation"><i class="fa-solid fa-rotate-left"></i></button>
+                <button type="button" class="ai-chat-hdr-btn" onclick="closeAiChat()" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="ai-chat-chips" th:if="${about.aiChatPromptChips != null and !#strings.isEmpty(about.aiChatPromptChips)}">
+            <th:block th:each="chip : ${#strings.arraySplit(about.aiChatPromptChips, '|')}">
+                <button type="button" class="ai-chip"
+                        th:with="parts=${#strings.arraySplit(chip, '::')}"
+                        th:attr="onclick='sendQuickAiQuery(\'' + ${#strings.escapeJavaScript(parts.length > 1 ? parts[1].trim() : parts[0].trim())} + '\')'"
+                        th:text="${parts[0].trim()}">Core Backend</button>
+            </th:block>
+        </div>
+        <div class="ai-chat-chips" th:unless="${about.aiChatPromptChips != null and !#strings.isEmpty(about.aiChatPromptChips)}">
+            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('What are Prince\'s core backend skills?')">Core Backend</button>
+            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('Tell me about your top projects')">Top Projects</button>
+            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('What is your problem solving and LeetCode record?')">LeetCode 350+</button>
+            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('Are you available for immediate hiring?')">Availability</button>
+            <button type="button" class="ai-chip" onclick="sendQuickAiQuery('How do I contact Prince or schedule an interview?')">Contact Info</button>
+        </div>
+
+        <!-- Chat Conversation Messages -->
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-msg bot">
+                <div class="ai-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="ai-msg-bubble" th:if="${about.aiChatWelcomeMessage != null and !#strings.isEmpty(about.aiChatWelcomeMessage)}" th:text="${about.aiChatWelcomeMessage}">
+                    👋 Hello! I am Prince's interactive AI assistant.
+                </div>
+                <div class="ai-msg-bubble" th:unless="${about.aiChatWelcomeMessage != null and !#strings.isEmpty(about.aiChatWelcomeMessage)}">
+                    👋 <strong>Hello!</strong> I am Prince's interactive AI assistant.<br><br>
+                    Ask me anything about Prince's <strong>Java &amp; Spring Boot</strong> mastery, featured projects, <strong>350+ LeetCode DSA record</strong>, or hiring availability!
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <form id="aiChatForm" onsubmit="handleAiChatSubmit(event)" class="ai-chat-input-bar">
+            <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Ask Prince AI anything..." autocomplete="off" />
+            <button type="submit" id="aiChatSendBtn" class="ai-chat-send-btn" title="Send Question">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
 </th:block>
 
 <!-- ===================== MODERN REDESIGNED FOOTER ===================== -->
