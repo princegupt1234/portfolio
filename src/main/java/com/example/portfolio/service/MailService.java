@@ -64,14 +64,26 @@ public class MailService {
         }
     }
 
+    public enum MailResult {
+        SUCCESS,
+        NOT_CONFIGURED,
+        AUTH_ERROR,
+        TIMEOUT,
+        FAILED
+    }
+
     public boolean sendReply(String toEmail, String toName, String subject, String body, String originalMessage) {
+        return sendReplyWithResult(toEmail, toName, subject, body, originalMessage) == MailResult.SUCCESS;
+    }
+
+    public MailResult sendReplyWithResult(String toEmail, String toName, String subject, String body, String originalMessage) {
         if (!isConfigured()) {
             log.warn("Mail sending is disabled or not configured. Reply email not sent to {}", toEmail);
-            return false;
+            return MailResult.NOT_CONFIGURED;
         }
         if (toEmail == null || toEmail.isBlank()) {
             log.warn("Reply email not sent because recipient address is missing");
-            return false;
+            return MailResult.FAILED;
         }
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -82,14 +94,46 @@ public class MailService {
             helper.setText(buildReplyPlainText(toName, body, originalMessage), html);
             applyFrom(helper);
             mailSender.send(message);
-            return true;
+            return MailResult.SUCCESS;
+        } catch (jakarta.mail.AuthenticationFailedException ex) {
+            log.error("SMTP Authentication failed when replying to {}. Verify MAIL_PASSWORD/App Password.", toEmail, ex);
+            return MailResult.AUTH_ERROR;
         } catch (MessagingException ex) {
-            log.error("Failed to compose reply email to {}", toEmail, ex);
-            return false;
+            log.error("Failed to compose/send reply email to {}", toEmail, ex);
+            if (isTimeout(ex)) return MailResult.TIMEOUT;
+            if (isAuth(ex)) return MailResult.AUTH_ERROR;
+            return MailResult.FAILED;
         } catch (Exception ex) {
             log.error("Failed to send reply email to {}", toEmail, ex);
-            return false;
+            if (isTimeout(ex)) return MailResult.TIMEOUT;
+            if (isAuth(ex)) return MailResult.AUTH_ERROR;
+            return MailResult.FAILED;
         }
+    }
+
+    private boolean isTimeout(Throwable t) {
+        Throwable curr = t;
+        while (curr != null) {
+            if (curr instanceof java.net.SocketTimeoutException) {
+                return true;
+            }
+            if (curr.getMessage() != null && curr.getMessage().toLowerCase().contains("timeout")) {
+                return true;
+            }
+            curr = curr.getCause();
+        }
+        return false;
+    }
+
+    private boolean isAuth(Throwable t) {
+        Throwable curr = t;
+        while (curr != null) {
+            if (curr instanceof jakarta.mail.AuthenticationFailedException || (curr.getMessage() != null && curr.getMessage().toLowerCase().contains("authentication"))) {
+                return true;
+            }
+            curr = curr.getCause();
+        }
+        return false;
     }
 
     private String buildReplyHtml(String recipientName, String replyBody, String originalMessage) {

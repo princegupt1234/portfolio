@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -75,6 +76,44 @@ class AdminMessageControllerTest {
                 .andExpect(flash().attributeExists("successMessage"));
 
         assertFalse(message.getIsRead());
+        verify(contactMessageRepository).save(message);
+    }
+
+    @Test
+    void replySuccess() throws Exception {
+        ContactMessage message = new ContactMessage();
+        message.setId(12L);
+        message.setName("Charlie");
+        message.setEmail("charlie@example.com");
+        message.setSubject("Hello");
+        message.setMessage("Interested in hiring.");
+
+        when(contactMessageRepository.findById(12L)).thenReturn(Optional.of(message));
+        when(mailService.sendReplyWithResult(any(), any(), any(), any(), any()))
+                .thenReturn(MailService.MailResult.SUCCESS);
+
+        mockMvc.perform(post("/admin/messages/12/reply").param("replyText", "Thanks for reaching out!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages/12?sent=true&reason=success"));
+
+        verify(contactMessageRepository).save(message);
+    }
+
+    @Test
+    void replyNotConfigured() throws Exception {
+        ContactMessage message = new ContactMessage();
+        message.setId(13L);
+        message.setName("David");
+        message.setEmail("david@example.com");
+
+        when(contactMessageRepository.findById(13L)).thenReturn(Optional.of(message));
+        when(mailService.sendReplyWithResult(any(), any(), any(), any(), any()))
+                .thenReturn(MailService.MailResult.NOT_CONFIGURED);
+
+        mockMvc.perform(post("/admin/messages/13/reply").param("replyText", "Some response"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages/13?sent=false&reason=not_configured"));
+
         verify(contactMessageRepository).save(message);
     }
 }

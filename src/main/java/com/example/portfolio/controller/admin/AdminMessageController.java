@@ -65,10 +65,11 @@ public class AdminMessageController {
         ContactMessage msg = contactMessageRepository.findById(id).orElseThrow();
         msg.setReplyText(replyText);
         String replySubject = "Re: " + (msg.getSubject() == null || msg.getSubject().isBlank() ? "Your message" : msg.getSubject());
-        boolean sent = mailService.sendReply(msg.getEmail(), msg.getName(), replySubject, replyText, msg.getMessage());
+        MailService.MailResult result = mailService.sendReplyWithResult(msg.getEmail(), msg.getName(), replySubject, replyText, msg.getMessage());
+        boolean sent = (result == MailService.MailResult.SUCCESS);
         if (sent) msg.setRepliedAt(LocalDateTime.now());
         contactMessageRepository.save(msg);
-        return "redirect:/admin/messages/" + id + "?sent=" + sent;
+        return "redirect:/admin/messages/" + id + "?sent=" + sent + "&reason=" + result.name().toLowerCase();
     }
 
     @PostMapping("/{id}/toggle-read")

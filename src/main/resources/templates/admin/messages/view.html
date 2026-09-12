@@ -45,7 +45,18 @@
                 <div th:if="${param.sent != null and param.sent[0] == 'false'}" class="alert error">
                     <div class="alert-content">
                         <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>Reply saved in database, but SMTP delivery failed. Click <strong>"Open in Email"</strong> below to send directly from your mail app.</span>
+                        <span th:if="${param.reason != null and param.reason[0] == 'not_configured'}">
+                            Reply saved in database. <strong>SMTP is not configured</strong> on your server (set <code>MAIL_USERNAME</code> and <code>MAIL_PASSWORD</code> in Render Environment). Click <strong>"Open in Email App"</strong> below to send directly.
+                        </span>
+                        <span th:if="${param.reason != null and param.reason[0] == 'auth_error'}">
+                            Reply saved in database. <strong>Gmail authentication failed</strong>. Make sure you use a 16-character <strong>Google App Password</strong> (with no spaces). Click <strong>"Open in Email App"</strong> below to send directly.
+                        </span>
+                        <span th:if="${param.reason != null and param.reason[0] == 'timeout'}">
+                            Reply saved in database, but <strong>SMTP connection timed out</strong>. Click <strong>"Open in Email App"</strong> below to send directly.
+                        </span>
+                        <span th:if="${param.reason == null or (param.reason[0] != 'not_configured' and param.reason[0] != 'auth_error' and param.reason[0] != 'timeout')}">
+                            Reply saved in database, but SMTP delivery failed. Click <strong>"Open in Email App"</strong> below to send directly from your mail app.
+                        </span>
                     </div>
                     <button type="button" class="alert-close">×</button>
                 </div>
