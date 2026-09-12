@@ -17,6 +17,9 @@ public class ContactForm {
     @NotBlank(message = "Message cannot be empty")
     private String message;
 
+    // Invisible bot trap (honeypot)
+    private String websiteTrap;
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getEmail() { return email; }
@@ -25,4 +28,6 @@ public class ContactForm {
     public void setSubject(String subject) { this.subject = subject; }
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
+    public String getWebsiteTrap() { return websiteTrap; }
+    public void setWebsiteTrap(String websiteTrap) { this.websiteTrap = websiteTrap; }
 }

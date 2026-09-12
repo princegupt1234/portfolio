@@ -30,6 +30,7 @@ import com.example.portfolio.service.DataVersionService;
 import com.example.portfolio.service.GithubStatsService;
 import com.example.portfolio.service.LeetCodeRepositoryStatsService;
 import com.example.portfolio.service.MailService;
+import com.example.portfolio.service.ContactRateLimiterService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,7 @@ public class HomeController {
     private final LeetCodeRepositoryStatsService leetCodeRepositoryStatsService;
     private final MailService mailService;
     private final DataVersionService dataVersionService;
+    private final ContactRateLimiterService contactRateLimiterService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -82,7 +84,8 @@ public class HomeController {
                            ContactMessageRepository contactMessageRepository, ResumeRepository resumeRepository,
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
                            LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
-                           MailService mailService, DataVersionService dataVersionService) {
+                           MailService mailService, DataVersionService dataVersionService,
+                           ContactRateLimiterService contactRateLimiterService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.skillRepository = skillRepository;
@@ -100,6 +103,7 @@ public class HomeController {
         this.leetCodeRepositoryStatsService = leetCodeRepositoryStatsService;
         this.mailService = mailService;
         this.dataVersionService = dataVersionService;
+        this.contactRateLimiterService = contactRateLimiterService;
     }
 
     @GetMapping("/api/data-version")
@@ -161,10 +165,32 @@ public class HomeController {
 
     @PostMapping("/contact/submit")
     public String submitContact(@Valid @ModelAttribute("contactForm") ContactForm form,
-                                 BindingResult result, Model model) {
+                                 BindingResult result,
+                                 jakarta.servlet.http.HttpServletRequest request,
+                                 Model model) {
         if (result.hasErrors()) {
             return renderHome(null, model);
         }
+
+        AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
+
+        // 1. Bot Honeypot Trap check
+        if (about.getContactSpamProtectionEnabled() != false && about.getContactHoneypotEnabled() != false) {
+            if (form.getWebsiteTrap() != null && !form.getWebsiteTrap().isBlank()) {
+                // Silently discard automated bot submission
+                return "redirect:/?contactSuccess=true";
+            }
+        }
+
+        // 2. IP Rate Limiter check
+        if (about.getContactSpamProtectionEnabled() != false) {
+            int cooldown = about.getContactRateLimitSeconds() != null ? about.getContactRateLimitSeconds() : 60;
+            String clientIp = contactRateLimiterService.extractClientIp(request);
+            if (!contactRateLimiterService.checkAndRecord(clientIp, cooldown)) {
+                return "redirect:/?contactRateLimited=true";
+            }
+        }
+
         ContactMessage msg = new ContactMessage();
         msg.setName(form.getName());
         msg.setEmail(form.getEmail());

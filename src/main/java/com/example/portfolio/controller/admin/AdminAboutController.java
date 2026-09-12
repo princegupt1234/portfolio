@@ -80,6 +80,18 @@ public class AdminAboutController {
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS languages_spoken TEXT NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS calendly_url TEXT NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS terminal_enabled BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS og_tags_enabled BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS og_title TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS og_description TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS og_image_url TEXT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS contact_spam_protection_enabled BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS contact_honeypot_enabled BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS contact_rate_limit_seconds INT NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_enabled BIT(1) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_app_name VARCHAR(255) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_short_name VARCHAR(255) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_theme_color VARCHAR(50) NULL").executeUpdate();
+            em.createNativeQuery("ALTER TABLE about_info ADD COLUMN IF NOT EXISTS pwa_background_color VARCHAR(50) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS engineering_highlight TEXT NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS demo_video_url VARCHAR(255) NULL").executeUpdate();
             em.createNativeQuery("ALTER TABLE projects ADD COLUMN IF NOT EXISTS architecture_image_url VARCHAR(255) NULL").executeUpdate();
@@ -127,6 +139,10 @@ public class AdminAboutController {
                         @RequestParam(value = "recruiterPitchEnabled", required = false) String recruiterPitchEnabledParam,
                         @RequestParam(value = "aiChatEnabled", required = false) String aiChatEnabledParam,
                         @RequestParam(value = "quickStatsVisible", required = false) String quickStatsVisibleParam,
+                        @RequestParam(value = "ogTagsEnabled", required = false) String ogTagsEnabledParam,
+                        @RequestParam(value = "contactSpamProtectionEnabled", required = false) String contactSpamProtectionEnabledParam,
+                        @RequestParam(value = "contactHoneypotEnabled", required = false) String contactHoneypotEnabledParam,
+                        @RequestParam(value = "pwaEnabled", required = false) String pwaEnabledParam,
                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         AboutInfo existing = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
 
@@ -169,6 +185,26 @@ public class AdminAboutController {
         existing.setAiChatEnabled("true".equals(aiChatEnabledParam));
         existing.setAiChatWelcomeMessage(form.getAiChatWelcomeMessage());
         existing.setAiChatPromptChips(form.getAiChatPromptChips());
+
+        // Social Sharing & Open Graph SEO
+        existing.setOgTagsEnabled("true".equals(ogTagsEnabledParam));
+        existing.setOgTitle(form.getOgTitle());
+        existing.setOgDescription(form.getOgDescription());
+        existing.setOgImageUrl(form.getOgImageUrl());
+
+        // Contact Spam Protection & Rate Limiting
+        existing.setContactSpamProtectionEnabled("true".equals(contactSpamProtectionEnabledParam));
+        existing.setContactHoneypotEnabled("true".equals(contactHoneypotEnabledParam));
+        if (form.getContactRateLimitSeconds() != null) {
+            existing.setContactRateLimitSeconds(form.getContactRateLimitSeconds());
+        }
+
+        // Mobile Web App & PWA Settings
+        existing.setPwaEnabled("true".equals(pwaEnabledParam));
+        existing.setPwaAppName(form.getPwaAppName());
+        existing.setPwaShortName(form.getPwaShortName());
+        existing.setPwaThemeColor(form.getPwaThemeColor());
+        existing.setPwaBackgroundColor(form.getPwaBackgroundColor());
 
         aboutInfoRepository.save(existing);
         dataVersionService.bump();

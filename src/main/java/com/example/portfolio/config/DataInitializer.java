@@ -160,6 +160,18 @@ public class DataInitializer implements CommandLineRunner {
             info.setAiChatEnabled(true);
             info.setAiChatWelcomeMessage("👋 Hello! I am Prince's interactive AI assistant. Ask me anything about Prince's Java & Spring Boot mastery, featured projects, LeetCode problem solving, or hiring availability!");
             info.setAiChatPromptChips("Core Backend :: What are Prince's core backend skills? | Top Projects :: Tell me about your top projects | LeetCode & DSA :: What is your problem solving and LeetCode record? | Availability :: Are you available for immediate hiring? | Contact Info :: How do I contact Prince or schedule an interview?");
+            info.setOgTagsEnabled(true);
+            info.setOgTitle("Prince Gupt | Full Stack Developer (Java & Spring Boot)");
+            info.setOgDescription("Final-year CSE student specializing in Java, Spring Boot, REST APIs, and production full-stack systems. Explore projects, live LeetCode stats, and credentials.");
+            info.setOgImageUrl("https://portfolio-gx88.onrender.com/images/og-preview.png");
+            info.setContactSpamProtectionEnabled(true);
+            info.setContactHoneypotEnabled(true);
+            info.setContactRateLimitSeconds(60);
+            info.setPwaEnabled(true);
+            info.setPwaAppName("Prince Gupt | Portfolio");
+            info.setPwaShortName("Prince Portfolio");
+            info.setPwaThemeColor("#0a0f1d");
+            info.setPwaBackgroundColor("#060913");
             aboutInfoRepository.save(info);
         } else {
             aboutInfoRepository.findAll().stream().findFirst().ifPresent(info -> {
@@ -247,6 +259,54 @@ public class DataInitializer implements CommandLineRunner {
                     changed = true;
                 } else if (info.getAiChatPromptChips().contains("350+")) {
                     info.setAiChatPromptChips(info.getAiChatPromptChips().replace("LeetCode 350+", "LeetCode & DSA").replace("350+", ""));
+                    changed = true;
+                }
+                if (info.getOgTagsEnabled() == null) {
+                    info.setOgTagsEnabled(true);
+                    changed = true;
+                }
+                if (info.getOgTitle() == null || info.getOgTitle().isBlank()) {
+                    info.setOgTitle("Prince Gupt | Full Stack Developer (Java & Spring Boot)");
+                    changed = true;
+                }
+                if (info.getOgDescription() == null || info.getOgDescription().isBlank()) {
+                    info.setOgDescription("Final-year CSE student specializing in Java, Spring Boot, REST APIs, and production full-stack systems. Explore projects, live LeetCode stats, and credentials.");
+                    changed = true;
+                }
+                if (info.getOgImageUrl() == null || info.getOgImageUrl().isBlank()) {
+                    info.setOgImageUrl("https://portfolio-gx88.onrender.com/images/og-preview.png");
+                    changed = true;
+                }
+                if (info.getContactSpamProtectionEnabled() == null) {
+                    info.setContactSpamProtectionEnabled(true);
+                    changed = true;
+                }
+                if (info.getContactHoneypotEnabled() == null) {
+                    info.setContactHoneypotEnabled(true);
+                    changed = true;
+                }
+                if (info.getContactRateLimitSeconds() == null) {
+                    info.setContactRateLimitSeconds(60);
+                    changed = true;
+                }
+                if (info.getPwaEnabled() == null) {
+                    info.setPwaEnabled(true);
+                    changed = true;
+                }
+                if (info.getPwaAppName() == null || info.getPwaAppName().isBlank()) {
+                    info.setPwaAppName("Prince Gupt | Portfolio");
+                    changed = true;
+                }
+                if (info.getPwaShortName() == null || info.getPwaShortName().isBlank()) {
+                    info.setPwaShortName("Prince Portfolio");
+                    changed = true;
+                }
+                if (info.getPwaThemeColor() == null || info.getPwaThemeColor().isBlank()) {
+                    info.setPwaThemeColor("#0a0f1d");
+                    changed = true;
+                }
+                if (info.getPwaBackgroundColor() == null || info.getPwaBackgroundColor().isBlank()) {
+                    info.setPwaBackgroundColor("#060913");
                     changed = true;
                 }
                 if (changed) {

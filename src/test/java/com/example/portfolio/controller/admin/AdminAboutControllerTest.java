@@ -147,4 +147,44 @@ class AdminAboutControllerTest {
         ));
         verify(dataVersionService).bump();
     }
+
+    @Test
+    void savesOgSpamProtectionAndPwaSettingsAndRedirects() throws Exception {
+        AboutInfo existing = new AboutInfo();
+        existing.setId(1L);
+        when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
+
+        mockMvc.perform(post("/admin/about/save")
+                        .param("ogTagsEnabled", "true")
+                        .param("ogTitle", "Prince Gupt | SDE-1")
+                        .param("ogDescription", "High performance Java & Spring Boot developer.")
+                        .param("ogImageUrl", "https://portfolio-gx88.onrender.com/images/og-preview.png")
+                        .param("contactSpamProtectionEnabled", "true")
+                        .param("contactHoneypotEnabled", "true")
+                        .param("contactRateLimitSeconds", "45")
+                        .param("pwaEnabled", "true")
+                        .param("pwaAppName", "Prince Portfolio WebApp")
+                        .param("pwaShortName", "Prince App")
+                        .param("pwaThemeColor", "#0a0f1d")
+                        .param("pwaBackgroundColor", "#060913")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/about"));
+
+        verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
+                Boolean.TRUE.equals(info.getOgTagsEnabled()) &&
+                "Prince Gupt | SDE-1".equals(info.getOgTitle()) &&
+                "High performance Java & Spring Boot developer.".equals(info.getOgDescription()) &&
+                "https://portfolio-gx88.onrender.com/images/og-preview.png".equals(info.getOgImageUrl()) &&
+                Boolean.TRUE.equals(info.getContactSpamProtectionEnabled()) &&
+                Boolean.TRUE.equals(info.getContactHoneypotEnabled()) &&
+                Integer.valueOf(45).equals(info.getContactRateLimitSeconds()) &&
+                Boolean.TRUE.equals(info.getPwaEnabled()) &&
+                "Prince Portfolio WebApp".equals(info.getPwaAppName()) &&
+                "Prince App".equals(info.getPwaShortName()) &&
+                "#0a0f1d".equals(info.getPwaThemeColor()) &&
+                "#060913".equals(info.getPwaBackgroundColor())
+        ));
+        verify(dataVersionService).bump();
+    }
 }

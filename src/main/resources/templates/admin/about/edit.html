@@ -175,6 +175,9 @@
           <a href="#sec-settings"><i class="fa-solid fa-paper-plane"></i> Contact &amp; Footer</a>
           <a href="#sec-recruiter"><i class="fa-solid fa-bolt"></i> Recruiter Pitch</a>
           <a href="#sec-aichat"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a>
+          <a href="#sec-opengraph"><i class="fa-brands fa-linkedin"></i> Social Sharing</a>
+          <a href="#sec-security"><i class="fa-solid fa-shield-halved"></i> Spam Protection</a>
+          <a href="#sec-pwa"><i class="fa-solid fa-mobile-screen"></i> Mobile PWA</a>
         </nav>
 
         <form id="aboutForm" th:action="@{/admin/about/save}" th:object="${about}" method="post">
@@ -645,6 +648,177 @@
                 </div>
             </div>
 
+            <!-- ═══════════════════════════════════════════════
+                 CARD 7 · SOCIAL SHARING & OPEN GRAPH (SEO / LINKEDIN)
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-opengraph">
+              <div class="ab-card-header" onclick="toggleSection('sec-opengraph')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(10,102,194,0.18); color:#0a66c2;"><i class="fa-brands fa-linkedin-in"></i></div>
+                  <div>
+                    <div class="ab-card-title">Social Sharing &amp; Open Graph (LinkedIn / WhatsApp / Twitter)</div>
+                    <div class="ab-card-subtitle">Enable rich social media preview cards, custom title, description, and high-res banner</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">When you share your portfolio link on LinkedIn, WhatsApp, Twitter/X, or Discord, these tags render a rich, branded preview card.</p>
+
+                <div class="form-grid">
+                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="ogTagsEnabled">
+                      <input type="checkbox" id="ogTagsEnabled" name="ogTagsEnabled" value="true" th:checked="*{ogTagsEnabled != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="ogTagsEnabled" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Enable Open Graph &amp; Twitter Card Meta Tags</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Generates rich social preview cards across LinkedIn, WhatsApp, Twitter/X, Facebook, and Slack.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="ogTitle"><i class="fa-solid fa-heading" style="color:var(--primary); margin-right:6px;"></i> Social Card Title</label>
+                    <input class="glass-input" id="ogTitle" th:field="*{ogTitle}" placeholder="Prince Gupt | Full Stack Developer (Java &amp; Spring Boot)"/>
+                    <span class="field-hint">Defaults to <code>[Your Name] | [Your Title]</code> if left blank.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="ogDescription"><i class="fa-solid fa-align-left" style="color:var(--primary); margin-right:6px;"></i> Social Card Description</label>
+                    <textarea class="glass-textarea" id="ogDescription" th:field="*{ogDescription}" rows="2"
+                      placeholder="Final-year CSE student specializing in Java 17+, Spring Boot, REST APIs, and scalable web applications."></textarea>
+                    <span class="field-hint">Summary shown under the preview banner on LinkedIn and WhatsApp.</span>
+                  </div>
+
+                  <div class="form-group full">
+                    <label for="ogImageUrl"><i class="fa-solid fa-image" style="color:var(--primary); margin-right:6px;"></i> Social Preview Banner Image URL</label>
+                    <input class="glass-input" id="ogImageUrl" th:field="*{ogImageUrl}" placeholder="https://portfolio-gx88.onrender.com/images/og-preview.png"/>
+                    <span class="field-hint">Must be an absolute URL (e.g. <code>https://portfolio-gx88.onrender.com/images/og-preview.png</code>). Standard size: 1200x630.</span>
+                  </div>
+
+                  <!-- Live LinkedIn / WhatsApp Card Simulation -->
+                  <div class="form-group full" style="margin-top:10px;">
+                    <label style="font-size:0.84rem; font-weight:600; color:var(--text); margin-bottom:8px; display:block;"><i class="fa-brands fa-linkedin" style="color:#0a66c2; margin-right:6px;"></i> Live Social Share Preview (What recruiters see)</label>
+                    <div style="max-width:580px; border-radius:14px; background:#0e131f; border:1px solid rgba(255,255,255,0.1); overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.3);">
+                      <div style="width:100%; aspect-ratio:1.91/1; background:#1e293b; overflow:hidden; position:relative;">
+                        <img id="ogPreviewImg" th:src="@{/images/og-preview.png}" style="width:100%; height:100%; object-fit:cover;" />
+                      </div>
+                      <div style="padding:14px 16px; background:rgba(255,255,255,0.02);">
+                        <div style="color:var(--text-secondary); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">portfolio-gx88.onrender.com</div>
+                        <div id="ogPrevTitle" style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:4px; line-height:1.3;" th:text="${!#strings.isEmpty(about.ogTitle) ? about.ogTitle : (about.fullName + ' | ' + about.title)}">Prince Gupt | Full Stack Developer</div>
+                        <div id="ogPrevDesc" style="color:var(--text-secondary); font-size:0.8rem; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" th:text="${!#strings.isEmpty(about.ogDescription) ? about.ogDescription : about.careerObjective}">Final-year CSE student specializing in Java &amp; Spring Boot...</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 8 · CONTACT FORM SPAM PROTECTION & RATE LIMITING
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-security">
+              <div class="ab-card-header" onclick="toggleSection('sec-security')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(16,185,129,0.15); color:#10b981;"><i class="fa-solid fa-shield-halved"></i></div>
+                  <div>
+                    <div class="ab-card-title">Contact Form Spam Protection &amp; Rate Limiting</div>
+                    <div class="ab-card-subtitle">Invisible bot honeypot trap, IP rate limiter cooldown, and SMTP quota shielding</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Prevents automated web bots and malicious scrapers from spamming your contact form and exhausting your Gmail SMTP quota.</p>
+
+                <div class="form-grid">
+                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="contactSpamProtectionEnabled">
+                      <input type="checkbox" id="contactSpamProtectionEnabled" name="contactSpamProtectionEnabled" value="true" th:checked="*{contactSpamProtectionEnabled != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="contactSpamProtectionEnabled" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Enable Master Spam &amp; Abuse Shield</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Activates protection layers against bots and repeated rapid submissions.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:14px;">
+                    <label class="toggle-switch" for="contactHoneypotEnabled" style="margin:0;">
+                      <input type="checkbox" id="contactHoneypotEnabled" name="contactHoneypotEnabled" value="true" th:checked="*{contactHoneypotEnabled != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="contactHoneypotEnabled" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.88rem; display:block;"><i class="fa-solid fa-robot" style="color:var(--primary); margin-right:6px;"></i> Invisible Bot Honeypot Trap</strong>
+                      <span style="color:var(--text-secondary); font-size:0.75rem;">Silently discards automated bot submissions without sending emails.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:14px;">
+                    <label for="contactRateLimitSeconds" style="font-weight:600; font-size:0.88rem; margin-bottom:6px; display:block;"><i class="fa-solid fa-stopwatch" style="color:#f59e0b; margin-right:6px;"></i> Submission Cooldown (Seconds)</label>
+                    <input class="glass-input" id="contactRateLimitSeconds" type="number" min="0" max="600" th:field="*{contactRateLimitSeconds}" placeholder="60"/>
+                    <span class="field-hint">Default 60s. Prevents the same IP address from submitting multiple messages in rapid succession (set 0 to disable).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 9 · MOBILE WEB APP & PWA MANIFEST
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-pwa">
+              <div class="ab-card-header" onclick="toggleSection('sec-pwa')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="background:rgba(236,72,153,0.15); color:#ec4899;"><i class="fa-solid fa-mobile-screen"></i></div>
+                  <div>
+                    <div class="ab-card-title">Mobile Web App &amp; PWA Manifest Settings</div>
+                    <div class="ab-card-subtitle">Control mobile app name, short name, browser theme color, and installable PWA manifest</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">Allows mobile visitors to add your portfolio to their phone's home screen like a native application with custom theme colors and icons.</p>
+
+                <div class="form-grid">
+                  <div class="form-group full toggle-group" style="display:flex; align-items:center; gap:14px; padding:10px 0; cursor:pointer;">
+                    <label class="toggle-switch" for="pwaEnabled">
+                      <input type="checkbox" id="pwaEnabled" name="pwaEnabled" value="true" th:checked="*{pwaEnabled != false}"/>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="pwaEnabled" style="cursor:pointer; margin:0;">
+                      <strong style="color:var(--text); font-size:0.9rem; display:block;">Enable Progressive Web App (PWA) Manifest</strong>
+                      <span style="color:var(--text-secondary); font-size:0.78rem;">Enables <code>/manifest.webmanifest</code> and mobile home screen installation.</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pwaAppName"><i class="fa-solid fa-font" style="color:var(--primary); margin-right:6px;"></i> Full Application Name</label>
+                    <input class="glass-input" id="pwaAppName" th:field="*{pwaAppName}" placeholder="Prince Gupt | Portfolio"/>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pwaShortName"><i class="fa-solid fa-tag" style="color:var(--primary); margin-right:6px;"></i> Short Name (Home screen icon text)</label>
+                    <input class="glass-input" id="pwaShortName" th:field="*{pwaShortName}" placeholder="Prince Portfolio"/>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pwaThemeColor"><i class="fa-solid fa-palette" style="color:var(--primary); margin-right:6px;"></i> Browser Navigation Theme Color</label>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                      <input class="glass-input" id="pwaThemeColor" th:field="*{pwaThemeColor}" placeholder="#0a0f1d" style="flex:1;"/>
+                    </div>
+                    <span class="field-hint">Hex color code for mobile browser address bar (e.g. <code>#0a0f1d</code>).</span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pwaBackgroundColor"><i class="fa-solid fa-fill-drip" style="color:var(--primary); margin-right:6px;"></i> Splash Background Color</label>
+                    <input class="glass-input" id="pwaBackgroundColor" th:field="*{pwaBackgroundColor}" placeholder="#060913"/>
+                    <span class="field-hint">Background color while mobile app is loading (e.g. <code>#060913</code>).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div><!-- /about-sections -->
 
           <!-- Sticky save bar -->
@@ -1002,6 +1176,33 @@
     const initialItems = parseStats();
     renderRows(initialItems);
     updatePreview();
+  })();
+
+  // Live Social Card Simulator update
+  (function() {
+    const titleInp = document.getElementById('ogTitle');
+    const descInp = document.getElementById('ogDescription');
+    const imgInp = document.getElementById('ogImageUrl');
+    const prevTitle = document.getElementById('ogPrevTitle');
+    const prevDesc = document.getElementById('ogPrevDesc');
+    const prevImg = document.getElementById('ogPreviewImg');
+
+    function updateOgSim() {
+      if (prevTitle && titleInp) {
+        prevTitle.textContent = titleInp.value.trim() || 'Prince Gupt | Full Stack Developer';
+      }
+      if (prevDesc && descInp) {
+        prevDesc.textContent = descInp.value.trim() || 'Final-year CSE student specializing in Java 17+, Spring Boot, REST APIs, and scalable web applications.';
+      }
+      if (prevImg && imgInp) {
+        const val = imgInp.value.trim();
+        if (val) prevImg.src = val;
+      }
+    }
+
+    if (titleInp) titleInp.addEventListener('input', updateOgSim);
+    if (descInp) descInp.addEventListener('input', updateOgSim);
+    if (imgInp) imgInp.addEventListener('input', updateOgSim);
   })();
 
   // Keyboard shortcut Ctrl+S

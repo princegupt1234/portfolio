@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title th:text="${about.fullName} + ' | ' + ${about.title}">Prince Gupt | Full Stack Developer</title>
     <meta name="description" th:content="${about.bio}" />
+
+    <!-- Favicons & Mobile PWA -->
+    <link rel="icon" type="image/svg+xml" th:href="@{/icons/favicon.svg}">
+    <link rel="apple-touch-icon" sizes="192x192" th:href="@{/icons/icon-192.png}">
+    <link rel="manifest" th:if="${about.pwaEnabled != false}" th:href="@{/manifest.webmanifest}">
+    <meta name="theme-color" th:content="${!#strings.isEmpty(about.pwaThemeColor) ? about.pwaThemeColor : '#0a0f1d'}">
+
+    <!-- Open Graph & Social Sharing (LinkedIn, WhatsApp, Facebook, Discord) -->
+    <th:block th:if="${about.ogTagsEnabled != false}">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" th:content="${about.fullName} ?: 'Prince Gupt'">
+        <meta property="og:url" content="https://portfolio-gx88.onrender.com/">
+        <meta property="og:title" th:content="${!#strings.isEmpty(about.ogTitle) ? about.ogTitle : (about.fullName + ' | ' + about.title)}">
+        <meta property="og:description" th:content="${!#strings.isEmpty(about.ogDescription) ? about.ogDescription : (!#strings.isEmpty(about.careerObjective) ? about.careerObjective : about.bio)}">
+        <meta property="og:image" th:content="${!#strings.isEmpty(about.ogImageUrl) ? about.ogImageUrl : 'https://portfolio-gx88.onrender.com/images/og-preview.png'}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:type" content="image/png">
+
+        <!-- Twitter / X Cards -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" th:content="${!#strings.isEmpty(about.ogTitle) ? about.ogTitle : (about.fullName + ' | ' + about.title)}">
+        <meta name="twitter:description" th:content="${!#strings.isEmpty(about.ogDescription) ? about.ogDescription : (!#strings.isEmpty(about.careerObjective) ? about.careerObjective : about.bio)}">
+        <meta name="twitter:image" th:content="${!#strings.isEmpty(about.ogImageUrl) ? about.ogImageUrl : 'https://portfolio-gx88.onrender.com/images/og-preview.png'}">
+    </th:block>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -729,7 +755,16 @@ function zoomCert(dir) {
             <!-- Right: Contact form -->
             <div class="glass-card contact-form-panel" data-reveal>
                 <h3 class="contact-form-heading">Send a Message</h3>
+                <div class="alert warn" th:if="${param.contactRateLimited}" style="margin-bottom:16px; padding:12px 16px; border-radius:12px; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); color:#fbbf24; font-size:0.86rem; display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Please wait a moment before sending another message.</span>
+                </div>
                 <form id="contactForm" th:action="@{/contact/submit}" th:object="${contactForm}" method="post" th:attr="data-success=${contactSuccess != null and contactSuccess}" class="contact-form">
+                    <!-- Invisible Bot Trap (Honeypot) -->
+                    <div style="position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;" aria-hidden="true">
+                        <label for="form-website-trap">Leave this blank</label>
+                        <input type="text" id="form-website-trap" name="websiteTrap" tabindex="-1" autocomplete="off" />
+                    </div>
                     <div class="contact-field">
                         <input class="glass-input" th:field="*{name}" placeholder="Your Name" required />
                         <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>

@@ -152,6 +152,27 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String aiChatPromptChips;
 
+    // ----- Social Sharing & Open Graph (SEO / LinkedIn) Controls -----
+    private Boolean ogTagsEnabled = true;
+    @Column(columnDefinition = "TEXT")
+    private String ogTitle;
+    @Column(columnDefinition = "TEXT")
+    private String ogDescription;
+    @Column(columnDefinition = "TEXT")
+    private String ogImageUrl;
+
+    // ----- Contact Form Spam Protection & Rate Limiting -----
+    private Boolean contactSpamProtectionEnabled = true;
+    private Boolean contactHoneypotEnabled = true;
+    private Integer contactRateLimitSeconds = 60;
+
+    // ----- Mobile Web App & PWA Settings -----
+    private Boolean pwaEnabled = true;
+    private String pwaAppName = "Prince Gupt | Portfolio";
+    private String pwaShortName = "Prince Portfolio";
+    private String pwaThemeColor = "#0a0f1d";
+    private String pwaBackgroundColor = "#060913";
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getFullName() { return fullName; }
@@ -270,4 +291,31 @@ public class AboutInfo {
     public void setAiChatWelcomeMessage(String aiChatWelcomeMessage) { this.aiChatWelcomeMessage = aiChatWelcomeMessage; }
     public String getAiChatPromptChips() { return aiChatPromptChips; }
     public void setAiChatPromptChips(String aiChatPromptChips) { this.aiChatPromptChips = aiChatPromptChips; }
+
+    public Boolean getOgTagsEnabled() { return ogTagsEnabled; }
+    public void setOgTagsEnabled(Boolean ogTagsEnabled) { this.ogTagsEnabled = ogTagsEnabled; }
+    public String getOgTitle() { return ogTitle; }
+    public void setOgTitle(String ogTitle) { this.ogTitle = ogTitle; }
+    public String getOgDescription() { return ogDescription; }
+    public void setOgDescription(String ogDescription) { this.ogDescription = ogDescription; }
+    public String getOgImageUrl() { return ogImageUrl; }
+    public void setOgImageUrl(String ogImageUrl) { this.ogImageUrl = ogImageUrl; }
+
+    public Boolean getContactSpamProtectionEnabled() { return contactSpamProtectionEnabled; }
+    public void setContactSpamProtectionEnabled(Boolean contactSpamProtectionEnabled) { this.contactSpamProtectionEnabled = contactSpamProtectionEnabled; }
+    public Boolean getContactHoneypotEnabled() { return contactHoneypotEnabled; }
+    public void setContactHoneypotEnabled(Boolean contactHoneypotEnabled) { this.contactHoneypotEnabled = contactHoneypotEnabled; }
+    public Integer getContactRateLimitSeconds() { return contactRateLimitSeconds; }
+    public void setContactRateLimitSeconds(Integer contactRateLimitSeconds) { this.contactRateLimitSeconds = contactRateLimitSeconds; }
+
+    public Boolean getPwaEnabled() { return pwaEnabled; }
+    public void setPwaEnabled(Boolean pwaEnabled) { this.pwaEnabled = pwaEnabled; }
+    public String getPwaAppName() { return pwaAppName; }
+    public void setPwaAppName(String pwaAppName) { this.pwaAppName = pwaAppName; }
+    public String getPwaShortName() { return pwaShortName; }
+    public void setPwaShortName(String pwaShortName) { this.pwaShortName = pwaShortName; }
+    public String getPwaThemeColor() { return pwaThemeColor; }
+    public void setPwaThemeColor(String pwaThemeColor) { this.pwaThemeColor = pwaThemeColor; }
+    public String getPwaBackgroundColor() { return pwaBackgroundColor; }
+    public void setPwaBackgroundColor(String pwaBackgroundColor) { this.pwaBackgroundColor = pwaBackgroundColor; }
 }
