@@ -1,85 +1,110 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Experience Form | Admin</title>
+    <meta charset="UTF-8" />
+    <title th:text="${experience.id} != null ? 'Edit Experience | Admin' : 'Add Experience | Admin'">Experience Form | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <style>
-        .experience-editor { max-width:980px; margin:0 auto; }
-        .experience-card { padding:22px; }
-        .experience-intro { color:var(--text-secondary); font-size:.8rem; line-height:1.6; margin:-4px 0 18px; }
-        .experience-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-        .experience-grid .full { grid-column:1/-1; }
-        .experience-grid label { color:var(--text-secondary); font-size:.78rem; }
-        .experience-grid small { color:var(--text-muted) !important; font-size:.7rem !important; line-height:1.5; }
-        .experience-order-note { display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:.7rem; margin-top:6px; }
-        .experience-order-note i { color:var(--primary); }
-        .experience-preview-wrap { margin-top:20px; padding-top:18px; border-top:1px solid var(--glass-border); }
-        .experience-preview-label { display:flex; align-items:center; gap:8px; margin-bottom:10px; color:var(--text-muted); font:600 .68rem var(--font-mono); letter-spacing:1.4px; text-transform:uppercase; }
-        .experience-preview-label::after { content:''; height:1px; flex:1; background:var(--glass-border); }
-        .experience-preview { position:relative; padding:18px 18px 18px 22px; border:1px solid var(--glass-border); border-radius:13px; background:rgba(255,255,255,.025); }
-        .experience-preview::before { content:''; position:absolute; left:8px; top:18px; bottom:18px; width:2px; border-radius:2px; background:linear-gradient(var(--primary),var(--secondary)); }
-        .experience-preview-type { color:var(--primary); font:600 .68rem var(--font-mono); letter-spacing:1px; text-transform:uppercase; }
-        .experience-preview-role { color:var(--text); font:600 1rem var(--font-heading); margin:5px 0 3px; }
-        .experience-preview-meta { color:var(--secondary); font-size:.75rem; }
-        .experience-preview-list { color:var(--text-secondary); font-size:.76rem; line-height:1.6; margin:12px 0 0; padding-left:17px; }
-        .experience-preview-list:empty { display:none; }
-        .experience-preview-state { display:inline-flex; margin-top:13px; padding:4px 8px; border-radius:999px; font-size:.65rem; border:1px solid var(--glass-border); color:var(--text-muted); }
-        .experience-preview-state.visible { color:var(--success); border-color:rgba(34,197,94,.3); background:rgba(34,197,94,.1); }
-        @media(max-width:700px){ .experience-grid { grid-template-columns:1fr; } }
-    </style>
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(active='experience')}"></div>
     <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Experience', unread=0)}"></div>
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Experience Form', unread=0)}"></div>
         <div class="admin-content">
-            <div class="experience-editor">
-            <div class="page-header">
-                <div><div style="color:var(--primary);font:600 .7rem var(--font-mono);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Experience / Statistics</div><h1 th:text="${experience.id} != null ? 'Edit experience' : 'Add experience'">Add experience</h1></div>
-                <a th:href="@{/admin/experience}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to experience</a>
-            </div>
-            <div class="glass-card experience-card">
-                <p class="experience-intro">Add one clear entry at a time. Put each achievement on its own line so the public timeline stays easy to scan.</p>
-                <form id="experienceForm" th:action="@{/admin/experience/save}" th:object="${experience}" method="post" class="experience-grid">
-                    <input type="hidden" th:field="*{id}" />
-                    <div class="form-group"><label for="experience-company">Company</label><input id="experience-company" class="glass-input" th:field="*{company}" placeholder="e.g. Acme Technologies" required /></div>
-                    <div class="form-group"><label for="experience-role">Role</label><input id="experience-role" class="glass-input" th:field="*{role}" placeholder="e.g. Backend Intern" required /></div>
-                    <div class="form-group"><label for="experience-duration">Duration</label><input id="experience-duration" class="glass-input" th:field="*{duration}" placeholder="e.g. Jan 2026 – Feb 2026" /></div>
-                    <div class="form-group">
-                        <label for="experience-type">Type</label>
-                        <select id="experience-type" class="glass-input" th:field="*{type}">
-                            <option value="Internship">Internship</option>
-                            <option value="Training">Training</option>
-                            <option value="Achievement">Achievement</option>
-                        </select>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Career / Experience Editor</div>
+                        <h1 th:text="${experience.id} != null ? 'Edit Experience' : 'Add New Experience'">Experience Form</h1>
+                        <p class="page-desc">Add role details, duration, achievements, and preview the timeline card instantly.</p>
                     </div>
-                    <div class="form-group full"><label for="experience-description">Achievements</label><textarea id="experience-description" class="glass-textarea" th:field="*{description}" rows="5" placeholder="Built REST APIs using Spring Boot&#10;Implemented CRUD operations with MySQL&#10;Integrated frontend with backend APIs"></textarea><small>One achievement per line. Each line becomes a bullet on the public timeline.</small></div>
-                    <div class="form-group"><label for="experience-sort">Sort order</label><input id="experience-sort" class="glass-input" type="number" min="0" step="1" th:field="*{sortOrder}" placeholder="1" /><span class="experience-order-note"><i class="fa-solid fa-arrow-down-1-9"></i> Lower numbers appear first.</span></div>
-                    <div class="form-group full" style="flex-direction:row; align-items:center; gap:12px;">
-                        <input type="hidden" name="visible" value="false"/>
-                        <label class="toggle-switch"><input type="checkbox" name="visible" value="true" th:checked="*{visible}"/><span class="toggle-slider"></span></label>
-                        <label style="margin:0;">Visible on portfolio</label>
-                    </div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save experience</button>
-                    </div>
-                </form>
-                <div class="experience-preview-wrap">
-                    <div class="experience-preview-label"><i class="fa-solid fa-eye"></i> Live preview</div>
-                    <div class="experience-preview">
-                        <div class="experience-preview-type" id="experiencePreviewType">Internship</div>
-                        <div class="experience-preview-role" id="experiencePreviewRole">Your role</div>
-                        <div class="experience-preview-meta"><span id="experiencePreviewCompany">Your company</span><span> · </span><span id="experiencePreviewDuration">Your duration</span></div>
-                        <ul class="experience-preview-list" id="experiencePreviewList"></ul>
-                        <span class="experience-preview-state" id="experiencePreviewState">Hidden from portfolio</span>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/experience}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to Experience</a>
                     </div>
                 </div>
-            </div>
+
+                <div class="glass-card" style="padding:28px;">
+                    <form id="experienceForm" th:action="@{/admin/experience/save}" th:object="${experience}" method="post" class="form-grid">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-group">
+                            <label for="experience-company">Company / Organization</label>
+                            <input id="experience-company" class="glass-input" th:field="*{company}" placeholder="e.g. Acme Technologies" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="experience-role">Role Title</label>
+                            <input id="experience-role" class="glass-input" th:field="*{role}" placeholder="e.g. Full Stack Developer Intern" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="experience-duration">Duration</label>
+                            <input id="experience-duration" class="glass-input" th:field="*{duration}" placeholder="e.g. Jun 2024 – Aug 2024" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="experience-type">Experience Type</label>
+                            <select id="experience-type" class="glass-input" th:field="*{type}">
+                                <option value="Internship">Internship</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Training">Training</option>
+                                <option value="Achievement">Achievement</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="experience-description">Achievements / Key Responsibilities <span style="color:var(--text-muted);">(one bullet per line)</span></label>
+                            <textarea id="experience-description" class="glass-textarea" th:field="*{description}" rows="4" placeholder="Engineered high-throughput REST APIs&#10;Optimized MySQL database queries with indexes&#10;Collaborated using Git and Agile methodologies"></textarea>
+                            <small>Each line renders as an itemized bullet point on the public timeline.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="experience-sort">Sort Order</label>
+                            <input id="experience-sort" class="glass-input" type="number" min="0" step="1" th:field="*{sortOrder}" placeholder="1" />
+                            <small>Lower order numbers appear first in the timeline.</small>
+                        </div>
+
+                        <div class="form-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" th:field="*{visible}"/>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong style="color:var(--text); font-size:0.9rem;">Visible on Portfolio</strong>
+                                <div style="color:var(--text-secondary); font-size:0.75rem;">Show this role in your public timeline.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
+                            <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Experience</button>
+                            <a th:href="@{/admin/experience}" class="glass-btn">Cancel</a>
+                        </div>
+                    </form>
+
+                    <!-- Real-time Live Preview -->
+                    <div class="live-preview-box">
+                        <div class="live-preview-header"><i class="fa-solid fa-eye"></i> Live Timeline Preview</div>
+                        <div style="position:relative; padding:18px 20px 18px 24px; border:1px solid var(--glass-border); border-radius:var(--radius-sm); background:rgba(255,255,255,0.03);">
+                            <div style="position:absolute; left:10px; top:18px; bottom:18px; width:3px; border-radius:3px; background:linear-gradient(var(--primary), var(--secondary));"></div>
+                            <div id="experiencePreviewType" style="color:var(--primary); font-family:var(--font-mono); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Internship</div>
+                            <div id="experiencePreviewRole" style="color:var(--text); font-weight:700; font-size:1.05rem; margin:4px 0 2px;">Your Role</div>
+                            <div style="color:var(--secondary); font-size:0.82rem;">
+                                <span id="experiencePreviewCompany">Your Company</span> · <span id="experiencePreviewDuration">Your Duration</span>
+                            </div>
+                            <ul id="experiencePreviewList" style="margin:10px 0 0; padding-left:18px; color:var(--text-secondary); font-size:0.82rem; line-height:1.6;"></ul>
+                            <div style="margin-top:12px;">
+                                <span id="experiencePreviewState" class="status-pill on">Visible on portfolio</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -87,28 +112,41 @@
 <script th:src="@{/js/admin.js}"></script>
 <script>
 (function() {
-    var fields = {
+    const fields = {
         company: document.getElementById('experience-company'),
         role: document.getElementById('experience-role'),
         duration: document.getElementById('experience-duration'),
         type: document.getElementById('experience-type'),
         description: document.getElementById('experience-description')
     };
-    var visible = document.querySelector('input[name="visible"][value="true"]');
+    const visible = document.querySelector('input[name="visible"][value="true"]');
     if (!fields.company) return;
+
     function value(field, fallback) { return field && field.value.trim() ? field.value.trim() : fallback; }
+
     function render() {
-        document.getElementById('experiencePreviewCompany').textContent = value(fields.company, 'Your company');
-        document.getElementById('experiencePreviewRole').textContent = value(fields.role, 'Your role');
-        document.getElementById('experiencePreviewDuration').textContent = value(fields.duration, 'Your duration');
+        document.getElementById('experiencePreviewCompany').textContent = value(fields.company, 'Your Company');
+        document.getElementById('experiencePreviewRole').textContent = value(fields.role, 'Your Role');
+        document.getElementById('experiencePreviewDuration').textContent = value(fields.duration, 'Your Duration');
         document.getElementById('experiencePreviewType').textContent = value(fields.type, 'Experience');
-        var items = value(fields.description, '').split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean);
-        document.getElementById('experiencePreviewList').innerHTML = items.map(function(item) { return '<li>' + item.replace(/[&<>]/g, function(char) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[char]; }) + '</li>'; }).join('');
-        var state = document.getElementById('experiencePreviewState');
-        state.textContent = visible && visible.checked ? 'Visible on portfolio' : 'Hidden from portfolio';
-        state.className = 'experience-preview-state' + (visible && visible.checked ? ' visible' : '');
+        
+        const items = value(fields.description, '').split(/\r?\n/).map(i => i.trim()).filter(Boolean);
+        document.getElementById('experiencePreviewList').innerHTML = items.map(item => '<li>' + escapeHtml(item) + '</li>').join('');
+        
+        const state = document.getElementById('experiencePreviewState');
+        const isVisible = visible && visible.checked;
+        state.textContent = isVisible ? 'Visible on portfolio' : 'Hidden from portfolio';
+        state.className = 'status-pill ' + (isVisible ? 'on' : 'off');
     }
-    Object.keys(fields).forEach(function(key) { fields[key].addEventListener('input', render); fields[key].addEventListener('change', render); });
+
+    function escapeHtml(str) {
+        return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    }
+
+    Object.keys(fields).forEach(key => {
+        fields[key].addEventListener('input', render);
+        fields[key].addEventListener('change', render);
+    });
     if (visible) visible.addEventListener('change', render);
     render();
 })();

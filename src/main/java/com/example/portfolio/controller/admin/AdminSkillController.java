@@ -42,26 +42,30 @@ public class AdminSkillController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute Skill skill) {
+    public String save(@ModelAttribute Skill skill, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         skillRepository.save(skill);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Skill \"" + skill.getName() + "\" saved successfully.");
         return "redirect:/admin/skills";
     }
 
     @PostMapping("/{id}/toggle-visible")
-    public String toggleVisible(@PathVariable("id") Long id) {
+    public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         skillRepository.findById(id).ifPresent(s -> {
             s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
             skillRepository.save(s);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Skill \"" + s.getName() + "\" visibility set to " + (s.getVisible() ? "Visible." : "Hidden."));
         });
         dataVersionService.bump();
         return "redirect:/admin/skills";
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         skillRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Skill deleted successfully.");
         return "redirect:/admin/skills";
     }
 }

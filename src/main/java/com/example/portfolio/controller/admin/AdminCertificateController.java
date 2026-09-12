@@ -49,7 +49,8 @@ public class AdminCertificateController {
     @PostMapping("/save")
     public String save(@ModelAttribute Certificate certificate,
                         @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                        @RequestParam(value = "pdfFile", required = false) MultipartFile pdfFile) {
+                        @RequestParam(value = "pdfFile", required = false) MultipartFile pdfFile,
+                        org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         if (imageFile != null && !imageFile.isEmpty()) {
             certificate.setImageUrl(fileStorageService.store(imageFile, "certificates"));
         }
@@ -65,23 +66,27 @@ public class AdminCertificateController {
         }
         certificateRepository.save(certificate);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Certificate \"" + certificate.getTitle() + "\" saved successfully.");
         return "redirect:/admin/certificates";
     }
 
     @PostMapping("/{id}/toggle-visible")
-    public String toggleVisible(@PathVariable("id") Long id) {
+    public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         certificateRepository.findById(id).ifPresent(c -> {
             c.setVisible(!Boolean.TRUE.equals(c.getVisible()));
             certificateRepository.save(c);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Certificate \"" + c.getTitle() + "\" visibility set to " + (c.getVisible() ? "Visible." : "Hidden."));
         });
         dataVersionService.bump();
         return "redirect:/admin/certificates";
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         certificateRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Certificate deleted successfully.");
         return "redirect:/admin/certificates";
     }
 }

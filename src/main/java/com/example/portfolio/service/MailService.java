@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
@@ -38,13 +39,18 @@ public class MailService {
         return mailEnabled && mailUsername != null && !mailUsername.isBlank();
     }
 
+    @Async
     public void notifyNewMessage(String fromName, String fromEmail, String subject, String message) {
         if (!isConfigured()) {
             return;
         }
+        String recipient = (notifyTo != null && !notifyTo.isBlank()) ? notifyTo : mailUsername;
+        if (recipient == null || recipient.isBlank()) {
+            return;
+        }
         try {
             SimpleMailMessage mail = new SimpleMailMessage();
-            mail.setTo(notifyTo);
+            mail.setTo(recipient);
             mail.setSubject("New portfolio contact: " + (subject == null || subject.isBlank() ? "No subject" : subject));
             mail.setText("From: " + fromName + " <" + fromEmail + ">\n\n" + message);
             if (fromEmail != null && !fromEmail.isBlank()) {
@@ -52,7 +58,8 @@ public class MailService {
             }
             applyFrom(mail);
             mailSender.send(mail);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to deliver contact notification email: {}", e.getMessage());
             // Never let a mail failure break the contact form submission.
         }
     }

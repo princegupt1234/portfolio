@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Testimonials | Admin</title>
+    <meta charset="UTF-8" />
+    <title>Testimonials | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -14,37 +17,83 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Testimonials', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1>Testimonials</h1>
-                <a th:href="@{/admin/testimonials/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Testimonial</a>
-            </div>
-            <div class="glass-card glass-table-wrap">
-                <table class="glass-table">
-                    <thead><tr><th>Photo</th><th>Name</th><th>Role</th><th>Rating</th><th>Published</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="t : ${testimonials}">
-                        <td><img class="row-thumb" th:if="${t.photoUrl}" th:src="@{${t.photoUrl}}" alt="" /><span th:unless="${t.photoUrl}">—</span></td>
-                        <td th:text="${t.name}">Name</td>
-                        <td th:text="${t.role}">Role</td>
-                        <td th:text="${t.rating} + ' / 5'">5/5</td>
-                        <td>
-                            <form th:action="@{'/admin/testimonials/' + ${t.id} + '/toggle-published'}" method="post" style="margin:0;">
-                                <button type="submit" class="status-pill" th:classappend="${t.published} ? 'on' : 'off'"
-                                        th:text="${t.published} ? 'Published' : 'Hidden'">Published</button>
-                            </form>
-                        </td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{'/admin/testimonials/' + ${t.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>
-                                <form th:action="@{'/admin/testimonials/' + ${t.id} + '/delete'}" method="post" data-confirm="Delete this testimonial?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(testimonials)}"><td colspan="6" style="text-align:center; color:var(--text-secondary);">No testimonials yet.</td></tr>
-                    </tbody>
-                </table>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Social Proof / Reviews</div>
+                        <h1>Client &amp; Peer Testimonials</h1>
+                        <p class="page-desc">Manage reviews, ratings, client avatars, and public testimonial visibility.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/testimonials/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Testimonial</a>
+                    </div>
+                </div>
+
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-comment-dots" style="color:var(--primary);"></i> Testimonial List</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(testimonials)}">0</strong> testimonials</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px;">Photo</th>
+                                <th>Name &amp; Role</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th style="text-align:right; width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="t : ${testimonials}">
+                                <td>
+                                    <img class="row-thumb" th:if="${t.photoUrl}" th:src="@{${t.photoUrl}}" alt="" style="border-radius:50%;" />
+                                    <span th:unless="${t.photoUrl}" class="row-thumb" style="border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.9rem;"><i class="fa-solid fa-user"></i></span>
+                                </td>
+                                <td>
+                                    <strong th:text="${t.name}" style="color:var(--text); display:block;">Name</strong>
+                                    <span th:text="${t.role}" style="color:var(--text-secondary); font-size:0.8rem;">Role</span>
+                                </td>
+                                <td>
+                                    <span style="color:#f59e0b; font-size:0.85rem;"><i class="fa-solid fa-star"></i></span>
+                                    <span th:text="${t.rating} + ' / 5'" style="font-family:var(--font-mono); font-size:0.82rem; margin-left:4px;">5 / 5</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{'/admin/testimonials/' + ${t.id} + '/toggle-published'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill" th:classappend="${t.published} ? 'on' : 'off'"
+                                                title="Click to toggle publication">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${t.published} ? 'Published' : 'Hidden'">Published</span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{'/admin/testimonials/' + ${t.id} + '/edit'}" title="Edit Testimonial"><i class="fa-solid fa-pen"></i></a>
+                                        <form th:action="@{'/admin/testimonials/' + ${t.id} + '/delete'}" method="post" data-confirm="Delete this testimonial?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Testimonial"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(testimonials)}" class="empty-initial-row">
+                                <td colspan="5" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-comment-dots" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No testimonials yet. Click <strong>Add Testimonial</strong> above to add reviews.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

@@ -3,33 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>Skills | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <style>
-        .skills-workspace { max-width:1180px; margin:0 auto; }
-        .skills-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin-bottom:18px; }
-        .skills-kicker { color:var(--primary); font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px; }
-        .skills-intro h1 { margin:0; font-size:clamp(1.35rem,2.5vw,1.9rem); }
-        .skills-intro p { color:var(--text-secondary); font-size:.8rem; line-height:1.6; margin:7px 0 0; }
-        .skills-table-card { padding:0; overflow:hidden; }
-        .skills-table-card .table-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid var(--glass-border); color:var(--text-secondary); font-size:.75rem; }
-        .skills-count { color:var(--text-muted); }
-        .skills-count strong { color:var(--text); }
-        .skills-table-card table { font-size:.82rem; }
-        .skills-table-card th { padding:11px 14px; font-size:.68rem; }
-        .skills-table-card td { padding:12px 14px; }
-        .skill-name-cell { display:flex; align-items:center; gap:10px; min-width:170px; }
-        .skill-list-icon { width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:8px; color:var(--primary); background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.2); }
-        .skill-name-cell strong { font-size:.82rem; }
-        .skill-category { display:inline-flex; padding:4px 8px; border:1px solid var(--glass-border); border-radius:7px; color:var(--text-secondary); font-size:.68rem; }
-        .skill-order { display:inline-flex; min-width:25px; justify-content:center; padding:3px 6px; border-radius:6px; background:rgba(255,255,255,.06); color:var(--text-secondary); font:600 .7rem var(--font-mono); }
-        .skill-progress { min-width:130px; }
-        .skill-progress-top { display:flex; justify-content:space-between; color:var(--text-muted); font-size:.68rem; margin-bottom:5px; }
-        .skill-progress .progress-track { height:5px; }
-        @media(max-width:700px){ .skills-intro { align-items:flex-start; flex-direction:column; } .skills-table-card .table-toolbar { align-items:flex-start; flex-direction:column; } }
-    </style>
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
@@ -38,42 +17,92 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Skills', unread=0)}"></div>
         <div class="admin-content">
-            <div class="skills-workspace">
-            <div class="skills-intro">
-                <div><div class="skills-kicker">Skills / Expertise</div><h1>Skills</h1><p>Manage the expertise cards shown on your public portfolio. Use Sort Order to control the sequence.</p></div>
-                <a th:href="@{/admin/skills/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add skill</a>
-            </div>
-            <div class="glass-card skills-table-card glass-table-wrap">
-                <div class="table-toolbar"><span><i class="fa-solid fa-layer-group" style="color:var(--primary);margin-right:7px;"></i> Your expertise</span><span class="skills-count"><strong th:text="${#lists.size(skills)}">0</strong> skills · lower order appears first</span></div>
-                <table class="glass-table">
-                    <thead><tr><th>Name</th><th>Category</th><th>Proficiency</th><th>Order</th><th>Visible</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="skill : ${skills}">
-                        <td><div class="skill-name-cell"><span class="skill-list-icon"><i th:class="${skill.icon ?: 'fa-solid fa-star'}"></i></span><strong th:text="${skill.name}">Java</strong></div></td>
-                        <td><span class="skill-category" th:text="${skill.category}">Programming</span></td>
-                        <td class="skill-progress">
-                            <div class="skill-progress-top"><span>Proficiency</span><span th:text="${skill.proficiency} + '%'">80%</span></div>
-                            <div class="progress-track"><div class="progress-fill" th:style="'width:' + ${skill.proficiency} + '%' "></div></div>
-                        </td>
-                        <td><span class="skill-order" th:text="${skill.sortOrder}">0</span></td>
-                        <td>
-                            <form th:action="@{'/admin/skills/' + ${skill.id} + '/toggle-visible'}" method="post" style="margin:0;">
-                                <button type="submit" class="status-pill" th:classappend="${skill.visible} ? 'on' : 'off'" th:text="${skill.visible} ? 'Visible' : 'Hidden'">Visible</button>
-                            </form>
-                        </td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{'/admin/skills/' + ${skill.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>
-                                <form th:action="@{'/admin/skills/' + ${skill.id} + '/delete'}" method="post" data-confirm="Delete this skill?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(skills)}"><td colspan="6" style="text-align:center; color:var(--text-secondary);">No skills yet — add your first one.</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Expertise / Skills</div>
+                        <h1>Skills &amp; Capabilities</h1>
+                        <p class="page-desc">Manage the technical competencies, proficiency levels, and category tabs shown on your portfolio.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/skills/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Skill</a>
+                    </div>
+                </div>
+
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> Expertise List</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(skills)}">0</strong> skills · lower order appears first</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>Skill Name</th>
+                                <th>Category</th>
+                                <th style="min-width:140px;">Proficiency</th>
+                                <th>Sort Order</th>
+                                <th>Visibility</th>
+                                <th style="text-align:right; width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="skill : ${skills}">
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span class="row-thumb" style="width:34px; height:34px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; color:var(--primary); font-size:0.95rem;">
+                                            <i th:class="${skill.icon ?: 'fa-solid fa-star'}"></i>
+                                        </span>
+                                        <strong th:text="${skill.name}" style="color:var(--text);">Java</strong>
+                                    </div>
+                                </td>
+                                <td><span class="badge-tag" th:text="${skill.category}">Programming</span></td>
+                                <td>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">
+                                        <span>Mastery</span>
+                                        <span th:text="${skill.proficiency} + '%'">80%</span>
+                                    </div>
+                                    <div class="progress-track" style="height:5px;">
+                                        <div class="progress-fill" th:style="'width:' + ${skill.proficiency} + '%'"></div>
+                                    </div>
+                                </td>
+                                <td><span class="order-badge" th:text="${skill.sortOrder}">0</span></td>
+                                <td>
+                                    <form th:action="@{'/admin/skills/' + ${skill.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill"
+                                                th:classappend="${skill.visible} ? 'on' : 'off'"
+                                                title="Click to toggle visibility">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${skill.visible} ? 'Visible' : 'Hidden'">Visible</span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{'/admin/skills/' + ${skill.id} + '/edit'}" title="Edit Skill"><i class="fa-solid fa-pen"></i></a>
+                                        <form th:action="@{'/admin/skills/' + ${skill.id} + '/delete'}" method="post" data-confirm="Delete this skill?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Skill"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(skills)}" class="empty-initial-row">
+                                <td colspan="6" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-layer-group" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No skills added yet. Click <strong>Add Skill</strong> to define your expertise.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

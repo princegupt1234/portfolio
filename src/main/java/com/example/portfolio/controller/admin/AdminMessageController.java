@@ -71,9 +71,22 @@ public class AdminMessageController {
         return "redirect:/admin/messages/" + id + "?sent=" + sent;
     }
 
+    @PostMapping("/{id}/toggle-read")
+    public String toggleRead(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        contactMessageRepository.findById(id).ifPresent(m -> {
+            boolean newStatus = !Boolean.TRUE.equals(m.getIsRead());
+            m.setIsRead(newStatus);
+            contactMessageRepository.save(m);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Message from \"" + m.getName() + "\" marked as " + (newStatus ? "Read." : "Unread."));
+        });
+        return "redirect:/admin/messages";
+    }
+
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         contactMessageRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Contact message deleted successfully.");
         return "redirect:/admin/messages";
     }
 

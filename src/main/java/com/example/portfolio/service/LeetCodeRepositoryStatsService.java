@@ -39,18 +39,28 @@ public class LeetCodeRepositoryStatsService {
                         username, Instant.now().toEpochMilli())
                     .retrieve()
                     .body(String.class);
-            if (response == null || !response.contains("\"leetcode\"")) return unavailable();
-
-            return new LeetCodeRepositoryStats(
-                    number(response, SOLVED),
-                    number(response, EASY),
-                    number(response, MEDIUM),
-                    number(response, HARD),
-                    true);
+            return parseResponse(response);
         } catch (Exception e) {
             log.warn("Unable to load GitHub-backed LeetCode stats for '{}': {}", username, e.getMessage());
             return unavailable();
         }
+    }
+
+    LeetCodeRepositoryStats parseResponse(String response) {
+        if (response == null || !response.contains("\"leetcode\"")) return unavailable();
+
+        int easy = number(response, EASY);
+        int medium = number(response, MEDIUM);
+        int hard = number(response, HARD);
+        int solvedVal = number(response, SOLVED);
+        int solved = solvedVal > 0 ? solvedVal : (easy + medium + hard);
+
+        return new LeetCodeRepositoryStats(
+                solved,
+                easy,
+                medium,
+                hard,
+                true);
     }
 
     private int number(String response, Pattern pattern) {

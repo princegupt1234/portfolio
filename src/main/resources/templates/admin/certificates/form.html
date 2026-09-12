@@ -1,99 +1,127 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Certificate Form | Admin</title>
+    <meta charset="UTF-8" />
+    <title th:text="${certificate.id} != null ? 'Edit Certificate | Admin' : 'Add Certificate | Admin'">Certificate Form | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <style>
-        .achievement-editor { max-width:980px; margin:0 auto; }
-        .achievement-card { padding:22px; }
-        .achievement-intro { color:var(--text-secondary); font-size:.8rem; line-height:1.6; margin:-4px 0 18px; }
-        .achievement-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-        .achievement-grid .full { grid-column:1/-1; }
-        .achievement-grid label { color:var(--text-secondary); font-size:.78rem; }
-        .achievement-grid small { color:var(--text-muted) !important; font-size:.7rem !important; line-height:1.5; }
-        .achievement-order-note { display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:.7rem; margin-top:6px; }
-        .achievement-order-note i { color:var(--primary); }
-        .achievement-preview-wrap { margin-top:20px; padding-top:18px; border-top:1px solid var(--glass-border); }
-        .achievement-preview-label { display:flex; align-items:center; gap:8px; margin-bottom:10px; color:var(--text-muted); font:600 .68rem var(--font-mono); letter-spacing:1.4px; text-transform:uppercase; }
-        .achievement-preview-label::after { content:''; height:1px; flex:1; background:var(--glass-border); }
-        .achievement-preview { display:grid; grid-template-columns:120px minmax(0,1fr); gap:16px; padding:14px; border:1px solid var(--glass-border); border-radius:13px; background:rgba(255,255,255,.025); }
-        .achievement-preview-image { aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:9px; background:rgba(255,255,255,.06); color:var(--primary); font-size:1.6rem; }
-        .achievement-preview-image img { width:100%; height:100%; object-fit:cover; }
-        .achievement-preview-kicker { color:var(--primary); font:600 .65rem var(--font-mono); letter-spacing:1px; text-transform:uppercase; }
-        .achievement-preview-title { color:var(--text); font:600 .95rem var(--font-heading); margin:5px 0 4px; }
-        .achievement-preview-org { color:var(--text-secondary); font-size:.75rem; }
-        .achievement-preview-meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:9px; color:var(--text-muted); font-size:.68rem; }
-        .achievement-preview-meta span { padding:3px 7px; border:1px solid var(--glass-border); border-radius:6px; }
-        .achievement-preview-state { display:inline-flex; margin-top:10px; padding:4px 8px; border-radius:999px; color:var(--text-muted); font-size:.64rem; border:1px solid var(--glass-border); }
-        .achievement-preview-state.visible { color:var(--success); border-color:rgba(34,197,94,.3); background:rgba(34,197,94,.1); }
-        @media(max-width:700px){ .achievement-grid { grid-template-columns:1fr; } .achievement-preview { grid-template-columns:1fr; } .achievement-preview-image { max-width:180px; } }
-    </style>
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(active='certificates')}"></div>
     <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Certificate', unread=0)}"></div>
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Certificate Form', unread=0)}"></div>
         <div class="admin-content">
-            <div class="achievement-editor">
-            <div class="page-header">
-                <div><div style="color:var(--primary);font:600 .7rem var(--font-mono);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Achievements / Certifications</div><h1 th:text="${certificate.id} != null ? 'Edit achievement' : 'Add achievement'">Add achievement</h1></div>
-                <a th:href="@{/admin/certificates}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to achievements</a>
-            </div>
-            <div class="glass-card achievement-card">
-                <p class="achievement-intro">Add the achievement details visitors should see. Upload an image or PDF only when you have one; existing files are kept during edits.</p>
-                <form id="achievementForm" th:action="@{/admin/certificates/save}" th:object="${certificate}" method="post" enctype="multipart/form-data" class="achievement-grid">
-                    <input type="hidden" th:field="*{id}" />
-                    <div class="form-group"><label for="achievement-title">Title</label><input id="achievement-title" class="glass-input" th:field="*{title}" placeholder="e.g. Java Foundations Certificate" required /></div>
-                    <div class="form-group"><label for="achievement-organization">Organization</label><input id="achievement-organization" class="glass-input" th:field="*{organization}" placeholder="e.g. Oracle, Google, Coursera" /></div>
-                    <div class="form-group"><label for="achievement-date">Issue date</label><input id="achievement-date" class="glass-input" type="date" th:field="*{issueDate}" /></div>
-                    <div class="form-group"><label for="achievement-credential">Credential ID</label><input id="achievement-credential" class="glass-input" th:field="*{credentialId}" placeholder="e.g. ABC-123-XYZ" /></div>
-                    <div class="form-group"><label for="achievement-sort">Sort order</label><input id="achievement-sort" class="glass-input" type="number" min="0" step="1" th:field="*{sortOrder}" placeholder="1" /><span class="achievement-order-note"><i class="fa-solid fa-arrow-down-1-9"></i> Lower numbers appear first.</span></div>
-                    <div class="form-group full" style="flex-direction:row; align-items:center; gap:12px;">
-                        <input type="hidden" name="visible" value="false"/>
-                        <label class="toggle-switch"><input type="checkbox" name="visible" value="true" th:checked="*{visible}"/><span class="toggle-slider"></span></label>
-                        <label style="margin:0;">Visible on portfolio</label>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Credentials / Certificate Editor</div>
+                        <h1 th:text="${certificate.id} != null ? 'Edit Certificate' : 'Add New Certificate'">Certificate Form</h1>
+                        <p class="page-desc">Enter certificate credentials, upload badge images or PDFs, and preview the card in real time.</p>
                     </div>
-                    <div class="form-group">
-                        <label>Current Certificate Image</label>
-                        <img th:if="*{imageUrl}" th:src="@{*{imageUrl}}" style="max-width:180px; border-radius:10px; margin-top:6px; border:1px solid var(--glass-border);"/>
-                        <span th:unless="*{imageUrl}" style="font-size:.82rem; color:var(--text-secondary);">No image uploaded yet.</span>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/certificates}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to Certificates</a>
                     </div>
-                    <div class="form-group">
-                        <label>Current PDF</label>
-                        <a th:if="*{pdfUrl}" th:href="@{*{pdfUrl}}" target="_blank" class="glass-btn" style="font-size:.8rem; padding:7px 14px; margin-top:6px; display:inline-flex;"><i class="fa-solid fa-file-pdf"></i> View PDF</a>
-                        <span th:unless="*{pdfUrl}" style="font-size:.82rem; color:var(--text-secondary);">No PDF uploaded yet.</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Certificate Image</label>
-                        <div class="file-drop"><input type="file" name="imageFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload image</div></div>
-                    </div>
-                    <div class="form-group">
-                        <label>Certificate PDF</label>
-                        <div class="file-drop"><input type="file" name="pdfFile" accept="application/pdf" /><div class="file-drop-label"><i class="fa-solid fa-file-pdf"></i> Upload PDF</div></div>
-                    </div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save achievement</button>
-                    </div>
-                </form>
-                <div class="achievement-preview-wrap">
-                    <div class="achievement-preview-label"><i class="fa-solid fa-eye"></i> Live preview</div>
-                    <div class="achievement-preview">
-                        <div class="achievement-preview-image" id="achievementPreviewImage"><i class="fa-solid fa-award"></i></div>
-                        <div>
-                            <div class="achievement-preview-kicker">Certification</div>
-                            <div class="achievement-preview-title" id="achievementPreviewTitle">Your achievement</div>
-                            <div class="achievement-preview-org" id="achievementPreviewOrganization">Issuing organization</div>
-                            <div class="achievement-preview-meta"><span id="achievementPreviewDate">Issue date</span><span id="achievementPreviewCredential">Credential ID</span></div>
-                            <span class="achievement-preview-state" id="achievementPreviewState">Hidden from portfolio</span>
+                </div>
+
+                <div class="glass-card" style="padding:28px;">
+                    <form id="achievementForm" th:action="@{/admin/certificates/save}" th:object="${certificate}" method="post" enctype="multipart/form-data" class="form-grid">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-group">
+                            <label for="achievement-title">Certificate / Achievement Title</label>
+                            <input id="achievement-title" class="glass-input" th:field="*{title}" placeholder="e.g. AWS Certified Cloud Practitioner" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="achievement-organization">Issuing Organization</label>
+                            <input id="achievement-organization" class="glass-input" th:field="*{organization}" placeholder="e.g. Amazon Web Services, Oracle, Coursera" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="achievement-date">Issue Date</label>
+                            <input id="achievement-date" class="glass-input" type="date" th:field="*{issueDate}" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="achievement-credential">Credential ID / Verification Code</label>
+                            <input id="achievement-credential" class="glass-input" th:field="*{credentialId}" placeholder="e.g. AWS-123456789" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="achievement-sort">Sort Order</label>
+                            <input id="achievement-sort" class="glass-input" type="number" min="0" step="1" th:field="*{sortOrder}" placeholder="1" />
+                            <small>Lower order numbers appear first.</small>
+                        </div>
+
+                        <div class="form-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" th:field="*{visible}"/>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong style="color:var(--text); font-size:0.9rem;">Visible on Portfolio</strong>
+                                <div style="color:var(--text-secondary); font-size:0.75rem;">Display this certificate in your public showcase.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Certificate Badge / Image</label>
+                            <div class="file-drop">
+                                <input type="file" name="imageFile" accept="image/*" />
+                                <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload badge or certificate image</div>
+                            </div>
+                            <div th:if="*{imageUrl}" style="margin-top:10px; display:flex; align-items:center; gap:12px;">
+                                <img th:src="@{*{imageUrl}}" style="width:50px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--glass-border);"/>
+                                <span style="font-size:0.8rem; color:var(--text-secondary);">Current image active.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Certificate Document (PDF)</label>
+                            <div class="file-drop">
+                                <input type="file" name="pdfFile" accept="application/pdf" />
+                                <div class="file-drop-label"><i class="fa-solid fa-file-pdf"></i> Upload certificate PDF</div>
+                            </div>
+                            <div th:if="*{pdfUrl}" style="margin-top:10px;">
+                                <a th:href="@{*{pdfUrl}}" target="_blank" class="glass-btn" style="font-size:0.8rem; padding:6px 12px;"><i class="fa-solid fa-file-pdf"></i> View Current PDF</a>
+                            </div>
+                        </div>
+
+                        <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
+                            <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Certificate</button>
+                            <a th:href="@{/admin/certificates}" class="glass-btn">Cancel</a>
+                        </div>
+                    </form>
+
+                    <!-- Real-time Live Preview -->
+                    <div class="live-preview-box">
+                        <div class="live-preview-header"><i class="fa-solid fa-eye"></i> Live Credential Preview</div>
+                        <div style="display:flex; align-items:center; gap:16px; padding:18px 20px; border:1px solid var(--glass-border); border-radius:var(--radius-sm); background:rgba(255,255,255,0.03);">
+                            <div id="achievementPreviewImage" style="width:60px; height:50px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(59,130,246,0.12); color:var(--primary); font-size:1.6rem; border:1px solid rgba(59,130,246,0.25); overflow:hidden;">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <div style="flex:1; min-width:0;">
+                                <div style="color:var(--primary); font-family:var(--font-mono); font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Certification</div>
+                                <div id="achievementPreviewTitle" style="color:var(--text); font-weight:700; font-size:1rem; margin:2px 0;">Your Achievement</div>
+                                <div id="achievementPreviewOrganization" style="color:var(--secondary); font-size:0.82rem;">Issuing Organization</div>
+                                <div style="display:flex; gap:10px; margin-top:6px; font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">
+                                    <span id="achievementPreviewDate">Issue Date</span>
+                                    <span>·</span>
+                                    <span id="achievementPreviewCredential">Credential ID</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span id="achievementPreviewState" class="status-pill on">Visible</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>
@@ -101,33 +129,45 @@
 <script th:src="@{/js/admin.js}"></script>
 <script>
 (function() {
-    var fields = {
+    const fields = {
         title: document.getElementById('achievement-title'),
         organization: document.getElementById('achievement-organization'),
         date: document.getElementById('achievement-date'),
         credential: document.getElementById('achievement-credential')
     };
-    var visible = document.querySelector('input[name="visible"][value="true"]');
-    var imageInput = document.querySelector('input[name="imageFile"]');
+    const visible = document.querySelector('input[name="visible"][value="true"]');
+    const imageInput = document.querySelector('input[name="imageFile"]');
     if (!fields.title) return;
+
     function value(field, fallback) { return field && field.value.trim() ? field.value.trim() : fallback; }
+
     function render() {
-        document.getElementById('achievementPreviewTitle').textContent = value(fields.title, 'Your achievement');
-        document.getElementById('achievementPreviewOrganization').textContent = value(fields.organization, 'Issuing organization');
-        document.getElementById('achievementPreviewDate').textContent = value(fields.date, 'Issue date');
+        document.getElementById('achievementPreviewTitle').textContent = value(fields.title, 'Your Achievement');
+        document.getElementById('achievementPreviewOrganization').textContent = value(fields.organization, 'Issuing Organization');
+        document.getElementById('achievementPreviewDate').textContent = value(fields.date, 'Issue Date');
         document.getElementById('achievementPreviewCredential').textContent = value(fields.credential, 'Credential ID');
-        var state = document.getElementById('achievementPreviewState');
-        state.textContent = visible && visible.checked ? 'Visible on portfolio' : 'Hidden from portfolio';
-        state.className = 'achievement-preview-state' + (visible && visible.checked ? ' visible' : '');
+        
+        const state = document.getElementById('achievementPreviewState');
+        const isVisible = visible && visible.checked;
+        state.textContent = isVisible ? 'Visible' : 'Hidden';
+        state.className = 'status-pill ' + (isVisible ? 'on' : 'off');
     }
-    Object.keys(fields).forEach(function(key) { fields[key].addEventListener('input', render); fields[key].addEventListener('change', render); });
-    if (visible) visible.addEventListener('change', render);
-    if (imageInput) imageInput.addEventListener('change', function() {
-        if (!imageInput.files || !imageInput.files[0]) return;
-        var reader = new FileReader();
-        reader.onload = function(event) { document.getElementById('achievementPreviewImage').innerHTML = '<img src="' + event.target.result + '" alt="Achievement preview">'; };
-        reader.readAsDataURL(imageInput.files[0]);
+
+    Object.keys(fields).forEach(key => {
+        fields[key].addEventListener('input', render);
+        fields[key].addEventListener('change', render);
     });
+    if (visible) visible.addEventListener('change', render);
+    if (imageInput) {
+        imageInput.addEventListener('change', () => {
+            if (!imageInput.files || !imageInput.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('achievementPreviewImage').innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;" alt="Preview">';
+            };
+            reader.readAsDataURL(imageInput.files[0]);
+        });
+    }
     render();
 })();
 </script>

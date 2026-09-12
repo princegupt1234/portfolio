@@ -104,7 +104,8 @@ public class AdminAboutController {
     @PostMapping("/save")
     public String save(@ModelAttribute AboutInfo about,
                         @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
-                        @RequestParam(value = "availabilityVisible", required = false) String availabilityVisibleParam) {
+                        @RequestParam(value = "availabilityVisible", required = false) String availabilityVisibleParam,
+                        org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         about.setAvailabilityVisible("true".equals(availabilityVisibleParam));
         if (photoFile != null && !photoFile.isEmpty()) {
             about.setProfileImage(fileStorageService.store(photoFile, "profile"));
@@ -114,6 +115,7 @@ public class AdminAboutController {
         }
         aboutInfoRepository.save(about);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "About & Hero profile saved successfully.");
         return "redirect:/admin/about";
     }
 

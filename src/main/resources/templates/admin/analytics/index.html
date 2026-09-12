@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" /><title>Analytics | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -14,35 +16,79 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Analytics', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header"><h1>Analytics</h1></div>
-
-            <div class="dash-grid">
-                <div class="glass-card">
-                    <h3 style="margin-bottom:18px;">Daily Visitors — Last 30 Days</h3>
-                    <canvas id="visitorsChart" height="100"></canvas>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Performance / Traffic</div>
+                        <h1>Portfolio Analytics</h1>
+                        <p class="page-desc">Traffic metrics, page visits, resume downloads, and project engagement breakdown.</p>
+                    </div>
                 </div>
-                <div class="glass-card">
-                    <h3 style="margin-bottom:18px;">Views by Project</h3>
-                    <canvas id="projectClicksChart" height="220"></canvas>
-                    <p style="font-size:0.78rem; margin-top:12px;">Per-project view counts, updated whenever a visitor clicks a project link.</p>
-                </div>
-            </div>
 
-            <div class="glass-card glass-table-wrap">
-                <h3 style="margin-bottom:16px;">Daily Breakdown</h3>
-                <table class="glass-table">
-                    <thead><tr><th>Date</th><th>Portfolio Views</th><th>Resume Downloads</th><th>Project Clicks</th><th>Messages</th></tr></thead>
-                    <tbody>
-                    <tr th:each="s : ${stats}">
-                        <td th:text="${s.statDate}">Date</td>
-                        <td th:text="${s.portfolioViews}">0</td>
-                        <td th:text="${s.resumeDownloads}">0</td>
-                        <td th:text="${s.projectClicks}">0</td>
-                        <td th:text="${s.messagesReceived}">0</td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(stats)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No analytics data yet — visit the public site to generate some.</td></tr>
-                    </tbody>
-                </table>
+                <div class="dash-grid">
+                    <div class="glass-card" style="padding:24px;">
+                        <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
+                            <span class="toolbar-title"><i class="fa-solid fa-chart-line" style="color:var(--primary);"></i> Daily Portfolio Visitors (30d)</span>
+                        </div>
+                        <canvas id="visitorsChart" height="100"></canvas>
+                    </div>
+                    <div class="glass-card" style="padding:24px;">
+                        <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
+                            <span class="toolbar-title"><i class="fa-solid fa-chart-pie" style="color:var(--secondary);"></i> Clicks by Project</span>
+                        </div>
+                        <canvas id="projectClicksChart" height="200"></canvas>
+                        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:14px; text-align:center;">Real-time clicks recorded when visitors open project links.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-calendar-days" style="color:var(--primary);"></i> Daily Traffic Breakdown</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(stats)}">0</strong> days recorded</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Portfolio Views</th>
+                                <th>Resume Downloads</th>
+                                <th>Project Clicks</th>
+                                <th>Messages Received</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s : ${stats}">
+                                <td><strong th:text="${s.statDate}" style="color:var(--text); font-family:var(--font-mono);">Date</strong></td>
+                                <td>
+                                    <span style="display:inline-flex; align-items:center; gap:6px; color:var(--primary); font-family:var(--font-mono); font-weight:600;">
+                                        <i class="fa-solid fa-eye" style="font-size:0.8rem;"></i> <span th:text="${s.portfolioViews}">0</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display:inline-flex; align-items:center; gap:6px; color:var(--secondary); font-family:var(--font-mono); font-weight:600;">
+                                        <i class="fa-solid fa-download" style="font-size:0.8rem;"></i> <span th:text="${s.resumeDownloads}">0</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display:inline-flex; align-items:center; gap:6px; color:#8b5cf6; font-family:var(--font-mono); font-weight:600;">
+                                        <i class="fa-solid fa-arrow-pointer" style="font-size:0.8rem;"></i> <span th:text="${s.projectClicks}">0</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display:inline-flex; align-items:center; gap:6px; color:#22c55e; font-family:var(--font-mono); font-weight:600;">
+                                        <i class="fa-solid fa-envelope" style="font-size:0.8rem;"></i> <span th:text="${s.messagesReceived}">0</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(stats)}" class="empty-initial-row">
+                                <td colspan="5" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-chart-line" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No analytics data recorded yet.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

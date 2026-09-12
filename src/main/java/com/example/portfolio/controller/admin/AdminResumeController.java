@@ -36,7 +36,8 @@ public class AdminResumeController {
     }
 
     @PostMapping("/upload")
-    public String upload(@RequestParam("resumeFile") MultipartFile resumeFile) {
+    public String upload(@RequestParam("resumeFile") MultipartFile resumeFile,
+                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         if (resumeFile != null && !resumeFile.isEmpty()) {
             String url = fileStorageService.store(resumeFile, "resume");
 
@@ -58,12 +59,16 @@ public class AdminResumeController {
                 about.setResumeUrl(url);
                 aboutInfoRepository.save(about);
             });
+            redirectAttributes.addFlashAttribute("successMessage", "New resume (" + resume.getVersionLabel() + ") uploaded and set as active.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Please select a valid PDF file to upload.");
         }
         return "redirect:/admin/resume";
     }
 
     @PostMapping("/{id}/activate")
-    public String activate(@PathVariable("id") Long id) {
+    public String activate(@PathVariable("id") Long id,
+                           org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         resumeRepository.findAll().forEach(r -> {
             r.setActive(false);
             resumeRepository.save(r);
@@ -75,13 +80,16 @@ public class AdminResumeController {
                 about.setResumeUrl(r.getFileUrl());
                 aboutInfoRepository.save(about);
             });
+            redirectAttributes.addFlashAttribute("successMessage", "Resume version " + r.getVersionLabel() + " is now active.");
         });
         return "redirect:/admin/resume";
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id,
+                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         resumeRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Resume version deleted successfully.");
         return "redirect:/admin/resume";
     }
 }

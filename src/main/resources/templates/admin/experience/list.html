@@ -1,30 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Experience | Admin</title>
+    <meta charset="UTF-8" />
+    <title>Experience | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <style>
-        .experience-workspace { max-width:1180px; margin:0 auto; }
-        .experience-intro-head { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin-bottom:18px; }
-        .experience-kicker { color:var(--primary); font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px; }
-        .experience-intro-head h1 { margin:0; font-size:clamp(1.35rem,2.5vw,1.9rem); }
-        .experience-intro-head p { color:var(--text-secondary); font-size:.8rem; line-height:1.6; margin:7px 0 0; }
-        .experience-table-card { padding:0; overflow:hidden; }
-        .experience-toolbar { display:flex; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid var(--glass-border); color:var(--text-secondary); font-size:.75rem; }
-        .experience-toolbar strong { color:var(--text); }
-        .experience-table-card table { font-size:.82rem; }
-        .experience-table-card th { padding:11px 14px; font-size:.68rem; }
-        .experience-table-card td { padding:12px 14px; }
-        .experience-role-cell { min-width:190px; }
-        .experience-role-cell strong { display:block; font-size:.82rem; }
-        .experience-role-cell span { display:block; color:var(--text-muted); font-size:.7rem; margin-top:3px; }
-        .experience-type { display:inline-flex; padding:4px 8px; border:1px solid var(--glass-border); border-radius:7px; color:var(--text-secondary); font-size:.68rem; }
-        .experience-order { display:inline-flex; min-width:25px; justify-content:center; padding:3px 6px; border-radius:6px; background:rgba(255,255,255,.06); color:var(--text-secondary); font:600 .7rem var(--font-mono); }
-        @media(max-width:700px){ .experience-intro-head,.experience-toolbar { align-items:flex-start; flex-direction:column; } }
-    </style>
 </head>
 <body>
 <div class="aurora-bg"><div class="aurora-blob b1"></div><div class="aurora-blob b2"></div></div>
@@ -33,39 +17,80 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Experience', unread=0)}"></div>
         <div class="admin-content">
-            <div class="experience-workspace">
-            <div class="experience-intro-head">
-                <div><div class="experience-kicker">Experience / Statistics</div><h1>Experience</h1><p>Build a clear timeline of roles, achievements, and training. Sort order controls the public sequence.</p></div>
-                <a th:href="@{/admin/experience/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add experience</a>
-            </div>
-            <div class="glass-card experience-table-card glass-table-wrap">
-                <div class="experience-toolbar"><span><i class="fa-solid fa-timeline" style="color:var(--primary);margin-right:7px;"></i> Timeline entries</span><span><strong th:text="${#lists.size(experiences)}">0</strong> entries · lower order appears first</span></div>
-                <table class="glass-table">
-                    <thead><tr><th>Role / Company</th><th>Duration</th><th>Type</th><th>Order</th><th>Visible</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="e : ${experiences}">
-                        <td class="experience-role-cell"><strong th:text="${e.role}">Intern</strong><span th:text="${e.company}">Company</span></td>
-                        <td th:text="${e.duration}">Jan-Feb</td>
-                        <td><span class="experience-type" th:text="${e.type}">Internship</span></td>
-                        <td><span class="experience-order" th:text="${e.sortOrder}">0</span></td>
-                        <td>
-                            <form th:action="@{'/admin/experience/' + ${e.id} + '/toggle-visible'}" method="post" style="margin:0;">
-                                <button type="submit" class="status-pill" th:classappend="${e.visible} ? 'on' : 'off'" th:text="${e.visible} ? 'Visible' : 'Hidden'">Visible</button>
-                            </form>
-                        </td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{'/admin/experience/' + ${e.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>
-                                <form th:action="@{'/admin/experience/' + ${e.id} + '/delete'}" method="post" data-confirm="Delete this entry?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(experiences)}"><td colspan="6" style="text-align:center; color:var(--text-secondary);">No experience entries yet.</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Career / Experience</div>
+                        <h1>Work &amp; Internship Timeline</h1>
+                        <p class="page-desc">Build your career timeline of professional roles, internships, achievements, and training.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/experience/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Experience</a>
+                    </div>
+                </div>
+
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-timeline" style="color:var(--primary);"></i> Timeline Entries</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(experiences)}">0</strong> entries · lower order appears first</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>Role &amp; Company</th>
+                                <th>Duration</th>
+                                <th>Type</th>
+                                <th>Sort Order</th>
+                                <th>Visibility</th>
+                                <th style="text-align:right; width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="e : ${experiences}">
+                                <td>
+                                    <strong th:text="${e.role}" style="color:var(--text); display:block;">Role</strong>
+                                    <span th:text="${e.company}" style="color:var(--text-secondary); font-size:0.8rem;">Company</span>
+                                </td>
+                                <td><span th:text="${e.duration}" style="font-family:var(--font-mono); font-size:0.8rem;">Jan - Feb</span></td>
+                                <td><span class="badge-tag" th:text="${e.type}">Internship</span></td>
+                                <td><span class="order-badge" th:text="${e.sortOrder}">0</span></td>
+                                <td>
+                                    <form th:action="@{'/admin/experience/' + ${e.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill"
+                                                th:classappend="${e.visible} ? 'on' : 'off'"
+                                                title="Click to toggle visibility">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${e.visible} ? 'Visible' : 'Hidden'">Visible</span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{'/admin/experience/' + ${e.id} + '/edit'}" title="Edit Experience"><i class="fa-solid fa-pen"></i></a>
+                                        <form th:action="@{'/admin/experience/' + ${e.id} + '/delete'}" method="post" data-confirm="Delete this experience entry?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Experience"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(experiences)}" class="empty-initial-row">
+                                <td colspan="6" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-briefcase" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No experience entries yet. Click <strong>Add Experience</strong> above to add your timeline.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

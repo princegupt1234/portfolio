@@ -189,12 +189,17 @@ public class HomeController {
             return;
         }
         Resume resume = active.get();
+        String relativePath = resume.getFileUrl().replaceFirst("^/uploads/", "");
+        Path filePath = Path.of(uploadDir, relativePath);
+
+        if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resume file not found on server");
+            return;
+        }
+
         resume.setDownloadCount(resume.getDownloadCount() + 1);
         resumeRepository.save(resume);
         analyticsService.recordResumeDownload();
-
-        String relativePath = resume.getFileUrl().replaceFirst("^/uploads/", "");
-        Path filePath = Path.of(uploadDir, relativePath);
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=\"Prince_Gupt_Resume.pdf\"");

@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" /><title>Projects | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -14,42 +16,95 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Projects', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1>Projects</h1>
-                <a th:href="@{/admin/projects/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Project</a>
-            </div>
-            <div class="glass-card glass-table-wrap">
-                <table class="glass-table">
-                    <thead><tr><th>Image</th><th>Title</th><th>Tech</th><th>Featured</th><th>Status</th><th>Visible</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="p : ${projects}">
-                        <td><img class="row-thumb" th:if="${p.imageUrl}" th:src="@{${p.imageUrl}}" alt="" /><span th:unless="${p.imageUrl}">—</span></td>
-                        <td th:text="${p.title}">Project</td>
-                        <td th:text="${p.techStack}">Tech</td>
-                        <td>
-                            <button type="button" class="status-pill" data-featured-toggle
-                                    th:classappend="${p.featured} ? 'on' : 'off'"
-                                    th:attr="data-project-id=${p.id},data-featured=${p.featured},aria-pressed=${p.featured}"
-                                    th:text="${p.featured} ? 'Yes' : 'No'">No</button>
-                        </td>
-                        <td><span class="badge" th:text="${p.status}">Live</span></td>
-                        <td>
-                            <form th:action="@{'/admin/projects/' + ${p.id} + '/toggle-visible'}" method="post" style="margin:0;">
-                                <button type="submit" class="status-pill" th:classappend="${p.visible} ? 'on' : 'off'" th:text="${p.visible} ? 'Visible' : 'Hidden'">Visible</button>
-                            </form>
-                        </td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{'/admin/projects/' + ${p.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>
-                                <form th:action="@{'/admin/projects/' + ${p.id} + '/delete'}" method="post" data-confirm="Delete this project?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(projects)}"><td colspan="7" style="text-align:center; color:var(--text-secondary);">No projects yet.</td></tr>
-                    </tbody>
-                </table>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Portfolio / Showcase</div>
+                        <h1>Projects</h1>
+                        <p class="page-desc">Manage featured portfolio projects, tech stacks, and live demo links.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/projects/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Project</a>
+                    </div>
+                </div>
+
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-diagram-project" style="color:var(--primary);"></i> Project Catalog</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(projects)}">0</strong> projects</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px;">Image</th>
+                                <th>Title</th>
+                                <th>Tech Stack</th>
+                                <th>Featured</th>
+                                <th>Status</th>
+                                <th>Visibility</th>
+                                <th style="text-align:right; width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${projects}">
+                                <td>
+                                    <img class="row-thumb" th:if="${p.imageUrl}" th:src="@{${p.imageUrl}}" alt="" />
+                                    <span th:unless="${p.imageUrl}" class="row-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.8rem;"><i class="fa-solid fa-image"></i></span>
+                                </td>
+                                <td>
+                                    <strong th:text="${p.title}" style="color:var(--text);">Project</strong>
+                                    <span th:if="${p.sortOrder != null}" class="order-badge" style="margin-left:6px;" th:text="'#' + ${p.sortOrder}">#0</span>
+                                </td>
+                                <td><span class="badge-tag" th:text="${p.techStack}">Java</span></td>
+                                <td>
+                                    <form th:action="@{'/admin/projects/' + ${p.id} + '/toggle-featured'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill" data-featured-toggle
+                                                th:classappend="${p.featured} ? 'on' : 'off'"
+                                                th:attr="data-project-id=${p.id},data-featured=${p.featured},aria-pressed=${p.featured}"
+                                                title="Click to toggle featured">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${p.featured} ? 'Yes' : 'No'">No</span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td><span class="badge" th:text="${p.status}">Live</span></td>
+                                <td>
+                                    <form th:action="@{'/admin/projects/' + ${p.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill"
+                                                th:classappend="${p.visible} ? 'on' : 'off'"
+                                                title="Click to toggle visibility">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${p.visible} ? 'Visible' : 'Hidden'">Visible</span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{'/admin/projects/' + ${p.id} + '/edit'}" title="Edit Project"><i class="fa-solid fa-pen"></i></a>
+                                        <form th:action="@{'/admin/projects/' + ${p.id} + '/delete'}" method="post" data-confirm="Delete this project?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Project"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(projects)}" class="empty-initial-row">
+                                <td colspan="7" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-diagram-project" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No projects yet. Click <strong>Add Project</strong> above to showcase your work.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Testimonial Form | Admin</title>
+    <meta charset="UTF-8" />
+    <title th:text="${testimonial.id} != null ? 'Edit Testimonial | Admin' : 'Add Testimonial | Admin'">Testimonial Form | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -12,35 +15,73 @@
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(active='testimonials')}"></div>
     <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Testimonial', unread=0)}"></div>
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Testimonial Form', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1 th:text="${testimonial.id} != null ? 'Edit Testimonial' : 'Add Testimonial'">Add</h1>
-                <a th:href="@{/admin/testimonials}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
-            </div>
-            <div class="glass-card">
-                <form th:action="@{/admin/testimonials/save}" th:object="${testimonial}" method="post" enctype="multipart/form-data" class="form-grid">
-                    <input type="hidden" th:field="*{id}" />
-                    <div class="form-group"><label>Name</label><input class="glass-input" th:field="*{name}" required /></div>
-                    <div class="form-group"><label>Role / Company</label><input class="glass-input" th:field="*{role}" /></div>
-                    <div class="form-group">
-                        <label>Rating (1-5)</label>
-                        <input class="glass-input" type="number" min="1" max="5" th:field="*{rating}" />
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Social Proof / Testimonial Editor</div>
+                        <h1 th:text="${testimonial.id} != null ? 'Edit Testimonial' : 'Add New Testimonial'">Testimonial Form</h1>
+                        <p class="page-desc">Enter client feedback, recommendation text, star rating, and avatar photo.</p>
                     </div>
-                    <div class="form-group full"><label>Comment</label><textarea class="glass-textarea" th:field="*{comment}" rows="4"></textarea></div>
-                    <div class="form-group">
-                        <label>Photo</label>
-                        <div class="file-drop"><input type="file" name="photoFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload photo</div></div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/testimonials}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to Testimonials</a>
                     </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center; gap:12px;">
-                        <input type="hidden" name="published" value="false" />
-                        <label class="toggle-switch"><input type="checkbox" name="published" value="true" th:checked="*{published}"/><span class="toggle-slider"></span></label>
-                        <label style="margin:0;">Published (visible on site)</label>
-                    </div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Testimonial</button>
-                    </div>
-                </form>
+                </div>
+
+                <div class="glass-card" style="padding:28px;">
+                    <form th:action="@{/admin/testimonials/save}" th:object="${testimonial}" method="post" enctype="multipart/form-data" class="form-grid">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-group">
+                            <label for="testimonial-name">Client / Colleague Name</label>
+                            <input id="testimonial-name" class="glass-input" th:field="*{name}" placeholder="e.g. Sarah Connor" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="testimonial-role">Role / Company</label>
+                            <input id="testimonial-role" class="glass-input" th:field="*{role}" placeholder="e.g. Engineering Lead at TechCorp" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="testimonial-rating">Rating (1 to 5 Stars)</label>
+                            <input id="testimonial-rating" class="glass-input" type="number" min="1" max="5" th:field="*{rating}" placeholder="5" />
+                        </div>
+
+                        <div class="form-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" th:field="*{published}"/>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong style="color:var(--text); font-size:0.9rem;">Published on Portfolio</strong>
+                                <div style="color:var(--text-secondary); font-size:0.75rem;">Show this recommendation in your public testimonials section.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="testimonial-comment">Testimonial / Review Text</label>
+                            <textarea id="testimonial-comment" class="glass-textarea" th:field="*{comment}" rows="4" placeholder="What they said about working with you..."></textarea>
+                        </div>
+
+                        <div class="form-group full" style="border-top:1px solid var(--glass-border); padding-top:16px;">
+                            <label>Avatar / Profile Photo</label>
+                            <div class="file-drop">
+                                <input type="file" name="photoFile" accept="image/*" />
+                                <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload client headshot</div>
+                            </div>
+                            <div th:if="*{photoUrl}" style="margin-top:12px; display:flex; align-items:center; gap:12px;">
+                                <img th:src="@{*{photoUrl}}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:1px solid var(--glass-border);" />
+                                <span style="font-size:0.8rem; color:var(--text-secondary);">Current avatar active. Uploading a new file will replace it.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
+                            <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Testimonial</button>
+                            <a th:href="@{/admin/testimonials}" class="glass-btn">Cancel</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -42,26 +42,30 @@ public class AdminExperienceController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute Experience experience) {
+    public String save(@ModelAttribute Experience experience, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         experienceRepository.save(experience);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Experience \"" + experience.getRole() + "\" saved successfully.");
         return "redirect:/admin/experience";
     }
 
     @PostMapping("/{id}/toggle-visible")
-    public String toggleVisible(@PathVariable("id") Long id) {
+    public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         experienceRepository.findById(id).ifPresent(e -> {
             e.setVisible(!Boolean.TRUE.equals(e.getVisible()));
             experienceRepository.save(e);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Experience \"" + e.getRole() + "\" visibility set to " + (e.getVisible() ? "Visible." : "Hidden."));
         });
         dataVersionService.bump();
         return "redirect:/admin/experience";
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         experienceRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Experience deleted successfully.");
         return "redirect:/admin/experience";
     }
 }

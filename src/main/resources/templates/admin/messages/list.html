@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Contact Messages | Admin</title>
+    <meta charset="UTF-8" /><title>Messages | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -14,40 +16,88 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Messages', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1>Contact Messages</h1>
-                <div style="display:flex; gap:12px;">
-                    <form th:action="@{/admin/messages}" method="get" style="display:flex; gap:8px;">
-                        <input class="glass-input" type="text" name="q" placeholder="Search messages..." th:value="${q}" />
-                        <button type="submit" class="glass-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-                    </form>
-                    <a th:href="@{/admin/messages/export}" class="glass-btn"><i class="fa-solid fa-file-csv"></i> Export CSV</a>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Communication / Inbox</div>
+                        <h1>Contact Messages</h1>
+                        <p class="page-desc">Review visitor messages, send replies via email, and export contact logs.</p>
+                    </div>
+                    <div class="header-actions">
+                        <form th:action="@{/admin/messages}" method="get" style="display:flex; gap:8px;">
+                            <input class="glass-input" type="text" name="q" placeholder="Filter messages..." th:value="${q}" style="width:200px;" />
+                            <button type="submit" class="glass-btn" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                            <a th:if="${q != null and !q.isBlank()}" th:href="@{/admin/messages}" class="glass-btn" title="Clear Filter">✕</a>
+                        </form>
+                        <a th:href="@{/admin/messages/export}" class="glass-btn"><i class="fa-solid fa-file-csv"></i> Export CSV</a>
+                    </div>
                 </div>
-            </div>
-            <div class="glass-card glass-table-wrap">
-                <table class="glass-table">
-                    <thead><tr><th>Status</th><th>From</th><th>Subject</th><th>Received</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="m : ${messages}">
-                        <td>
-                            <span class="status-pill" th:classappend="${m.isRead} ? 'off' : 'unread'" th:text="${m.isRead} ? 'Read' : 'Unread'">Unread</span>
-                            <span th:if="${m.repliedAt != null}" class="status-pill on" style="margin-top:4px; display:block;">Replied</span>
-                        </td>
-                        <td><strong th:text="${m.name}">Name</strong><br/><span style="color:var(--text-secondary); font-size:0.82rem;" th:text="${m.email}">email</span></td>
-                        <td th:text="${#strings.abbreviate(m.subject ?: '(no subject)', 40)}">Subject</td>
-                        <td th:text="${#temporals.format(m.createdAt, 'dd MMM yyyy, HH:mm')}">Date</td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{'/admin/messages/' + ${m.id}}"><i class="fa-solid fa-eye"></i></a>
-                                <form th:action="@{'/admin/messages/' + ${m.id} + '/delete'}" method="post" data-confirm="Delete this message?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(messages)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No messages yet.</td></tr>
-                    </tbody>
-                </table>
+
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-inbox" style="color:var(--primary);"></i> Inbound Inquiries</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(messages)}">0</strong> messages</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px;">Status</th>
+                                <th>Sender</th>
+                                <th>Subject</th>
+                                <th>Received</th>
+                                <th style="text-align:right; width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="m : ${messages}">
+                                <td>
+                                    <form th:action="@{'/admin/messages/' + ${m.id} + '/toggle-read'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill" th:classappend="${m.isRead} ? 'off' : 'unread'"
+                                                title="Click to toggle Read / Unread">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${m.isRead} ? 'Read' : 'Unread'">Unread</span>
+                                        </button>
+                                    </form>
+                                    <span th:if="${m.repliedAt != null}" class="status-pill on" style="margin-top:4px; display:inline-flex;">
+                                        <span class="status-dot"></span>
+                                        <span>Replied</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong th:text="${m.name}" style="color:var(--text); display:block;">Sender Name</strong>
+                                    <a th:href="'mailto:' + ${m.email}" style="color:var(--text-secondary); font-size:0.8rem; text-decoration:none;" th:text="${m.email}">email@example.com</a>
+                                </td>
+                                <td>
+                                    <span th:text="${#strings.abbreviate(m.subject ?: '(No Subject)', 45)}" style="color:var(--text); font-weight:500;">Subject</span>
+                                </td>
+                                <td><span th:text="${#temporals.format(m.createdAt, 'dd MMM yyyy, HH:mm')}" style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-secondary);">Date</span></td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{'/admin/messages/' + ${m.id}}" title="View &amp; Reply"><i class="fa-solid fa-envelope-open-text"></i></a>
+                                        <form th:action="@{'/admin/messages/' + ${m.id} + '/delete'}" method="post" data-confirm="Delete this message?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Message"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(messages)}" class="empty-initial-row">
+                                <td colspan="5" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-inbox" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No messages found in your inbox.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

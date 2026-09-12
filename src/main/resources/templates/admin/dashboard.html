@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -19,65 +21,87 @@
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Dashboard', unread=${unreadMessages})}"></div>
 
         <div class="admin-content">
-            <div class="page-header">
-                <div>
-                    <h1>Welcome back, Prince 👋</h1>
-                    <p style="margin:4px 0 0;">Here's what's happening with your portfolio today.</p>
-                </div>
-                <a th:href="@{/admin/projects/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Project</a>
-            </div>
-
-            <div class="kpi-grid">
-                <div class="glass-card kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-eye"></i></div>
-                    <div><div class="kpi-value" th:text="${todayViews}">0</div><div class="kpi-label">Today's Visitors</div></div>
-                </div>
-                <div class="glass-card kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <div><div class="kpi-value" th:text="${totalViews30d}">0</div><div class="kpi-label">Portfolio Views (30d)</div></div>
-                </div>
-                <div class="glass-card kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-diagram-project"></i></div>
-                    <div><div class="kpi-value" th:text="${totalClicks30d}">0</div><div class="kpi-label">Project Views (30d)</div></div>
-                </div>
-                <div class="glass-card kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-download"></i></div>
-                    <div><div class="kpi-value" th:text="${totalDownloads30d}">0</div><div class="kpi-label">Resume Downloads (30d)</div></div>
-                </div>
-                <div class="glass-card kpi-card">
-                    <div class="kpi-icon"><i class="fa-solid fa-envelope"></i></div>
-                    <div><div class="kpi-value" th:text="${unreadMessages} + ' / ' + ${totalMessages}">0</div><div class="kpi-label">Unread Messages</div></div>
-                </div>
-                <div class="glass-card kpi-card">
-                    <div class="kpi-icon"><i class="fa-brands fa-github"></i></div>
-                    <div><div class="kpi-value" th:text="${github != null and github.available} ? ${github.followers} : '—'">0</div><div class="kpi-label">GitHub Followers</div></div>
-                </div>
-            </div>
-
-            <div class="dash-grid">
-                <div class="glass-card">
-                    <h3 style="margin-bottom:18px;">Visitors — Last 30 Days</h3>
-                    <canvas id="visitorsChart" height="90"></canvas>
-                </div>
-                <div class="glass-card">
-                    <h3 style="margin-bottom:18px;">Profile Completion</h3>
-                    <div style="text-align:center; padding: 10px 0 18px;">
-                        <div style="font-size:2.4rem; font-weight:700;" class="gradient-text" th:text="${profileCompletion} + '%'">0%</div>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Overview / Control Center</div>
+                        <h1 th:text="'Welcome back, ' + ${currentAdminUsername ?: 'Prince'} + ' 👋'">Welcome back, Prince 👋</h1>
+                        <p class="page-desc">Here is what is happening across your portfolio, visitor statistics, and contact requests today.</p>
                     </div>
-                    <div class="progress-track" style="margin-bottom:22px;">
-                        <div class="progress-fill" th:style="'width:' + ${profileCompletion} + '%'" style="width:0"></div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/projects/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Project</a>
+                        <a th:href="@{/}" target="_blank" class="glass-btn"><i class="fa-solid fa-eye"></i> View Live Site</a>
                     </div>
                 </div>
-            </div>
 
-            <div class="glass-card" style="margin-bottom:22px;">
-                <h3 style="margin-bottom:18px;">Quick Actions</h3>
-                <div class="quick-actions">
-                    <a th:href="@{/admin/projects/new}" class="glass-card quick-action"><i class="fa-solid fa-diagram-project"></i><span>Add Project</span></a>
-                    <a th:href="@{/admin/certificates/new}" class="glass-card quick-action"><i class="fa-solid fa-certificate"></i><span>Upload Certificate</span></a>
-                    <a th:href="@{/admin/skills}" class="glass-card quick-action"><i class="fa-solid fa-layer-group"></i><span>Edit Skills</span></a>
-                    <a th:href="@{/admin/resume}" class="glass-card quick-action"><i class="fa-solid fa-file-arrow-up"></i><span>Update Resume</span></a>
-                    <a th:href="@{/}" target="_blank" class="glass-card quick-action"><i class="fa-solid fa-rocket"></i><span>Publish / View</span></a>
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-eye"></i></div>
+                        <div><div class="kpi-value" th:text="${todayViews}">0</div><div class="kpi-label">Today's Visitors</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div><div class="kpi-value" th:text="${totalViews30d}">0</div><div class="kpi-label">Portfolio Views (30d)</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                        <div><div class="kpi-value" th:text="${totalClicks30d}">0</div><div class="kpi-label">Project Views (30d)</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-download"></i></div>
+                        <div><div class="kpi-value" th:text="${totalDownloads30d}">0</div><div class="kpi-label">Resume Downloads (30d)</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <div><div class="kpi-value" th:text="${unreadMessages} + ' / ' + ${totalMessages}">0</div><div class="kpi-label">Unread Messages</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-brands fa-github"></i></div>
+                        <div><div class="kpi-value" th:text="${github != null and github.available} ? ${github.followers} : '—'">0</div><div class="kpi-label">GitHub Followers</div></div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <div class="glass-card" style="padding:24px;">
+                        <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
+                            <span class="toolbar-title"><i class="fa-solid fa-chart-area" style="color:var(--primary);"></i> Visitors — Last 30 Days</span>
+                        </div>
+                        <canvas id="visitorsChart" height="90"></canvas>
+                    </div>
+                    <div class="glass-card" style="padding:24px;">
+                        <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
+                            <span class="toolbar-title"><i class="fa-solid fa-circle-notch" style="color:var(--secondary);"></i> Profile Completeness</span>
+                        </div>
+                        <div style="text-align:center; padding: 10px 0 18px;">
+                            <div style="font-size:2.6rem; font-weight:700;" class="gradient-text" th:text="${profileCompletion} + '%'">0%</div>
+                        </div>
+                        <div class="progress-track" style="margin-bottom:22px; height:8px;">
+                            <div class="progress-fill" th:style="'width:' + ${profileCompletion} + '%'" style="width:0"></div>
+                        </div>
+                        <p style="font-size:0.8rem; color:var(--text-secondary); text-align:center; margin:0;">Keep your bio, social links, resume, and projects up to date for maximum impact.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom:22px; padding:24px;">
+                    <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
+                        <span class="toolbar-title"><i class="fa-solid fa-bolt" style="color:var(--primary);"></i> Quick Actions</span>
+                    </div>
+                    <div class="quick-actions">
+                        <a th:href="@{/admin/projects/new}" class="glass-card quick-action"><i class="fa-solid fa-diagram-project"></i><span>Add Project</span></a>
+                        <a th:href="@{/admin/certificates/new}" class="glass-card quick-action"><i class="fa-solid fa-certificate"></i><span>Upload Certificate</span></a>
+                        <a th:href="@{/admin/skills}" class="glass-card quick-action"><i class="fa-solid fa-layer-group"></i><span>Edit Skills</span></a>
+                        <a th:href="@{/admin/resume}" class="glass-card quick-action"><i class="fa-solid fa-file-arrow-up"></i><span>Update Resume</span></a>
+                        <a th:href="@{/admin/messages}" class="glass-card quick-action"><i class="fa-solid fa-inbox"></i><span>Check Inbox</span></a>
+                    </div>
                 </div>
             </div>
         </div>

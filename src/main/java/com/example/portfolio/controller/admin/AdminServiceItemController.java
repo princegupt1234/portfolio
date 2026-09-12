@@ -42,26 +42,30 @@ public class AdminServiceItemController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute("service") ServiceItem service) {
+    public String save(@ModelAttribute("service") ServiceItem service, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         serviceItemRepository.save(service);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Service \"" + service.getTitle() + "\" saved successfully.");
         return "redirect:/admin/services";
     }
 
     @PostMapping("/{id}/toggle-visible")
-    public String toggleVisible(@PathVariable("id") Long id) {
+    public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         serviceItemRepository.findById(id).ifPresent(s -> {
             s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
             serviceItemRepository.save(s);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Service \"" + s.getTitle() + "\" visibility set to " + (s.getVisible() ? "Visible." : "Hidden."));
         });
         dataVersionService.bump();
         return "redirect:/admin/services";
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         serviceItemRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Service deleted successfully.");
         return "redirect:/admin/services";
     }
 }

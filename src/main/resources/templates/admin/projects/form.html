@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Project Form | Admin</title>
+    <meta charset="UTF-8" />
+    <title th:text="${project.id} != null ? 'Edit Project | Admin' : 'Add Project | Admin'">Project Form | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -12,54 +15,115 @@
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(active='projects')}"></div>
     <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Project', unread=0)}"></div>
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Project Form', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1 th:text="${project.id} != null ? 'Edit Project' : 'Add Project'">Add</h1>
-                <a th:href="@{/admin/projects}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
-            </div>
-            <div class="glass-card">
-                <form th:action="@{/admin/projects/save}" th:object="${project}" method="post" enctype="multipart/form-data" class="form-grid">
-                    <input type="hidden" th:field="*{id}" />
-                    <input type="hidden" th:field="*{viewCount}" />
-                    <div class="form-group full"><label>Title</label><input class="glass-input" th:field="*{title}" required /></div>
-                    <div class="form-group full"><label>Description</label><textarea class="glass-textarea" th:field="*{description}" rows="4"></textarea></div>
-                    <div class="form-group full"><label>Features (one per line)</label><textarea class="glass-textarea" th:field="*{features}" rows="4"></textarea></div>
-                    <div class="form-group"><label>Tech Stack (comma separated)</label><input class="glass-input" th:field="*{techStack}" placeholder="Java,Spring Boot,MySQL" /></div>
-                    <div class="form-group"><label>Tags (comma separated)</label><input class="glass-input" th:field="*{tags}" /></div>
-                    <div class="form-group"><label>GitHub URL</label><input class="glass-input" th:field="*{githubUrl}" /></div>
-                    <div class="form-group"><label>Live Demo URL</label><input class="glass-input" th:field="*{liveUrl}" /></div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select class="glass-input" th:field="*{status}">
-                            <option value="Live">Live</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Completed">Completed</option>
-                        </select>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Portfolio / Project Editor</div>
+                        <h1 th:text="${project.id} != null ? 'Edit Project' : 'Add New Project'">Project Form</h1>
+                        <p class="page-desc">Configure project showcase information, tags, and media links.</p>
                     </div>
-                    <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
-                    <div class="form-group full" style="flex-direction:row; align-items:center; gap:12px;">
-                        <input type="hidden" name="visible" value="false" />
-                        <label class="toggle-switch"><input type="checkbox" name="visible" value="true" th:checked="*{visible}" /><span class="toggle-slider"></span></label>
-                        <label style="margin:0;">Visible on portfolio</label>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/projects}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to Projects</a>
                     </div>
-                    <div class="form-group full" style="flex-direction:row; align-items:center; gap:12px;">
-                        <input type="hidden" name="featured" value="false" />
-                        <label class="toggle-switch"><input type="checkbox" name="featured" value="true" th:checked="*{featured}" /><span class="toggle-slider"></span></label>
-                        <label style="margin:0;">Featured project</label>
-                    </div>
-                    <div class="form-group full">
-                        <label>Project Image</label>
-                        <div class="file-drop">
-                            <input type="file" name="imageFile" accept="image/*" />
-                            <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Click to upload or replace image</div>
+                </div>
+
+                <div class="glass-card" style="padding:28px;">
+                    <form th:action="@{/admin/projects/save}" th:object="${project}" method="post" enctype="multipart/form-data" class="form-grid">
+                        <input type="hidden" th:field="*{id}" />
+                        <input type="hidden" th:field="*{viewCount}" />
+
+                        <div class="form-group full">
+                            <label for="project-title">Project Title</label>
+                            <input id="project-title" class="glass-input" th:field="*{title}" placeholder="e.g. Modern Full-Stack E-Commerce" required />
                         </div>
-                        <img th:if="*{imageUrl}" th:src="@{*{imageUrl}}" style="max-width:200px; border-radius:12px; margin-top:10px;" />
-                    </div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Project</button>
-                    </div>
-                </form>
+
+                        <div class="form-group full">
+                            <label for="project-desc">Description</label>
+                            <textarea id="project-desc" class="glass-textarea" th:field="*{description}" rows="4" placeholder="Brief summary of the project and problem solved..."></textarea>
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="project-features">Key Highlights / Features <span style="color:var(--text-muted);">(one per line)</span></label>
+                            <textarea id="project-features" class="glass-textarea" th:field="*{features}" rows="3" placeholder="JWT Authentication&#10;Stripe Payment Gateway&#10;Dockerized Deployment"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-tech">Tech Stack <span style="color:var(--text-muted);">(comma separated)</span></label>
+                            <input id="project-tech" class="glass-input" th:field="*{techStack}" placeholder="Java, Spring Boot, MySQL, Thymeleaf" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-tags">Category Tags <span style="color:var(--text-muted);">(comma separated)</span></label>
+                            <input id="project-tags" class="glass-input" th:field="*{tags}" placeholder="Full Stack, Backend, Cloud" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-github">GitHub Repository URL</label>
+                            <input id="project-github" class="glass-input" type="url" th:field="*{githubUrl}" placeholder="https://github.com/..." />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-live">Live Demo URL</label>
+                            <input id="project-live" class="glass-input" type="url" th:field="*{liveUrl}" placeholder="https://..." />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-status">Project Status</label>
+                            <select id="project-status" class="glass-input" th:field="*{status}">
+                                <option value="Live">Live</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project-order">Display Sort Order</label>
+                            <input id="project-order" class="glass-input" type="number" min="0" th:field="*{sortOrder}" placeholder="1" />
+                            <small>Lower order numbers appear first on your portfolio.</small>
+                        </div>
+
+                        <div class="form-group full" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding:12px 0;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" th:field="*{visible}" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong style="color:var(--text); font-size:0.9rem;">Visible on Portfolio</strong>
+                                <div style="color:var(--text-secondary); font-size:0.78rem;">Display this project publicly on your portfolio site.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group full" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding:12px 0; border-top:1px solid var(--glass-border);">
+                            <label class="toggle-switch">
+                                <input type="checkbox" th:field="*{featured}" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong style="color:var(--text); font-size:0.9rem;">Featured Project</strong>
+                                <div style="color:var(--text-secondary); font-size:0.78rem;">Highlight this project prominently at the top of your works section.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group full" style="border-top:1px solid var(--glass-border); padding-top:18px;">
+                            <label>Project Cover Image</label>
+                            <div class="file-drop">
+                                <input type="file" name="imageFile" accept="image/*" />
+                                <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up" style="margin-right:6px;"></i> Click to upload or drag cover image</div>
+                            </div>
+                            <div th:if="*{imageUrl}" style="margin-top:14px; display:flex; align-items:center; gap:14px;">
+                                <img th:src="@{*{imageUrl}}" style="max-width:180px; max-height:100px; border-radius:10px; border:1px solid var(--glass-border); object-fit:cover;" />
+                                <div style="color:var(--text-secondary); font-size:0.8rem;">Current image active. Uploading a new file will replace it.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
+                            <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Project</button>
+                            <a th:href="@{/admin/projects}" class="glass-btn">Cancel</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

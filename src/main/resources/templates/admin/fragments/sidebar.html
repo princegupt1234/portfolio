@@ -7,24 +7,30 @@
         <span>Prince<span class="gradient-text">Admin</span></span>
     </div>
     <ul class="admin-nav">
-        <li><a th:href="@{/admin/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
-        <li><a th:href="@{/admin/about}" th:classappend="${active == 'about'} ? 'active'"><i class="fa-solid fa-user"></i> About</a></li>
-        <li><a th:href="@{/admin/skills}" th:classappend="${active == 'skills'} ? 'active'"><i class="fa-solid fa-layer-group"></i> Skills</a></li>
-        <li><a th:href="@{/admin/experience}" th:classappend="${active == 'experience'} ? 'active'"><i class="fa-solid fa-briefcase"></i> Experience</a></li>
-        <li><a th:href="@{/admin/projects}" th:classappend="${active == 'projects'} ? 'active'"><i class="fa-solid fa-diagram-project"></i> Projects</a></li>
-        <li><a th:href="@{/admin/certificates}" th:classappend="${active == 'certificates'} ? 'active'"><i class="fa-solid fa-certificate"></i> Certificates</a></li>
-        <li><a th:href="@{/admin/services}" th:classappend="${active == 'services'} ? 'active'"><i class="fa-solid fa-toolbox"></i> Services</a></li>
-        <li><a th:href="@{/admin/testimonials}" th:classappend="${active == 'testimonials'} ? 'active'"><i class="fa-solid fa-comment-dots"></i> Testimonials</a></li>
-        <li><a th:href="@{/admin/messages}" th:classappend="${active == 'messages'} ? 'active'"><i class="fa-solid fa-envelope"></i> Contact Messages</a></li>
-        <li><a th:href="@{/admin/resume}" th:classappend="${active == 'resume'} ? 'active'"><i class="fa-solid fa-file-arrow-down"></i> Resume</a></li>
-        <li><a th:href="@{/admin/analytics}" th:classappend="${active == 'analytics'} ? 'active'"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+        <li><a th:href="@{/admin/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+        <li><a th:href="@{/admin/about}" th:classappend="${active == 'about'} ? 'active'"><i class="fa-solid fa-user"></i> <span>About &amp; Hero</span></a></li>
+        <li><a th:href="@{/admin/skills}" th:classappend="${active == 'skills'} ? 'active'"><i class="fa-solid fa-layer-group"></i> <span>Skills</span></a></li>
+        <li><a th:href="@{/admin/experience}" th:classappend="${active == 'experience'} ? 'active'"><i class="fa-solid fa-briefcase"></i> <span>Experience</span></a></li>
+        <li><a th:href="@{/admin/projects}" th:classappend="${active == 'projects'} ? 'active'"><i class="fa-solid fa-diagram-project"></i> <span>Projects</span></a></li>
+        <li><a th:href="@{/admin/certificates}" th:classappend="${active == 'certificates'} ? 'active'"><i class="fa-solid fa-certificate"></i> <span>Certificates</span></a></li>
+        <li><a th:href="@{/admin/services}" th:classappend="${active == 'services'} ? 'active'"><i class="fa-solid fa-toolbox"></i> <span>Services</span></a></li>
+        <li><a th:href="@{/admin/testimonials}" th:classappend="${active == 'testimonials'} ? 'active'"><i class="fa-solid fa-comment-dots"></i> <span>Testimonials</span></a></li>
+        <li>
+            <a th:href="@{/admin/messages}" th:classappend="${active == 'messages'} ? 'active'">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Messages</span>
+                <span class="nav-badge" th:if="${unreadMessagesCount != null and unreadMessagesCount > 0}" th:text="${unreadMessagesCount}">1</span>
+            </a>
+        </li>
+        <li><a th:href="@{/admin/resume}" th:classappend="${active == 'resume'} ? 'active'"><i class="fa-solid fa-file-arrow-down"></i> <span>Resume</span></a></li>
+        <li><a th:href="@{/admin/analytics}" th:classappend="${active == 'analytics'} ? 'active'"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a></li>
         <li class="section-label">Account</li>
-        <li><a th:href="@{/admin/profile}" th:classappend="${active == 'profile'} ? 'active'"><i class="fa-solid fa-gear"></i> Profile / Settings</a></li>
-        <li><a th:href="@{/}" target="_blank"><i class="fa-solid fa-eye"></i> View Site</a></li>
+        <li><a th:href="@{/admin/profile}" th:classappend="${active == 'profile'} ? 'active'"><i class="fa-solid fa-gear"></i> <span>Profile &amp; Settings</span></a></li>
+        <li><a th:href="@{/}" target="_blank"><i class="fa-solid fa-eye"></i> <span>View Live Site</span></a></li>
         <li>
             <form th:action="@{/admin/logout}" method="post" style="margin:0;">
-                <button type="submit" style="all:unset; display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius: var(--radius-sm); color: var(--text-secondary); font-size:0.9rem; font-weight:500; cursor:pointer; width:100%;">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                <button type="submit" style="all:unset; display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius: var(--radius-sm); color: var(--text-secondary); font-size:0.9rem; font-weight:500; cursor:pointer; width:100%; box-sizing:border-box; transition:all 0.2s ease;">
+                    <i class="fa-solid fa-right-from-bracket" style="width:18px; text-align:center;"></i> <span>Logout</span>
                 </button>
             </form>
         </li>

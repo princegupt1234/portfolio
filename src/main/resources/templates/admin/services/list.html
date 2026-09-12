@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Services | Admin</title>
+    <meta charset="UTF-8" />
+    <title>Services | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -14,36 +17,80 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Services', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1>Services</h1>
-                <a th:href="@{/admin/services/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Service</a>
-            </div>
-            <div class="glass-card glass-table-wrap">
-                <table class="glass-table">
-                    <thead><tr><th>Icon</th><th>Title</th><th>Description</th><th>Visible</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="s : ${services}">
-                        <td><i th:class="${s.icon}"></i></td>
-                        <td th:text="${s.title}">Title</td>
-                        <td th:text="${#strings.abbreviate(s.description, 80)}">Desc</td>
-                        <td>
-                            <form th:action="@{'/admin/services/' + ${s.id} + '/toggle-visible'}" method="post" style="margin:0;">
-                                <button type="submit" class="status-pill" th:classappend="${s.visible} ? 'on' : 'off'"
-                                        th:text="${s.visible} ? 'Visible' : 'Hidden'">Visible</button>
-                            </form>
-                        </td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{'/admin/services/' + ${s.id} + '/edit'}"><i class="fa-solid fa-pen"></i></a>
-                                <form th:action="@{'/admin/services/' + ${s.id} + '/delete'}" method="post" data-confirm="Delete this service?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(services)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No services yet.</td></tr>
-                    </tbody>
-                </table>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Offerings / Services</div>
+                        <h1>Services &amp; Solutions</h1>
+                        <p class="page-desc">Manage services and freelance solutions displayed in your public portfolio.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/services/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Service</a>
+                    </div>
+                </div>
+
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-toolbox" style="color:var(--primary);"></i> Service Catalog</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(services)}">0</strong> services</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px;">Icon</th>
+                                <th>Service Title</th>
+                                <th>Description</th>
+                                <th>Sort Order</th>
+                                <th>Visibility</th>
+                                <th style="text-align:right; width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s : ${services}">
+                                <td>
+                                    <span class="row-thumb" style="width:36px; height:36px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; color:var(--primary); font-size:1rem;">
+                                        <i th:class="${s.icon ?: 'fa-solid fa-code'}"></i>
+                                    </span>
+                                </td>
+                                <td><strong th:text="${s.title}" style="color:var(--text);">Title</strong></td>
+                                <td><span style="color:var(--text-secondary); font-size:0.82rem;" th:text="${#strings.abbreviate(s.description, 80)}">Desc</span></td>
+                                <td><span class="order-badge" th:text="${s.sortOrder}">0</span></td>
+                                <td>
+                                    <form th:action="@{'/admin/services/' + ${s.id} + '/toggle-visible'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill" th:classappend="${s.visible} ? 'on' : 'off'"
+                                                title="Click to toggle visibility">
+                                            <span class="status-dot"></span>
+                                            <span th:text="${s.visible} ? 'Visible' : 'Hidden'">Visible</span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{'/admin/services/' + ${s.id} + '/edit'}" title="Edit Service"><i class="fa-solid fa-pen"></i></a>
+                                        <form th:action="@{'/admin/services/' + ${s.id} + '/delete'}" method="post" data-confirm="Delete this service?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Service"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(services)}" class="empty-initial-row">
+                                <td colspan="6" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-toolbox" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No services added yet. Click <strong>Add Service</strong> above to list your offerings.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

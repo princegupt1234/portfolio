@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" /><title>Resume | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -14,44 +16,95 @@
     <div class="admin-main">
         <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Resume', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header"><h1>Resume Management</h1></div>
-
-            <div class="glass-card" style="margin-bottom:24px;">
-                <h3 style="margin-bottom:16px;">Upload New Version</h3>
-                <form th:action="@{/admin/resume/upload}" method="post" enctype="multipart/form-data" style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-                    <div class="file-drop" style="flex:1; min-width:240px;">
-                        <input type="file" name="resumeFile" accept="application/pdf" required />
-                        <div class="file-drop-label"><i class="fa-solid fa-file-pdf"></i> Upload resume PDF</div>
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">CV / Document Management</div>
+                        <h1>Resume Versions</h1>
+                        <p class="page-desc">Upload updated resume PDFs, track version history, and manage the live download.</p>
                     </div>
-                    <button type="submit" class="glass-btn primary"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</button>
-                </form>
-            </div>
+                </div>
 
-            <div class="glass-card glass-table-wrap">
-                <h3 style="margin-bottom:16px;">Version History</h3>
-                <table class="glass-table">
-                    <thead><tr><th>Version</th><th>Uploaded</th><th>Downloads</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody>
-                    <tr th:each="r : ${resumes}">
-                        <td th:text="${r.versionLabel}">v1</td>
-                        <td th:text="${#temporals.format(r.uploadedAt, 'dd MMM yyyy, HH:mm')}">Date</td>
-                        <td th:text="${r.downloadCount}">0</td>
-                        <td><span class="status-pill" th:classappend="${r.active} ? 'on' : 'off'" th:text="${r.active} ? 'Active' : 'Inactive'">Active</span></td>
-                        <td>
-                            <div class="action-icons">
-                                <a th:href="@{${r.fileUrl}}" target="_blank"><i class="fa-solid fa-eye"></i></a>
-                                <form th:if="${!r.active}" th:action="@{'/admin/resume/' + ${r.id} + '/activate'}" method="post" style="margin:0;">
-                                    <button type="submit"><i class="fa-solid fa-check"></i></button>
-                                </form>
-                                <form th:action="@{'/admin/resume/' + ${r.id} + '/delete'}" method="post" data-confirm="Delete this resume version?" style="margin:0;">
-                                    <button type="submit" class="danger"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(resumes)}"><td colspan="5" style="text-align:center; color:var(--text-secondary);">No resume uploaded yet.</td></tr>
-                    </tbody>
-                </table>
+                <div class="alert success" th:if="${successMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card" style="padding:28px; margin-bottom:24px;">
+                    <h3 style="margin-bottom:8px; font-size:1.1rem;"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--primary); margin-right:8px;"></i> Upload New PDF Version</h3>
+                    <p style="margin-bottom:18px; font-size:0.85rem;">Uploading a new PDF automatically sets it as the active version for public downloads.</p>
+                    <form th:action="@{/admin/resume/upload}" method="post" enctype="multipart/form-data" style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                        <div class="file-drop" style="flex:1; min-width:260px; padding:18px;">
+                            <input type="file" name="resumeFile" accept="application/pdf" required />
+                            <div class="file-drop-label"><i class="fa-solid fa-file-pdf" style="margin-right:6px;"></i> Click or drag resume PDF here</div>
+                        </div>
+                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-upload"></i> Upload &amp; Activate</button>
+                    </form>
+                </div>
+
+                <div class="glass-card table-card glass-table-wrap">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--primary);"></i> Version History</span>
+                        <span class="toolbar-meta"><strong th:text="${#lists.size(resumes)}">0</strong> versions archived</span>
+                    </div>
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>Version</th>
+                                <th>Uploaded Date</th>
+                                <th>Downloads</th>
+                                <th>Status</th>
+                                <th style="text-align:right; width:120px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${resumes}">
+                                <td>
+                                    <strong th:text="${r.versionLabel}" style="color:var(--text); font-family:var(--font-mono);">v1</strong>
+                                </td>
+                                <td><span th:text="${#temporals.format(r.uploadedAt, 'dd MMM yyyy, HH:mm')}" style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-secondary);">Date</span></td>
+                                <td>
+                                    <span style="display:inline-flex; align-items:center; gap:6px; color:var(--secondary); font-family:var(--font-mono); font-size:0.85rem;">
+                                        <i class="fa-solid fa-download"></i> <span th:text="${r.downloadCount}">0</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <form th:if="${!r.active}" th:action="@{'/admin/resume/' + ${r.id} + '/activate'}" method="post" style="margin:0;">
+                                        <button type="submit" class="status-pill off" title="Click to make this the active version">
+                                            <span class="status-dot"></span>
+                                            <span>Archived</span>
+                                        </button>
+                                    </form>
+                                    <span th:if="${r.active}" class="status-pill on" title="Currently active version">
+                                        <span class="status-dot"></span>
+                                        <span>Active (Live)</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-icons" style="justify-content:flex-end;">
+                                        <a th:href="@{${r.fileUrl}}" target="_blank" title="Preview PDF"><i class="fa-solid fa-eye"></i></a>
+                                        <form th:if="${!r.active}" th:action="@{'/admin/resume/' + ${r.id} + '/activate'}" method="post" style="margin:0;">
+                                            <button type="submit" title="Make Active Version"><i class="fa-solid fa-check"></i></button>
+                                        </form>
+                                        <form th:action="@{'/admin/resume/' + ${r.id} + '/delete'}" method="post" data-confirm="Delete this resume version?" style="margin:0;">
+                                            <button type="submit" class="danger" title="Delete Version"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(resumes)}" class="empty-initial-row">
+                                <td colspan="5" style="text-align:center; padding:40px; color:var(--text-secondary);">
+                                    <i class="fa-solid fa-file-pdf" style="font-size:1.8rem; opacity:0.4; margin-bottom:10px; display:block;"></i>
+                                    No resume versions uploaded yet. Use the upload box above to add your PDF.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

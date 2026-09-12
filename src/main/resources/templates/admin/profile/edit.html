@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" /><title>Profile Settings | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -12,26 +14,60 @@
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(active='profile')}"></div>
     <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Profile', unread=0)}"></div>
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Profile Settings', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header"><h1>Profile Settings</h1></div>
-
-            <div class="alert success" th:if="${param.saved}">Profile updated successfully.</div>
-
-            <div class="glass-card">
-                <form th:action="@{/admin/profile/save}" method="post" enctype="multipart/form-data" class="form-grid">
-                    <div class="form-group full">
-                        <label>Profile Picture</label>
-                        <div class="file-drop"><input type="file" name="photoFile" accept="image/*" /><div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload photo</div></div>
-                        <img th:if="${admin.profileImage}" th:src="@{${admin.profileImage}}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-top:10px;" />
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Security / Account</div>
+                        <h1>Admin Profile &amp; Settings</h1>
+                        <p class="page-desc">Manage your admin login credentials, email address, password, and avatar.</p>
                     </div>
-                    <div class="form-group"><label>Username</label><input class="glass-input" name="username" th:value="${admin.username}" required /></div>
-                    <div class="form-group"><label>Email</label><input class="glass-input" name="email" type="email" th:value="${admin.email}" required /></div>
-                    <div class="form-group full"><label>New Password (leave blank to keep current)</label><input class="glass-input" name="newPassword" type="password" /></div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
-                    </div>
-                </form>
+                </div>
+
+                <div class="alert success" th:if="${successMessage != null or param.saved != null}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage ?: 'Profile settings updated successfully.'}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+                <div class="alert error" th:if="${errorMessage}">
+                    <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+                    <button type="button" class="alert-close">×</button>
+                </div>
+
+                <div class="glass-card" style="padding:28px;">
+                    <form th:action="@{/admin/profile/save}" method="post" enctype="multipart/form-data" class="form-grid">
+                        <div class="form-group full">
+                            <label>Profile Picture</label>
+                            <div class="file-drop">
+                                <input type="file" name="photoFile" accept="image/*" />
+                                <div class="file-drop-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload new profile avatar</div>
+                            </div>
+                            <div th:if="${admin.profileImage}" style="margin-top:14px; display:flex; align-items:center; gap:14px;">
+                                <img th:src="@{${admin.profileImage}}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid var(--glass-border);" />
+                                <div style="color:var(--text-secondary); font-size:0.82rem;">Current avatar image active.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="admin-username">Admin Username</label>
+                            <input id="admin-username" class="glass-input" name="username" th:value="${admin.username}" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="admin-email">Admin Email Address</label>
+                            <input id="admin-email" class="glass-input" name="email" type="email" th:value="${admin.email}" required />
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="admin-password">New Password <span style="color:var(--text-muted);">(leave blank to keep current password)</span></label>
+                            <input id="admin-password" class="glass-input" name="newPassword" type="password" placeholder="••••••••" autocomplete="new-password" />
+                        </div>
+
+                        <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
+                            <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Profile Settings</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

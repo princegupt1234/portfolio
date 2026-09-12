@@ -39,7 +39,8 @@ public class AdminProfileController {
     public String save(@RequestParam("username") String username, @RequestParam("email") String email,
                         @RequestParam(value = "newPassword", required = false) String newPassword,
                         @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
-                        Authentication auth) {
+                        Authentication auth,
+                        org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         Admin admin = adminRepository.findByUsername(auth.getName()).orElseThrow();
         admin.setUsername(username);
         admin.setEmail(email);
@@ -50,6 +51,7 @@ public class AdminProfileController {
             admin.setProfileImage(fileStorageService.store(photoFile, "admin"));
         }
         adminRepository.save(admin);
+        redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully.");
         return "redirect:/admin/profile?saved=true";
     }
 }

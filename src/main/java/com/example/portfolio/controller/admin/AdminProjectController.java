@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 @Controller
 @RequestMapping("/admin/projects")
 public class AdminProjectController {
@@ -36,7 +38,7 @@ public class AdminProjectController {
     private final ProjectService projectService;
 
     public AdminProjectController(ProjectRepository projectRepository, FileStorageService fileStorageService,
-                                  DataVersionService dataVersionService, ProjectService projectService) {
+                                   DataVersionService dataVersionService, ProjectService projectService) {
         this.projectRepository = projectRepository;
         this.fileStorageService = fileStorageService;
         this.dataVersionService = dataVersionService;
@@ -63,11 +65,17 @@ public class AdminProjectController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute Project project,
-                        @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+                        @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                        RedirectAttributes redirectAttributes) {
         if (project.getFeatured() == null) {
             project.setFeatured(project.getId() == null ? false : projectRepository.findById(project.getId())
                     .map(Project::getFeatured)
                     .orElse(false));
+        }
+        if (project.getVisible() == null) {
+            project.setVisible(project.getId() == null ? true : projectRepository.findById(project.getId())
+                    .map(Project::getVisible)
+                    .orElse(true));
         }
         if (imageFile != null && !imageFile.isEmpty()) {
             project.setImageUrl(fileStorageService.store(imageFile, "projects"));
@@ -81,6 +89,7 @@ public class AdminProjectController {
         }
         projectRepository.save(project);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Project saved successfully.");
         return "redirect:/admin/projects";
     }
 
@@ -97,20 +106,35 @@ public class AdminProjectController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", exception.getMessage()));
     }
 
+    @PostMapping("/{id}/toggle-featured")
+    public String toggleFeatured(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        projectRepository.findById(id).ifPresent(p -> {
+            p.setFeatured(!Boolean.TRUE.equals(p.getFeatured()));
+            projectRepository.save(p);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Project \"" + p.getTitle() + "\" is now " + (p.getFeatured() ? "featured." : "unfeatured."));
+        });
+        dataVersionService.bump();
+        return "redirect:/admin/projects";
+    }
+
     @PostMapping("/{id}/toggle-visible")
-    public String toggleVisible(@PathVariable("id") Long id) {
+    public String toggleVisible(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         projectRepository.findById(id).ifPresent(p -> {
             p.setVisible(!Boolean.TRUE.equals(p.getVisible()));
             projectRepository.save(p);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Project \"" + p.getTitle() + "\" visibility updated to " + (p.getVisible() ? "Visible." : "Hidden."));
         });
         dataVersionService.bump();
         return "redirect:/admin/projects";
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         projectRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Project deleted successfully.");
         return "redirect:/admin/projects";
     }
 }

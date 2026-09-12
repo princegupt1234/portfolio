@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /><title>Service Form | Admin</title>
+    <meta charset="UTF-8" />
+    <title th:text="${service.id} != null ? 'Edit Service | Admin' : 'Add Service | Admin'">Service Form | Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
@@ -12,31 +15,63 @@
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(active='services')}"></div>
     <div class="admin-main">
-        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Service', unread=0)}"></div>
+        <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Service Form', unread=0)}"></div>
         <div class="admin-content">
-            <div class="page-header">
-                <h1 th:text="${service.id} != null ? 'Edit Service' : 'Add Service'">Add</h1>
-                <a th:href="@{/admin/services}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
-            </div>
-            <div class="glass-card">
-                <form th:action="@{/admin/services/save}" th:object="${service}" method="post" class="form-grid">
-                    <input type="hidden" th:field="*{id}" />
-                    <div class="form-group"><label>Title</label><input class="glass-input" th:field="*{title}" required /></div>
-                    <div class="form-group">
-                        <label>Icon (Font Awesome class)</label>
-                        <input class="glass-input" th:field="*{icon}" placeholder="fa-solid fa-code" />
+            <div class="admin-workspace">
+                <div class="page-header">
+                    <div>
+                        <div class="page-kicker">Offerings / Service Editor</div>
+                        <h1 th:text="${service.id} != null ? 'Edit Service' : 'Add New Service'">Service Form</h1>
+                        <p class="page-desc">Define service offerings, icons, descriptions, and portfolio visibility.</p>
                     </div>
-                    <div class="form-group full"><label>Description</label><textarea class="glass-textarea" th:field="*{description}" rows="4"></textarea></div>
-                    <div class="form-group"><label>Sort Order</label><input class="glass-input" type="number" th:field="*{sortOrder}" /></div>
-                    <div class="form-group" style="flex-direction:row; align-items:center; gap:12px;">
-                        <input type="hidden" name="visible" value="false" />
-                        <label class="toggle-switch"><input type="checkbox" name="visible" value="true" th:checked="*{visible}"/><span class="toggle-slider"></span></label>
-                        <label style="margin:0;">Visible on site</label>
+                    <div class="header-actions">
+                        <a th:href="@{/admin/services}" class="glass-btn"><i class="fa-solid fa-arrow-left"></i> Back to Services</a>
                     </div>
-                    <div class="form-actions form-group full">
-                        <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Service</button>
-                    </div>
-                </form>
+                </div>
+
+                <div class="glass-card" style="padding:28px;">
+                    <form th:action="@{/admin/services/save}" th:object="${service}" method="post" class="form-grid">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-group">
+                            <label for="service-title">Service Title</label>
+                            <input id="service-title" class="glass-input" th:field="*{title}" placeholder="e.g. Backend Development &amp; APIs" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="service-icon">Icon Class (Font Awesome)</label>
+                            <input id="service-icon" class="glass-input" th:field="*{icon}" placeholder="fa-solid fa-server or fa-solid fa-code" />
+                            <small>e.g. <code>fa-solid fa-cloud</code> or <code>fa-solid fa-database</code></small>
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="service-desc">Service Description</label>
+                            <textarea id="service-desc" class="glass-textarea" th:field="*{description}" rows="4" placeholder="Describe the service, technologies used, and client benefits..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="service-order">Sort Order</label>
+                            <input id="service-order" class="glass-input" type="number" min="0" step="1" th:field="*{sortOrder}" placeholder="1" />
+                            <small>Lower order numbers appear first.</small>
+                        </div>
+
+                        <div class="form-group" style="display:flex; flex-direction:row; align-items:center; gap:14px; padding-top:10px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" th:field="*{visible}"/>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong style="color:var(--text); font-size:0.9rem;">Visible on Portfolio</strong>
+                                <div style="color:var(--text-secondary); font-size:0.75rem;">Display this service offering on your portfolio site.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions form-group full" style="border-top:1px solid var(--glass-border); padding-top:20px;">
+                            <button type="submit" class="glass-btn primary"><i class="fa-solid fa-floppy-disk"></i> Save Service</button>
+                            <a th:href="@{/admin/services}" class="glass-btn">Cancel</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
