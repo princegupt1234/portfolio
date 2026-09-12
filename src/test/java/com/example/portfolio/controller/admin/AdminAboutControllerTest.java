@@ -99,20 +99,22 @@ class AdminAboutControllerTest {
     }
 
     @Test
-    void savesQuickStatsFieldsAndRedirects() throws Exception {
+    void doesNotOverwriteHeroQuickStatsWhenSavingAbout() throws Exception {
         AboutInfo existing = new AboutInfo();
         existing.setId(1L);
+        existing.setQuickStats("ExistingHeroStats");
+        existing.setQuickStatsVisible(true);
         when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
 
         mockMvc.perform(post("/admin/about/save")
-                        .param("quickStats", "15+::Projects::fa-solid fa-code|400+::DSA::fa-solid fa-laptop")
-                        .param("quickStatsVisible", "true"))
+                        .param("careerObjective", "New objective"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/about"));
 
         verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
-                "15+::Projects::fa-solid fa-code|400+::DSA::fa-solid fa-laptop".equals(info.getQuickStats()) &&
-                Boolean.TRUE.equals(info.getQuickStatsVisible())
+                "ExistingHeroStats".equals(info.getQuickStats()) &&
+                Boolean.TRUE.equals(info.getQuickStatsVisible()) &&
+                "New objective".equals(info.getCareerObjective())
         ));
         verify(dataVersionService).bump();
     }

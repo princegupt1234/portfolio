@@ -139,7 +139,6 @@ public class AdminAboutController {
                         @RequestParam(value = "terminalEnabled", required = false) String terminalEnabledParam,
                         @RequestParam(value = "recruiterPitchEnabled", required = false) String recruiterPitchEnabledParam,
                         @RequestParam(value = "aiChatEnabled", required = false) String aiChatEnabledParam,
-                        @RequestParam(value = "quickStatsVisible", required = false) String quickStatsVisibleParam,
                         @RequestParam(value = "ogTagsEnabled", required = false) String ogTagsEnabledParam,
                         @RequestParam(value = "ogImageFile", required = false) MultipartFile ogImageFile,
                         @RequestParam(value = "contactSpamProtectionEnabled", required = false) String contactSpamProtectionEnabledParam,
@@ -169,16 +168,6 @@ public class AdminAboutController {
         // Developer CLI Custom Commands
         if (form.getCustomCliCommands() != null) {
             existing.setCustomCliCommands(form.getCustomCliCommands());
-        }
-
-        // Quick Credibility Stats
-        if (form.getQuickStats() != null) {
-            existing.setQuickStats(form.getQuickStats());
-        }
-        if (quickStatsVisibleParam != null) {
-            existing.setQuickStatsVisible("true".equals(quickStatsVisibleParam));
-        } else if (form.getQuickStats() != null) {
-            existing.setQuickStatsVisible(false);
         }
 
         // Recruiter Modal
