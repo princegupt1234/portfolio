@@ -252,8 +252,11 @@ public class HomeController {
             return;
         }
 
+        long fileLength = Files.size(filePath);
         response.setContentType("application/pdf");
+        response.setContentLengthLong(fileLength);
         response.setHeader("Content-Disposition", "inline; filename=\"Prince_Gupt_Resume.pdf\"");
+        response.setHeader("Cache-Control", "public, max-age=3600");
         Files.copy(filePath, response.getOutputStream());
         response.getOutputStream().flush();
     }

@@ -34,6 +34,9 @@ public class SecurityConfig {
         requestHandler.setCsrfRequestAttributeName(null);
 
         http
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/login", "/css/**", "/js/**", "/images/**",
                         "/uploads/**", "/webjars/**", "/", "/about", "/skills", "/experience",

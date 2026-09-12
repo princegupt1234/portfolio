@@ -60,8 +60,8 @@ window.openResumeModal = function() {
   const modal = document.getElementById('resumeModal');
   const iframe = document.getElementById('resumeIframe');
   if (!modal) return;
-  if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src.endsWith('/'))) {
-    iframe.src = '/resume/preview';
+  if (iframe) {
+    iframe.src = '/resume/preview#toolbar=1&navpanes=0';
   }
   modal.style.display = 'flex';
   modal.classList.add('open');
@@ -337,24 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
 
   /* ---------- Resume Preview Modal ---------- */
-  window.openResumeModal = function() {
-    const modal = document.getElementById('resumeModal');
-    const iframe = document.getElementById('resumeIframe');
-    if (!modal) return;
-    if (iframe && (!iframe.src || iframe.src === 'about:blank' || iframe.src.endsWith('/'))) {
-      iframe.src = '/resume/preview';
-    }
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  };
-
-  window.closeResumeModal = function() {
-    const modal = document.getElementById('resumeModal');
-    if (modal) {
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  };
+  // Implemented at top-level (lines 59-77) for reliable access
 
   /* ---------- Architecture Diagram Lightbox ---------- */
   window.openArchModal = function(url, title) {

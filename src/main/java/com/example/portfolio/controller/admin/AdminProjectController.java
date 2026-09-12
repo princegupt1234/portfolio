@@ -26,6 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -63,11 +66,42 @@ public class AdminProjectController {
         return "admin/projects/form";
     }
 
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
+
     @PostMapping("/save")
     public String save(@ModelAttribute Project project,
                         @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                         @RequestParam(value = "archImageFile", required = false) MultipartFile archImageFile,
                         RedirectAttributes redirectAttributes) {
+        // Sanitize empty strings to null so unpopulated links never render ghost buttons
+        if (project.getLiveUrl() != null && project.getLiveUrl().isBlank()) {
+            project.setLiveUrl(null);
+        }
+        if (project.getGithubUrl() != null && project.getGithubUrl().isBlank()) {
+            project.setGithubUrl(null);
+        }
+        if (project.getDemoVideoUrl() != null && project.getDemoVideoUrl().isBlank()) {
+            project.setDemoVideoUrl(null);
+        }
+        if (project.getArchitectureImageUrl() != null && project.getArchitectureImageUrl().isBlank()) {
+            project.setArchitectureImageUrl(null);
+        }
+        if (project.getEngineeringHighlight() != null && project.getEngineeringHighlight().isBlank()) {
+            project.setEngineeringHighlight(null);
+        }
+        if (project.getImageUrl() != null && project.getImageUrl().isBlank()) {
+            project.setImageUrl(null);
+        }
+        if (project.getTechStack() != null && project.getTechStack().isBlank()) {
+            project.setTechStack(null);
+        }
+        if (project.getTags() != null && project.getTags().isBlank()) {
+            project.setTags(null);
+        }
+
         if (project.getFeatured() == null) {
             project.setFeatured(project.getId() == null ? false : projectRepository.findById(project.getId())
                     .map(Project::getFeatured)

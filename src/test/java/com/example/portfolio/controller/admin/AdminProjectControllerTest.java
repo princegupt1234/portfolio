@@ -121,4 +121,28 @@ class AdminProjectControllerTest {
         org.junit.jupiter.api.Assertions.assertFalse(saved.getVisible(), "Visible should be false when unchecked");
         org.junit.jupiter.api.Assertions.assertFalse(saved.getFeatured(), "Featured should be false when unchecked");
     }
+
+    @Test
+    void testSaveWithBlankFieldsConvertsToNull() throws Exception {
+        mockMvc.perform(post("/admin/projects/save")
+                        .param("title", "Vistastore")
+                        .param("githubUrl", "https://github.com/princegupt1234/Vistastore")
+                        .param("liveUrl", "")
+                        .param("demoVideoUrl", "   ")
+                        .param("engineeringHighlight", "")
+                        .param("architectureImageUrl", "")
+                        .param("visible", "true")
+                        .param("_visible", "on"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/projects"));
+
+        org.mockito.ArgumentCaptor<Project> captor = org.mockito.ArgumentCaptor.forClass(Project.class);
+        verify(projectRepository).save(captor.capture());
+        Project saved = captor.getValue();
+        org.junit.jupiter.api.Assertions.assertEquals("https://github.com/princegupt1234/Vistastore", saved.getGithubUrl());
+        org.junit.jupiter.api.Assertions.assertNull(saved.getLiveUrl(), "Blank liveUrl must be converted to null");
+        org.junit.jupiter.api.Assertions.assertNull(saved.getDemoVideoUrl(), "Whitespace demoVideoUrl must be converted to null");
+        org.junit.jupiter.api.Assertions.assertNull(saved.getEngineeringHighlight(), "Blank engineeringHighlight must be null");
+        org.junit.jupiter.api.Assertions.assertNull(saved.getArchitectureImageUrl(), "Blank architectureImageUrl must be null");
+    }
 }

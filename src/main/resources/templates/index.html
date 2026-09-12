@@ -113,11 +113,11 @@
                     <i class="fa-solid fa-download"></i> Download Resume
                 </a>
             </div>
-            <div class="hero-socials">
-                <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                <a th:if="${about.linkedinUrl}" th:href="@{${about.linkedinUrl}}" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                <a th:if="${about.whatsappUrl}" th:href="@{${about.whatsappUrl}}" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                <a th:if="${about.email}" th:href="'mailto:' + ${about.email}" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            <div class="hero-socials" th:if="${(about.githubUrl != null and !#strings.isEmpty(#strings.trim(about.githubUrl))) or (about.linkedinUrl != null and !#strings.isEmpty(#strings.trim(about.linkedinUrl))) or (about.whatsappUrl != null and !#strings.isEmpty(#strings.trim(about.whatsappUrl))) or (about.email != null and !#strings.isEmpty(#strings.trim(about.email)))}">
+                <a th:if="${about.githubUrl != null and !#strings.isEmpty(#strings.trim(about.githubUrl))}" th:href="@{${about.githubUrl}}" target="_blank" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a th:if="${about.linkedinUrl != null and !#strings.isEmpty(#strings.trim(about.linkedinUrl))}" th:href="@{${about.linkedinUrl}}" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                <a th:if="${about.whatsappUrl != null and !#strings.isEmpty(#strings.trim(about.whatsappUrl))}" th:href="@{${about.whatsappUrl}}" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a th:if="${about.email != null and !#strings.isEmpty(#strings.trim(about.email))}" th:href="'mailto:' + ${about.email}" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
             </div>
         </div>
         <div class="hero-visual" data-reveal>
@@ -127,8 +127,8 @@
             <div class="floating-icon i4"><i class="fa-brands fa-github"></i></div>
             <div class="hero-photo-ring">
                 <div class="hero-photo">
-                    <img th:if="${about.profileImage}" th:src="@{${about.profileImage}}" alt="Prince Gupt" loading="eager" />
-                    <i th:unless="${about.profileImage}" class="fa-solid fa-user" style="font-size:5rem; color: var(--text-secondary);"></i>
+                    <img th:if="${about.profileImage != null and !#strings.isEmpty(#strings.trim(about.profileImage))}" th:src="@{${about.profileImage}}" alt="Prince Gupt" loading="eager" />
+                    <i th:unless="${about.profileImage != null and !#strings.isEmpty(#strings.trim(about.profileImage))}" class="fa-solid fa-user" style="font-size:5rem; color: var(--text-secondary);"></i>
                 </div>
             </div>
         </div>
@@ -160,13 +160,13 @@
             <div class="glass-card" data-reveal>
                 <p th:text="${about.careerObjective}" style="margin:0; line-height:1.8; font-size:0.95rem; color:var(--text-secondary);"></p>
                 <div class="info-grid" style="margin-top:24px;">
-                    <div th:if="${about.email}"><div class="label">Email</div><div class="value" th:text="${about.email}"></div></div>
-                    <div th:if="${about.location}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
-                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.availabilityVisible != false)}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText} ?: 'Open to opportunities'">Open to opportunities</div></div>
-                    <div th:if="${about.phone}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
-                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.workPreferenceVisible != false) and !#strings.isEmpty(about.workPreference)}"><div class="label">Work Preference</div><div class="value" th:text="${about.workPreference}"></div></div>
-                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.preferredLocationsVisible != false) and !#strings.isEmpty(about.preferredLocations)}"><div class="label">Preferred Locations</div><div class="value" th:text="${about.preferredLocations}"></div></div>
-                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.languagesSpokenVisible != false) and !#strings.isEmpty(about.languagesSpoken)}"><div class="label">Languages</div><div class="value" th:text="${about.languagesSpoken}"></div></div>
+                    <div th:if="${about.email != null and !#strings.isEmpty(#strings.trim(about.email))}"><div class="label">Email</div><div class="value" th:text="${about.email}"></div></div>
+                    <div th:if="${about.location != null and !#strings.isEmpty(#strings.trim(about.location))}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.availabilityVisible != false) and about.availabilityText != null and !#strings.isEmpty(#strings.trim(about.availabilityText))}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText}">Open to opportunities</div></div>
+                    <div th:if="${about.phone != null and !#strings.isEmpty(#strings.trim(about.phone))}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.workPreferenceVisible != false) and about.workPreference != null and !#strings.isEmpty(#strings.trim(about.workPreference))}"><div class="label">Work Preference</div><div class="value" th:text="${about.workPreference}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.preferredLocationsVisible != false) and about.preferredLocations != null and !#strings.isEmpty(#strings.trim(about.preferredLocations))}"><div class="label">Preferred Locations</div><div class="value" th:text="${about.preferredLocations}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.languagesSpokenVisible != false) and about.languagesSpoken != null and !#strings.isEmpty(#strings.trim(about.languagesSpoken))}"><div class="label">Languages</div><div class="value" th:text="${about.languagesSpoken}"></div></div>
                 </div>
             </div>
             <div class="glass-card" data-reveal>
@@ -234,30 +234,30 @@
         <div class="projects-grid" th:if="${!#lists.isEmpty(projects)}">
             <div class="glass-card project-card" th:each="project : ${projects}" data-reveal>
                 <div class="project-thumb">
-                    <img th:if="${project.imageUrl}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
-                    <i th:unless="${project.imageUrl}" class="fa-solid fa-diagram-project"></i>
+                    <img th:if="${project.imageUrl != null and !#strings.isEmpty(#strings.trim(project.imageUrl))}" th:src="@{${project.imageUrl}}" th:alt="${project.title}" loading="lazy" />
+                    <i th:unless="${project.imageUrl != null and !#strings.isEmpty(#strings.trim(project.imageUrl))}" class="fa-solid fa-diagram-project"></i>
                 </div>
                 <div class="project-body">
                     <div class="project-meta-row" th:if="${project.featured}"><span class="project-featured-badge">⭐ Featured</span></div>
                     <h3 class="project-title" th:text="${project.title}">Title</h3>
-                    <p class="project-desc" th:text="${project.description}">Description</p>
-                    <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(project.engineeringHighlight)}">
+                    <p class="project-desc" th:if="${project.description != null and !#strings.isEmpty(#strings.trim(project.description))}" th:text="${project.description}">Description</p>
+                    <div class="project-eng-highlight" th:if="${project.engineeringHighlight != null and !#strings.isEmpty(#strings.trim(project.engineeringHighlight))}">
                         <i class="fa-solid fa-bolt"></i> <span th:text="${project.engineeringHighlight}"></span>
                     </div>
-                    <div class="project-tech">
+                    <div class="project-tech" th:if="${project.techStack != null and !#strings.isEmpty(#strings.trim(project.techStack))}">
                         <span class="tech-chip" th:each="tech : ${#strings.arraySplit(project.techStack ?: '', ',')}" th:text="${tech.trim()}"></span>
                     </div>
-                    <div class="project-links">
-                        <a th:if="${project.liveUrl}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
+                    <div class="project-links" th:if="${(project.liveUrl != null and !#strings.isEmpty(#strings.trim(project.liveUrl))) or (project.githubUrl != null and !#strings.isEmpty(#strings.trim(project.githubUrl))) or (project.demoVideoUrl != null and !#strings.isEmpty(#strings.trim(project.demoVideoUrl))) or (project.architectureImageUrl != null and !#strings.isEmpty(#strings.trim(project.architectureImageUrl)))}">
+                        <a th:if="${project.liveUrl != null and !#strings.isEmpty(#strings.trim(project.liveUrl))}" th:href="@{${project.liveUrl}}" target="_blank" class="primary-link" th:attr="data-track-project=${project.id}">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
                         </a>
-                        <a th:if="${project.githubUrl}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
+                        <a th:if="${project.githubUrl != null and !#strings.isEmpty(#strings.trim(project.githubUrl))}" th:href="@{${project.githubUrl}}" target="_blank" th:attr="data-track-project=${project.id}">
                             <i class="fa-brands fa-github"></i> GitHub
                         </a>
-                        <a th:if="${project.demoVideoUrl}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
+                        <a th:if="${project.demoVideoUrl != null and !#strings.isEmpty(#strings.trim(project.demoVideoUrl))}" th:href="@{${project.demoVideoUrl}}" target="_blank" th:attr="data-track-project=${project.id}" class="glass-btn" style="padding:5px 11px; font-size:0.78rem;">
                             <i class="fa-solid fa-circle-play"></i> Demo
                         </a>
-                        <button type="button" th:if="${project.architectureImageUrl}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
+                        <button type="button" th:if="${project.architectureImageUrl != null and !#strings.isEmpty(#strings.trim(project.architectureImageUrl))}" class="glass-btn" th:attr="onclick='openArchModal(\'' + @{${project.architectureImageUrl}} + '\', \'' + ${#strings.escapeJavaScript(project.title)} + '\')'" style="padding:5px 11px; font-size:0.78rem;">
                             <i class="fa-solid fa-sitemap"></i> Architecture
                         </button>
                     </div>
@@ -286,7 +286,7 @@
                         <div class="cp-platform-name">GitHub</div>
                         <div class="cp-username" th:text="'@' + (${about.githubUsername} ?: 'princegupt1234')">@username</div>
                     </div>
-                    <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary cp-profile-btn">
+                    <a th:if="${about.githubUrl != null and !#strings.isEmpty(#strings.trim(about.githubUrl))}" th:href="@{${about.githubUrl}}" target="_blank" class="glass-btn primary cp-profile-btn">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Profile
                     </a>
                 </div>
@@ -361,16 +361,16 @@
         <div class="cert-carousel" data-reveal>
             <div class="glass-card cert-card" th:each="cert : ${certificates}">
                 <!-- ONLY CERTIFICATE IMAGE HAS ZOOM TRIGGER -->
-                <div class="cert-thumb" th:if="${cert.imageUrl}" onclick="openCertModal(this)" title="Click to view full certificate">
+                <div class="cert-thumb" th:if="${cert.imageUrl != null and !#strings.isEmpty(#strings.trim(cert.imageUrl))}" onclick="openCertModal(this)" title="Click to view full certificate">
                     <img th:src="@{${cert.imageUrl}}" th:alt="${cert.title}" loading="lazy" />
                 </div>
-                <div class="cert-thumb" th:unless="${cert.imageUrl}">
+                <div class="cert-thumb" th:unless="${cert.imageUrl != null and !#strings.isEmpty(#strings.trim(cert.imageUrl))}">
                     <i class="fa-solid fa-certificate" style="font-size:2.5rem; color: var(--text-secondary);"></i>
                 </div>
                 <h4 th:text="${cert.title}">Title</h4>
                 <p style="margin:4px 0;" th:text="${cert.organization}">Org</p>
                 <p style="font-size:0.8rem; color:var(--text-secondary);" th:text="${cert.issueDate}">Date</p>
-                <a th:if="${cert.pdfUrl}" th:href="@{${cert.pdfUrl}}" target="_blank" class="glass-btn" style="margin-top:10px; padding:8px 16px; font-size:0.8rem;"><i class="fa-solid fa-download"></i> Download PDF</a>
+                <a th:if="${cert.pdfUrl != null and !#strings.isEmpty(#strings.trim(cert.pdfUrl))}" th:href="@{${cert.pdfUrl}}" target="_blank" class="glass-btn" style="margin-top:10px; padding:8px 16px; font-size:0.8rem;"><i class="fa-solid fa-download"></i> Download PDF</a>
             </div>
             <div class="glass-card cert-card" th:if="${#lists.isEmpty(certificates)}">
                 <p style="margin:0;">Certificates will appear here.</p>
@@ -568,13 +568,13 @@ function zoomCert(dir) {
             <div class="glass-card building-panel" data-reveal>
                 <div class="panel-eyebrow"><span class="panel-dot building-dot"></span> BUILDING</div>
                 <h3 class="building-title" th:text="${bp.title}"></h3>
-                <p th:if="${bp.summary}" th:text="${bp.summary}" style="font-size:.85rem;color:var(--text-secondary);margin:0 0 10px;line-height:1.6;"></p>
-                <p class="building-desc" th:if="${bp.description}" th:text="${bp.description}"></p>
-                <div class="building-tech" th:if="${bp.techStack}">
+                <p th:if="${bp.summary != null and !#strings.isEmpty(#strings.trim(bp.summary))}" th:text="${bp.summary}" style="font-size:.85rem;color:var(--text-secondary);margin:0 0 10px;line-height:1.6;"></p>
+                <p class="building-desc" th:if="${bp.description != null and !#strings.isEmpty(#strings.trim(bp.description))}" th:text="${bp.description}"></p>
+                <div class="building-tech" th:if="${bp.techStack != null and !#strings.isEmpty(#strings.trim(bp.techStack))}">
                     <span class="tech-chip" th:each="t : ${#strings.arraySplit(bp.techStack, '|')}" th:text="${t.trim()}"></span>
                 </div>
                 <div class="building-actions">
-                    <a th:if="${bp.projectUrl}" th:href="@{${bp.projectUrl}}" target="_blank" class="glass-btn primary" style="font-size:0.85rem; padding:9px 20px;">
+                    <a th:if="${bp.projectUrl != null and !#strings.isEmpty(#strings.trim(bp.projectUrl))}" th:href="@{${bp.projectUrl}}" target="_blank" class="glass-btn primary" style="font-size:0.85rem; padding:9px 20px;">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Project
                     </a>
                     <span class="building-status-chip" th:text="${bp.status} ?: 'In Progress'"></span>
@@ -709,7 +709,7 @@ function zoomCert(dir) {
                 <p class="connect-msg" th:text="${about.contactMessage} ?: 'I\'m open to full-time roles, freelance projects, and interesting collaborations. Drop a message and I\'ll get back to you within 24 hours.'"></p>
 
                 <div class="connect-links">
-                    <a th:if="${about.email}" th:href="'mailto:' + ${about.email}" class="connect-link">
+                    <a th:if="${about.email != null and !#strings.isEmpty(#strings.trim(about.email))}" th:href="'mailto:' + ${about.email}" class="connect-link">
                         <div class="connect-link-icon"><i class="fa-solid fa-envelope"></i></div>
                         <div>
                             <div class="connect-link-label">Email</div>
@@ -717,7 +717,7 @@ function zoomCert(dir) {
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square connect-link-arrow"></i>
                     </a>
-                    <a th:if="${about.githubUrl}" th:href="@{${about.githubUrl}}" target="_blank" class="connect-link">
+                    <a th:if="${about.githubUrl != null and !#strings.isEmpty(#strings.trim(about.githubUrl))}" th:href="@{${about.githubUrl}}" target="_blank" class="connect-link">
                         <div class="connect-link-icon"><i class="fa-brands fa-github"></i></div>
                         <div>
                             <div class="connect-link-label">GitHub</div>
@@ -725,7 +725,7 @@ function zoomCert(dir) {
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square connect-link-arrow"></i>
                     </a>
-                    <a th:if="${about.linkedinUrl}" th:href="@{${about.linkedinUrl}}" target="_blank" class="connect-link">
+                    <a th:if="${about.linkedinUrl != null and !#strings.isEmpty(#strings.trim(about.linkedinUrl))}" th:href="@{${about.linkedinUrl}}" target="_blank" class="connect-link">
                         <div class="connect-link-icon" style="background:rgba(10,102,194,0.15); color:#0a66c2;"><i class="fa-brands fa-linkedin-in"></i></div>
                         <div>
                             <div class="connect-link-label">LinkedIn</div>
@@ -733,7 +733,7 @@ function zoomCert(dir) {
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square connect-link-arrow"></i>
                     </a>
-                    <a th:if="${about.whatsappUrl}" th:href="@{${about.whatsappUrl}}" target="_blank" class="connect-link">
+                    <a th:if="${about.whatsappUrl != null and !#strings.isEmpty(#strings.trim(about.whatsappUrl))}" th:href="@{${about.whatsappUrl}}" target="_blank" class="connect-link">
                         <div class="connect-link-icon" style="background:rgba(37,211,102,0.12); color:#25d366;"><i class="fa-brands fa-whatsapp"></i></div>
                         <div>
                             <div class="connect-link-label">WhatsApp</div>
@@ -799,6 +799,9 @@ function zoomCert(dir) {
                 <span><span th:text="${about.fullName} ?: 'Prince Gupt'">Prince Gupt</span> — Resume Preview</span>
             </div>
             <div class="doc-modal-actions">
+                <a th:href="@{/resume/preview}" target="_blank" class="glass-btn" style="padding:6px 14px; font-size:0.78rem;" title="Open in new browser tab">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Tab
+                </a>
                 <a th:href="@{/resume/download}" class="glass-btn primary" style="padding:6px 14px; font-size:0.78rem;">
                     <i class="fa-solid fa-download"></i> Download PDF
                 </a>
@@ -808,7 +811,7 @@ function zoomCert(dir) {
             </div>
         </div>
         <div class="doc-modal-body">
-            <iframe id="resumeIframe" src="" title="Resume Preview"></iframe>
+            <iframe id="resumeIframe" src="" title="Resume Preview" style="width:100%; height:100%; border:none; display:block;"></iframe>
         </div>
     </div>
 </div>
@@ -941,7 +944,7 @@ function zoomCert(dir) {
             <button type="button" class="glass-btn" onclick="closeRecruiterModal(); openResumeModal();" style="padding:8px 16px; font-size:0.85rem;">
                 <i class="fa-solid fa-eye"></i> Quick View Resume
             </button>
-            <a th:if="${about.email}" th:href="'mailto:' + ${about.email} + '?subject=Opportunity%20Interview%20Invitation'" class="glass-btn" style="padding:8px 16px; font-size:0.85rem; border-color:rgba(16,185,129,0.4); color:#10b981;">
+            <a th:if="${about.email != null and !#strings.isEmpty(#strings.trim(about.email))}" th:href="'mailto:' + ${about.email} + '?subject=Opportunity%20Interview%20Invitation'" class="glass-btn" style="padding:8px 16px; font-size:0.85rem; border-color:rgba(16,185,129,0.4); color:#10b981;">
                 <i class="fa-solid fa-calendar-check"></i> Request Interview
             </a>
         </div>

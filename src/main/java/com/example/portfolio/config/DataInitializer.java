@@ -93,6 +93,7 @@ public class DataInitializer implements CommandLineRunner {
         seedSkills();
         seedExperience();
         seedProjects();
+        sanitizeProjects();
         seedCertificates();
         seedServices();
         seedTestimonials();
@@ -500,6 +501,47 @@ public class DataInitializer implements CommandLineRunner {
                 }
             });
         }
+    }
+
+    private void sanitizeProjects() {
+        projectRepository.findAll().forEach(p -> {
+            boolean changed = false;
+            if (p.getLiveUrl() != null && p.getLiveUrl().isBlank()) {
+                p.setLiveUrl(null);
+                changed = true;
+            }
+            if (p.getGithubUrl() != null && p.getGithubUrl().isBlank()) {
+                p.setGithubUrl(null);
+                changed = true;
+            }
+            if (p.getDemoVideoUrl() != null && p.getDemoVideoUrl().isBlank()) {
+                p.setDemoVideoUrl(null);
+                changed = true;
+            }
+            if (p.getArchitectureImageUrl() != null && p.getArchitectureImageUrl().isBlank()) {
+                p.setArchitectureImageUrl(null);
+                changed = true;
+            }
+            if (p.getEngineeringHighlight() != null && p.getEngineeringHighlight().isBlank()) {
+                p.setEngineeringHighlight(null);
+                changed = true;
+            }
+            if (p.getImageUrl() != null && p.getImageUrl().isBlank()) {
+                p.setImageUrl(null);
+                changed = true;
+            }
+            if (p.getTechStack() != null && p.getTechStack().isBlank()) {
+                p.setTechStack(null);
+                changed = true;
+            }
+            if (p.getTags() != null && p.getTags().isBlank()) {
+                p.setTags(null);
+                changed = true;
+            }
+            if (changed) {
+                projectRepository.save(p);
+            }
+        });
     }
 
     private void seedCertificates() {
