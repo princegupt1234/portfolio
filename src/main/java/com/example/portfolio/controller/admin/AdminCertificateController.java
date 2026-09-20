@@ -41,9 +41,16 @@ public class AdminCertificateController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("certificate", certificateRepository.findById(id).orElseThrow());
-        return "admin/certificates/form";
+    public String editForm(@PathVariable("id") Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        return certificateRepository.findById(id)
+                .map(certificate -> {
+                    model.addAttribute("certificate", certificate);
+                    return "admin/certificates/form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Certificate not found.");
+                    return "redirect:/admin/certificates";
+                });
     }
 
     @PostMapping("/save")
@@ -72,18 +79,27 @@ public class AdminCertificateController {
 
     @PostMapping("/{id}/toggle-visible")
     public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        certificateRepository.findById(id).ifPresent(c -> {
-            c.setVisible(!Boolean.TRUE.equals(c.getVisible()));
-            certificateRepository.save(c);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Certificate \"" + c.getTitle() + "\" visibility set to " + (c.getVisible() ? "Visible." : "Hidden."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/certificates";
+        return certificateRepository.findById(id)
+                .map(c -> {
+                    c.setVisible(!Boolean.TRUE.equals(c.getVisible()));
+                    certificateRepository.save(c);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Certificate \"" + c.getTitle() + "\" visibility set to " + (c.getVisible() ? "Visible." : "Hidden."));
+                    return "redirect:/admin/certificates";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Certificate not found.");
+                    return "redirect:/admin/certificates";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!certificateRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Certificate not found.");
+            return "redirect:/admin/certificates";
+        }
         certificateRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Certificate deleted successfully.");

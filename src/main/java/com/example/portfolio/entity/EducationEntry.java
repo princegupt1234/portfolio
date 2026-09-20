@@ -33,4 +33,15 @@ public class EducationEntry {
     public void setScoreLabel(String scoreLabel) { this.scoreLabel = scoreLabel; }
     public Integer getSortOrder() { return sortOrder; }
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
+    public String getStartYear() {
+        if (duration != null && duration.contains("-")) return duration.split("-")[0].trim();
+        return duration;
+    }
+    public String getEndYear() {
+        if (duration != null && duration.contains("-")) {
+            String[] parts = duration.split("-");
+            return parts.length > 1 ? parts[1].trim() : "";
+        }
+        return "";
+    }
 }

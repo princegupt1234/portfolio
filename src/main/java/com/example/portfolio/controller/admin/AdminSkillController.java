@@ -36,9 +36,16 @@ public class AdminSkillController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("skill", skillRepository.findById(id).orElseThrow());
-        return "admin/skills/form";
+    public String editForm(@PathVariable("id") Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        return skillRepository.findById(id)
+                .map(skill -> {
+                    model.addAttribute("skill", skill);
+                    return "admin/skills/form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Skill not found.");
+                    return "redirect:/admin/skills";
+                });
     }
 
     @PostMapping("/save")
@@ -51,18 +58,27 @@ public class AdminSkillController {
 
     @PostMapping("/{id}/toggle-visible")
     public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        skillRepository.findById(id).ifPresent(s -> {
-            s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
-            skillRepository.save(s);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Skill \"" + s.getName() + "\" visibility set to " + (s.getVisible() ? "Visible." : "Hidden."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/skills";
+        return skillRepository.findById(id)
+                .map(s -> {
+                    s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
+                    skillRepository.save(s);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Skill \"" + s.getName() + "\" visibility set to " + (s.getVisible() ? "Visible." : "Hidden."));
+                    return "redirect:/admin/skills";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Skill not found.");
+                    return "redirect:/admin/skills";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!skillRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Skill not found.");
+            return "redirect:/admin/skills";
+        }
         skillRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Skill deleted successfully.");

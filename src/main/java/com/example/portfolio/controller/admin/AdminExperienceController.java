@@ -36,9 +36,16 @@ public class AdminExperienceController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("experience", experienceRepository.findById(id).orElseThrow());
-        return "admin/experience/form";
+    public String editForm(@PathVariable("id") Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        return experienceRepository.findById(id)
+                .map(experience -> {
+                    model.addAttribute("experience", experience);
+                    return "admin/experience/form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Experience not found.");
+                    return "redirect:/admin/experience";
+                });
     }
 
     @PostMapping("/save")
@@ -51,18 +58,27 @@ public class AdminExperienceController {
 
     @PostMapping("/{id}/toggle-visible")
     public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        experienceRepository.findById(id).ifPresent(e -> {
-            e.setVisible(!Boolean.TRUE.equals(e.getVisible()));
-            experienceRepository.save(e);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Experience \"" + e.getRole() + "\" visibility set to " + (e.getVisible() ? "Visible." : "Hidden."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/experience";
+        return experienceRepository.findById(id)
+                .map(e -> {
+                    e.setVisible(!Boolean.TRUE.equals(e.getVisible()));
+                    experienceRepository.save(e);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Experience \"" + e.getRole() + "\" visibility set to " + (e.getVisible() ? "Visible." : "Hidden."));
+                    return "redirect:/admin/experience";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Experience not found.");
+                    return "redirect:/admin/experience";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!experienceRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Experience not found.");
+            return "redirect:/admin/experience";
+        }
         experienceRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Experience deleted successfully.");

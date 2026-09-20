@@ -41,9 +41,16 @@ public class AdminTestimonialController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("testimonial", testimonialRepository.findById(id).orElseThrow());
-        return "admin/testimonials/form";
+    public String editForm(@PathVariable("id") Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        return testimonialRepository.findById(id)
+                .map(testimonial -> {
+                    model.addAttribute("testimonial", testimonial);
+                    return "admin/testimonials/form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Testimonial not found.");
+                    return "redirect:/admin/testimonials";
+                });
     }
 
     @PostMapping("/save")
@@ -65,18 +72,27 @@ public class AdminTestimonialController {
 
     @PostMapping("/{id}/toggle-published")
     public String togglePublished(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        testimonialRepository.findById(id).ifPresent(t -> {
-            t.setPublished(!Boolean.TRUE.equals(t.getPublished()));
-            testimonialRepository.save(t);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Testimonial from \"" + t.getName() + "\" status set to " + (t.getPublished() ? "Published." : "Hidden."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/testimonials";
+        return testimonialRepository.findById(id)
+                .map(t -> {
+                    t.setPublished(!Boolean.TRUE.equals(t.getPublished()));
+                    testimonialRepository.save(t);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Testimonial from \"" + t.getName() + "\" status set to " + (t.getPublished() ? "Published." : "Hidden."));
+                    return "redirect:/admin/testimonials";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Testimonial not found.");
+                    return "redirect:/admin/testimonials";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!testimonialRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Testimonial not found.");
+            return "redirect:/admin/testimonials";
+        }
         testimonialRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Testimonial deleted successfully.");

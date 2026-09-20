@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><title>Hiring &amp; Availability Management | Admin</title>
+  <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
+  <style>
+    .workspace-tabs-strip {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px;
+      background: rgba(255, 255, 255, 0.03); padding: 5px; border-radius: 12px;
+      border: 1px solid var(--glass-border);
+    }
+    .workspace-tabs-strip .tab-pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px;
+      border-radius: 9px; color: var(--text-secondary); font-size: 0.84rem; font-weight: 500;
+      text-decoration: none; transition: all 0.2s ease;
+    }
+    .workspace-tabs-strip .tab-pill:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .workspace-tabs-strip .tab-pill.active {
+      background: linear-gradient(135deg, rgba(16,185,129,.25), rgba(6,182,212,.18));
+      border: 1px solid rgba(16,185,129,.35); color: #fff; font-weight: 600;
+      box-shadow: 0 4px 12px rgba(16,185,129,.2);
+    }
+
+    .hiring-sections { display: flex; flex-direction: column; gap: 18px; }
+    .ab-card { border-radius: 16px; background: var(--glass-surface); border: 1px solid var(--glass-border); backdrop-filter: var(--blur); overflow: hidden; }
+    .ab-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 22px; cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--glass-border); transition: background .2s;
+    }
+    .ab-card-header:hover { background: rgba(255,255,255,.03); }
+    .ab-card-header-left { display: flex; align-items: center; gap: 12px; }
+    .ab-card-icon {
+      width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(16,185,129,.22), rgba(6,182,212,.14));
+      color: #10b981; border: 1px solid rgba(16,185,129,.25);
+    }
+    .ab-card-title { font-size: .95rem; font-weight: 600; color: var(--text); }
+    .ab-card-subtitle { font-size: .76rem; color: var(--text-secondary); margin-top: 2px; }
+    .ab-chevron { color: var(--text-secondary); transition: transform .3s; font-size: .85rem; }
+    .ab-card.collapsed .ab-chevron { transform: rotate(-90deg); }
+    .ab-card-body { padding: 22px; }
+    .ab-card.collapsed .ab-card-body { display: none; }
+
+    .sec-desc { font-size: .8rem; color: var(--text-secondary); margin-bottom: 16px; padding: 9px 13px; background: rgba(255,255,255,.03); border-radius: 10px; border-left: 3px solid rgba(16,185,129,.4); line-height: 1.6; }
+    .field-label-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+    .field-label-row label { font-size: .82rem; color: var(--text-secondary); font-weight: 500; }
+    .field-hint { font-size: .74rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.5; }
+
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.15); border: 1px solid var(--glass-border); transition: .3s; border-radius: 24px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; }
+    input:checked + .toggle-slider { background: #10b981; border-color: #10b981; }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,.02); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 14px; }
+    .toggle-row-info { display: flex; flex-direction: column; gap: 2px; }
+    .toggle-row-title { font-size: .86rem; font-weight: 600; color: var(--text); }
+    .toggle-row-desc { font-size: .76rem; color: var(--text-secondary); }
+
+    .hiring-preview-box {
+      margin-top: 20px; padding: 16px; border-radius: 12px;
+      background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.25);
+    }
+    .hiring-preview-title { font-size: 0.85rem; font-weight: 700; color: #10b981; margin-bottom: 8px; display:flex; align-items:center; gap:6px; }
+    .hiring-preview-content { font-size: 0.8rem; line-height: 1.6; color: var(--text); font-family: var(--font-sans); }
+
+    .preset-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .preset-chip {
+      padding: 3px 10px; font-size: 0.74rem; border-radius: 6px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+    }
+    .preset-chip:hover { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.4); color: #fff; }
+  </style>
+</head>
+<body class="admin-body">
+<div class="admin-wrapper">
+  <div th:replace="~{admin/fragments/sidebar :: sidebar(active='hiring')}"></div>
+  <div class="admin-main">
+    <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Hiring & Availability', unread=0)}"></div>
+    <div class="admin-content">
+      <div style="max-width: 1280px; margin: 0 auto;">
+
+        <!-- Workspace Tabs (5 Modular Sections) -->
+        <div class="workspace-tabs-strip">
+          <a th:href="@{/admin/hero}" class="tab-pill"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>1. Hero Section</span></a>
+          <a th:href="@{/admin/about}" class="tab-pill"><i class="fa-solid fa-user"></i> <span>2. About &amp; Story</span></a>
+          <a th:href="@{/admin/hiring}" class="tab-pill active"><i class="fa-solid fa-briefcase"></i> <span>3. Hiring &amp; Availability</span></a>
+          <a th:href="@{/admin/interactive}" class="tab-pill"><i class="fa-solid fa-robot"></i> <span>4. AI &amp; Interactive</span></a>
+          <a th:href="@{/admin/ai-training}" class="tab-pill"><i class="fa-solid fa-brain" style="color:#c084fc;"></i> <span>5. AI Training &amp; Corrections</span></a>
+        </div>
+
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:18px;">
+          <div>
+            <div style="color:#10b981; font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px;">Recruiter Pitch &amp; Career Availability</div>
+            <h1 style="font-size:clamp(1.35rem,2.5vw,1.9rem); margin:0; letter-spacing:-.02em;">Hiring &amp; Availability Settings</h1>
+            <p style="max-width:640px; color:var(--text-secondary); font-size:.82rem; line-height:1.6; margin:6px 0 0;">
+              Complete control over your hiring availability status, target roles, notice period, location flexibility, work preference badges, and the 30-second recruiter brief modal.
+            </p>
+          </div>
+          <div style="display:flex; gap:9px; flex-wrap:wrap;">
+            <a th:href="@{/}" target="_blank" class="glass-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> View live site</a>
+            <button type="button" onclick="document.getElementById('hiringForm').requestSubmit();" class="glass-btn primary" style="background:#10b981; border-color:#10b981; color:#000; font-weight:600;"><i class="fa-solid fa-floppy-disk"></i> Save Hiring Settings</button>
+          </div>
+        </div>
+
+        <div class="alert success" th:if="${successMessage}">
+          <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+          <button type="button" class="alert-close">×</button>
+        </div>
+        <div class="alert error" th:if="${errorMessage}">
+          <div class="alert-content"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span></div>
+          <button type="button" class="alert-close">×</button>
+        </div>
+
+        <nav class="about-nav" aria-label="Hiring anchors">
+          <a href="#sec-availability"><i class="fa-solid fa-circle-check"></i> Hiring Availability Status</a>
+          <a href="#sec-workpref"><i class="fa-solid fa-tags"></i> Work Preferences &amp; Badges</a>
+          <a href="#sec-recruiter"><i class="fa-solid fa-bolt"></i> 30s Recruiter Brief Modal</a>
+        </nav>
+
+        <form id="hiringForm" th:action="@{/admin/hiring/save}" th:object="${about}" method="post">
+          <input type="hidden" th:field="*{id}"/>
+          <div class="hiring-sections">
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 1 · HIRING AVAILABILITY COMPLETE CONTROL
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-availability">
+              <div class="ab-card-header" onclick="toggleSection('sec-availability')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                  <div>
+                    <div class="ab-card-title">Hiring Availability Controls</div>
+                    <div class="ab-card-subtitle">Live status, target roles, notice period, location flexibility, direct hiring email, and recruiter action prompt</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">
+                  These settings directly power what <strong>Prince AI Assistant</strong> outputs when recruiters click the <code>Availability</code> chip, what the CLI <code>hire</code> command prints, and what displays in the About Me section badges.
+                </p>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-info">
+                    <div class="toggle-row-title">Enable Hiring Availability System</div>
+                    <div class="toggle-row-desc">Show availability status across the portfolio, AI Assistant, and CLI terminal</div>
+                  </div>
+                  <label class="toggle-switch" for="availabilityVisible">
+                    <input type="checkbox" id="availabilityVisible" name="availabilityVisible" value="true" th:checked="*{availabilityVisible != false}"/>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="form-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:18px;">
+
+                  <!-- 1. Status -->
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="availabilityText">Availability Status</label>
+                    </div>
+                    <input class="glass-input" id="availabilityText" th:field="*{availabilityText}" placeholder="e.g. Open to opportunities"/>
+                    <div class="preset-chips">
+                      <span class="preset-chip" onclick="setFieldValue('availabilityText', 'Open to opportunities')">Open to opportunities</span>
+                      <span class="preset-chip" onclick="setFieldValue('availabilityText', 'Ready for Immediate Joining (0 days notice)')">Immediate Joining</span>
+                      <span class="preset-chip" onclick="setFieldValue('availabilityText', 'Actively Interviewing')">Actively Interviewing</span>
+                      <span class="preset-chip" onclick="setFieldValue('availabilityText', 'Available for Freelance / Contracts')">Freelance / Contracts</span>
+                    </div>
+                    <span class="field-hint">Displayed next to the green status indicator dot.</span>
+                  </div>
+
+                  <!-- 2. Notice Period -->
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="hiringNoticePeriod">Notice Period</label>
+                    </div>
+                    <input class="glass-input" id="hiringNoticePeriod" th:field="*{hiringNoticePeriod}" placeholder="e.g. Immediate Joiner (0 days notice)"/>
+                    <div class="preset-chips">
+                      <span class="preset-chip" onclick="setFieldValue('hiringNoticePeriod', 'Immediate Joiner (0 days notice)')">0 days (Immediate)</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringNoticePeriod', '15 Days Notice Period')">15 Days</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringNoticePeriod', '30 Days Notice Period')">30 Days</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringNoticePeriod', 'Negotiable Notice')">Negotiable</span>
+                    </div>
+                    <span class="field-hint">Notice period expected before official joining.</span>
+                  </div>
+
+                  <!-- 3. Target Roles -->
+                  <div class="form-group" style="grid-column: 1 / -1;">
+                    <div class="field-label-row">
+                      <label for="hiringRoles">Target Engineering Roles</label>
+                    </div>
+                    <input class="glass-input" id="hiringRoles" th:field="*{hiringRoles}" placeholder="e.g. SDE-1 / Software Engineer / Java Backend / Full Stack Developer"/>
+                    <div class="preset-chips">
+                      <span class="preset-chip" onclick="setFieldValue('hiringRoles', 'SDE-1 / Software Engineer / Java Backend / Full Stack Developer')">SDE-1 / Java Backend / Full Stack</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringRoles', 'Backend Java Developer / Spring Boot Engineer')">Backend Java / Spring Boot</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringRoles', 'Junior Software Engineer (Java, REST APIs, MySQL)')">Junior Software Engineer</span>
+                    </div>
+                    <span class="field-hint">The specific roles and job titles you are targeting.</span>
+                  </div>
+
+                  <!-- 4. Location Flexibility -->
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="hiringLocationDetails">Location &amp; Relocation Flexibility</label>
+                    </div>
+                    <input class="glass-input" id="hiringLocationDetails" th:field="*{hiringLocationDetails}" placeholder="e.g. Lucknow, Uttar Pradesh (Open to Remote, Hybrid, or On-site Relocation)"/>
+                    <div class="preset-chips">
+                      <span class="preset-chip" onclick="setFieldValue('hiringLocationDetails', 'Lucknow, Uttar Pradesh (Open to Remote, Hybrid, or On-site Relocation)')">Lucknow (Open to Remote/Relocation)</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringLocationDetails', 'Bengaluru, Delhi NCR, Pune, or Remote')">Bengaluru / Delhi / Pune / Remote</span>
+                      <span class="preset-chip" onclick="setFieldValue('hiringLocationDetails', 'Remote Only')">Remote Only</span>
+                    </div>
+                    <span class="field-hint">Your current location and relocation flexibility.</span>
+                  </div>
+
+                  <!-- 5. Direct Hiring Contact Email -->
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="hiringContactEmail">Recruiter Contact Email</label>
+                    </div>
+                    <input class="glass-input" type="email" id="hiringContactEmail" th:field="*{hiringContactEmail}" placeholder="e.g. princegupt3052@gmail.com"/>
+                    <span class="field-hint">Direct email address provided for interview invitations and recruiter outreach.</span>
+                  </div>
+
+                  <!-- 6. Custom Hiring Note / CTA -->
+                  <div class="form-group" style="grid-column: 1 / -1;">
+                    <div class="field-label-row">
+                      <label for="hiringCustomNote">Recruiter Action Note / Next Step</label>
+                    </div>
+                    <textarea class="glass-textarea" id="hiringCustomNote" th:field="*{hiringCustomNote}" rows="2"
+                              placeholder="e.g. Click the 30s Recruiter Brief button in the header for the executive candidate summary!"></textarea>
+                    <span class="field-hint">Shown at the end of the AI Assistant's hiring availability card.</span>
+                  </div>
+
+                </div>
+
+                <!-- Live Simulation Preview -->
+                <div class="hiring-preview-box">
+                  <div class="hiring-preview-title"><i class="fa-solid fa-robot"></i> Live AI Assistant Output Preview</div>
+                  <div class="hiring-preview-content" id="liveHiringPreview">
+                    🟢 <strong>Hiring Availability:</strong><br><br>
+                    • <strong>Status:</strong> <span id="prevStatus">Open to opportunities</span><br>
+                    • <strong>Roles:</strong> <span id="prevRoles">SDE-1 / Software Engineer / Java Backend / Full Stack Developer</span><br>
+                    • <strong>Notice Period:</strong> <span id="prevNotice">Immediate Joiner (0 days notice)</span><br>
+                    • <strong>Location:</strong> <span id="prevLoc">Lucknow, Uttar Pradesh (Open to Remote, Hybrid, or On-site Relocation)</span><br>
+                    • <strong>Contact:</strong> <span id="prevEmail" style="color:var(--primary);">princegupt3052@gmail.com</span><br><br>
+                    <span id="prevNote" style="color:var(--text-secondary);">Click the 30s Recruiter Brief button in the header for the executive candidate summary!</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 2 · WORK PREFERENCES & BADGES
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-workpref">
+              <div class="ab-card-header" onclick="toggleSection('sec-workpref')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon"><i class="fa-solid fa-tags"></i></div>
+                  <div>
+                    <div class="ab-card-title">Work Preferences &amp; Badges</div>
+                    <div class="ab-card-subtitle">Work modes, preferred tech hub cities, spoken languages, and individual badge toggles</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">These chips are displayed on your portfolio inside the About section info grid.</p>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-info">
+                    <div class="toggle-row-title">Master Toggle: Show Work Preferences in About Grid</div>
+                    <div class="toggle-row-desc">Display work preference badges on your live portfolio</div>
+                  </div>
+                  <label class="toggle-switch" for="workPreferencesSectionVisible">
+                    <input type="checkbox" id="workPreferencesSectionVisible" name="workPreferencesSectionVisible" value="true" th:checked="*{workPreferencesSectionVisible != false}"/>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="form-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:18px;">
+
+                  <!-- Work Preference -->
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="workPreference">Work Mode Preference</label>
+                      <label class="toggle-switch" for="workPreferenceVisible">
+                        <input type="checkbox" id="workPreferenceVisible" name="workPreferenceVisible" value="true" th:checked="*{workPreferenceVisible != false}"/>
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                    <input class="glass-input" id="workPreference" th:field="*{workPreference}" placeholder="e.g. Full-time (Remote / Hybrid / On-site)"/>
+                  </div>
+
+                  <!-- Preferred Locations -->
+                  <div class="form-group">
+                    <div class="field-label-row">
+                      <label for="preferredLocations">Preferred Locations</label>
+                      <label class="toggle-switch" for="preferredLocationsVisible">
+                        <input type="checkbox" id="preferredLocationsVisible" name="preferredLocationsVisible" value="true" th:checked="*{preferredLocationsVisible != false}"/>
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                    <input class="glass-input" id="preferredLocations" th:field="*{preferredLocations}" placeholder="e.g. Bengaluru, Delhi NCR, Pune, Remote"/>
+                  </div>
+
+                  <!-- Languages -->
+                  <div class="form-group" style="grid-column: 1 / -1;">
+                    <div class="field-label-row">
+                      <label for="languagesSpoken">Languages Spoken</label>
+                      <label class="toggle-switch" for="languagesSpokenVisible">
+                        <input type="checkbox" id="languagesSpokenVisible" name="languagesSpokenVisible" value="true" th:checked="*{languagesSpokenVisible != false}"/>
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                    <input class="glass-input" id="languagesSpoken" th:field="*{languagesSpoken}" placeholder="e.g. English (Professional), Hindi (Native)"/>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════
+                 CARD 3 · 30-SECOND RECRUITER BRIEF MODAL
+            ═══════════════════════════════════════════════ -->
+            <div class="ab-card" id="sec-recruiter">
+              <div class="ab-card-header" onclick="toggleSection('sec-recruiter')">
+                <div class="ab-card-header-left">
+                  <div class="ab-card-icon" style="color:#f59e0b; background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.3);"><i class="fa-solid fa-bolt"></i></div>
+                  <div>
+                    <div class="ab-card-title">30-Second Recruiter Brief Modal</div>
+                    <div class="ab-card-subtitle">Fast executive modal triggered from the header bolt icon for recruiters and hiring managers</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-down ab-chevron"></i>
+              </div>
+              <div class="ab-card-body">
+                <p class="sec-desc">A high-conversion modal designed specifically for recruiters who only have 30 seconds to evaluate your technical qualifications.</p>
+
+                <div class="toggle-row">
+                  <div class="toggle-row-info">
+                    <div class="toggle-row-title">Enable 30s Recruiter Briefing Modal</div>
+                    <div class="toggle-row-desc">Displays the "30s Brief" pill in the navbar and hero CTA button</div>
+                  </div>
+                  <label class="toggle-switch" for="recruiterPitchEnabled">
+                    <input type="checkbox" id="recruiterPitchEnabled" name="recruiterPitchEnabled" value="true" th:checked="*{recruiterPitchEnabled != false}"/>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom:14px;">
+                  <div class="field-label-row">
+                    <label for="recruiterTargetRole">Target Role Banner</label>
+                  </div>
+                  <input class="glass-input" id="recruiterTargetRole" th:field="*{recruiterTargetRole}" placeholder="Target: Software Engineer / Backend Developer (SDE-1)"/>
+                </div>
+
+                <div class="form-group" style="margin-bottom:14px;">
+                  <div class="field-label-row">
+                    <label for="recruiterMetrics">Credibility Metrics (Pipe-separated Title :: Subtitle)</label>
+                  </div>
+                  <input class="glass-input" id="recruiterMetrics" th:field="*{recruiterMetrics}" placeholder="B.Tech CSE :: Target: SDE-1 / Backend | LeetCode &amp; DSA :: Active Problem Solving | Production-Ready :: Spring Boot &amp; REST APIs"/>
+                </div>
+
+                <div class="form-group" style="margin-bottom:14px;">
+                  <div class="field-label-row">
+                    <label for="recruiterHighlights">Core Highlights (Title :: Desc :: Icon | ...)</label>
+                  </div>
+                  <textarea class="glass-textarea" id="recruiterHighlights" th:field="*{recruiterHighlights}" rows="3"
+                            placeholder="Core Backend Mastery :: Proficient in Java 17+, Spring Boot 3, Spring Data JPA/Hibernate, Spring Security (JWT &amp; RBAC), and MySQL relational database indexing. :: fa-solid fa-server | Architecture &amp; Clean Code :: Hands-on expertise with MVC architecture, RESTful API design principles, DTO patterns, exception handling, and Maven builds. :: fa-solid fa-layer-group | Full-Stack Versatility :: Modern interactive UI with HTML5/CSS3/JavaScript &amp; React. Strong CLI, Docker, Git workflow, and fast ramp-up capability. :: fa-solid fa-bolt-lightning"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <div class="field-label-row">
+                    <label for="recruiterPitchCopyText">One-Click Copy Summary for Recruiters</label>
+                  </div>
+                  <textarea class="glass-textarea" id="recruiterPitchCopyText" th:field="*{recruiterPitchCopyText}" rows="2"
+                            placeholder="Prince Gupt | Full Stack Software Engineer (Java, Spring Boot, MySQL, React). Ready for immediate hire (0-day notice) for SDE-1 / Software Engineer roles. Email: princegupt3052@gmail.com | Portfolio: https://github.com/princegupt1234"></textarea>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSection(id) {
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle('collapsed');
+}
+
+function setFieldValue(fieldId, val) {
+  const input = document.getElementById(fieldId);
+  if (input) {
+    input.value = val;
+    updateLivePreview();
+  }
+}
+
+function updateLivePreview() {
+  const status = document.getElementById('availabilityText')?.value || 'Open to opportunities';
+  const roles = document.getElementById('hiringRoles')?.value || 'SDE-1 / Software Engineer / Java Backend / Full Stack Developer';
+  const notice = document.getElementById('hiringNoticePeriod')?.value || 'Immediate Joiner (0 days notice)';
+  const loc = document.getElementById('hiringLocationDetails')?.value || 'Lucknow, Uttar Pradesh (Open to Remote, Hybrid, or On-site Relocation)';
+  const email = document.getElementById('hiringContactEmail')?.value || 'princegupt3052@gmail.com';
+  const note = document.getElementById('hiringCustomNote')?.value || 'Click the 30s Recruiter Brief button in the header for the executive candidate summary!';
+
+  const prevStatus = document.getElementById('prevStatus');
+  const prevRoles = document.getElementById('prevRoles');
+  const prevNotice = document.getElementById('prevNotice');
+  const prevLoc = document.getElementById('prevLoc');
+  const prevEmail = document.getElementById('prevEmail');
+  const prevNote = document.getElementById('prevNote');
+
+  if (prevStatus) prevStatus.textContent = status;
+  if (prevRoles) prevRoles.textContent = roles;
+  if (prevNotice) prevNotice.textContent = notice;
+  if (prevLoc) prevLoc.textContent = loc;
+  if (prevEmail) prevEmail.textContent = email;
+  if (prevNote) prevNote.textContent = note;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  ['availabilityText', 'hiringRoles', 'hiringNoticePeriod', 'hiringLocationDetails', 'hiringContactEmail', 'hiringCustomNote'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateLivePreview);
+  });
+  updateLivePreview();
+});
+</script>
+</body>
+</html>

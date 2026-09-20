@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -115,5 +116,47 @@ class AdminMessageControllerTest {
                 .andExpect(redirectedUrl("/admin/messages/13?sent=false&reason=not_configured"));
 
         verify(contactMessageRepository).save(message);
+    }
+
+    @Test
+    void view_messageNotFound_redirectsWithErrorMessage() throws Exception {
+        when(contactMessageRepository.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/admin/messages/999"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages"))
+                .andExpect(flash().attribute("errorMessage", "Message not found."));
+    }
+
+    @Test
+    void reply_messageNotFound_redirectsWithErrorMessage() throws Exception {
+        when(contactMessageRepository.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/admin/messages/999/reply").param("replyText", "Hi"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages"))
+                .andExpect(flash().attribute("errorMessage", "Message not found."));
+    }
+
+    @Test
+    void delete_messageNotFound_redirectsWithErrorMessage() throws Exception {
+        when(contactMessageRepository.existsById(999L)).thenReturn(false);
+
+        mockMvc.perform(post("/admin/messages/999/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages"))
+                .andExpect(flash().attribute("errorMessage", "Contact message not found."));
+    }
+
+    @Test
+    void delete_messageFound_deletesMessage() throws Exception {
+        when(contactMessageRepository.existsById(10L)).thenReturn(true);
+
+        mockMvc.perform(post("/admin/messages/10/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages"))
+                .andExpect(flash().attribute("successMessage", "Contact message deleted successfully."));
+
+        verify(contactMessageRepository).deleteById(10L);
     }
 }

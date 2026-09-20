@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -167,7 +168,8 @@ public class AdminAboutController {
 
         // Developer CLI Custom Commands
         if (form.getCustomCliCommands() != null) {
-            existing.setCustomCliCommands(form.getCustomCliCommands());
+            String trimmed = form.getCustomCliCommands().trim();
+            existing.setCustomCliCommands(trimmed.isEmpty() ? "[]" : trimmed);
         }
 
         // Recruiter Modal
@@ -223,21 +225,31 @@ public class AdminAboutController {
     }
 
     @PostMapping("/education/{id}/delete")
-    public String deleteEducation(@PathVariable("id") Long id) {
+    public String deleteEducation(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        if (!educationEntryRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Education entry not found.");
+            return "redirect:/admin/about";
+        }
         educationEntryRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Education entry deleted.");
         return "redirect:/admin/about";
     }
 
     @GetMapping("/building/{id}/edit")
-    public String editBuildingProjectForm(@PathVariable("id") Long id, Model model) {
+    public String editBuildingProjectForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        var opt = buildingProjectRepository.findById(id);
+        if (opt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Building project not found.");
+            return "redirect:/admin/about#sec-building";
+        }
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
         model.addAttribute("about", about);
         model.addAttribute("activeSub", "about");
         model.addAttribute("education", educationEntryRepository.findAllByOrderBySortOrderAsc());
         model.addAttribute("newEducation", new EducationEntry());
         model.addAttribute("buildingProjects", buildingProjectRepository.findAllByOrderBySortOrderAsc());
-        model.addAttribute("editingBuildingProject", buildingProjectRepository.findById(id).orElseThrow());
+        model.addAttribute("editingBuildingProject", opt.get());
         model.addAttribute("learningProjects", learningProjectRepository.findAllByOrderBySortOrderAsc());
         model.addAttribute("newLearningProject", new LearningProject());
         return "admin/about/edit";
@@ -251,9 +263,14 @@ public class AdminAboutController {
     }
 
     @PostMapping("/building/{id}/delete")
-    public String deleteBuildingProject(@PathVariable("id") Long id) {
+    public String deleteBuildingProject(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        if (!buildingProjectRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Building project not found.");
+            return "redirect:/admin/about#sec-building";
+        }
         buildingProjectRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Building project deleted.");
         return "redirect:/admin/about#sec-building";
     }
 
@@ -329,9 +346,14 @@ public class AdminAboutController {
     }
 
     @PostMapping("/learning/{id}/delete")
-    public String deleteLearningProject(@PathVariable("id") Long id) {
+    public String deleteLearningProject(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        if (!learningProjectRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Learning project not found.");
+            return "redirect:/admin/about#sec-learning";
+        }
         learningProjectRepository.deleteById(id);
         dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Learning project deleted.");
         return "redirect:/admin/about#sec-learning";
     }
 

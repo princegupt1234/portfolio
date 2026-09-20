@@ -73,26 +73,34 @@ public class AdminResumeController {
     @PostMapping("/{id}/activate")
     public String activate(@PathVariable("id") Long id,
                            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        var opt = resumeRepository.findById(id);
+        if (opt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Resume version not found.");
+            return "redirect:/admin/resume";
+        }
         resumeRepository.findAll().forEach(r -> {
             r.setActive(false);
             resumeRepository.save(r);
         });
-        resumeRepository.findById(id).ifPresent(r -> {
-            r.setActive(true);
-            resumeRepository.save(r);
-            aboutInfoRepository.findAll().stream().findFirst().ifPresent(about -> {
-                about.setResumeUrl(r.getFileUrl());
-                aboutInfoRepository.save(about);
-            });
-            dataVersionService.bump();
-            redirectAttributes.addFlashAttribute("successMessage", "Resume version " + r.getVersionLabel() + " is now active.");
+        Resume r = opt.get();
+        r.setActive(true);
+        resumeRepository.save(r);
+        aboutInfoRepository.findAll().stream().findFirst().ifPresent(about -> {
+            about.setResumeUrl(r.getFileUrl());
+            aboutInfoRepository.save(about);
         });
+        dataVersionService.bump();
+        redirectAttributes.addFlashAttribute("successMessage", "Resume version " + r.getVersionLabel() + " is now active.");
         return "redirect:/admin/resume";
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id,
                          org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!resumeRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Resume version not found.");
+            return "redirect:/admin/resume";
+        }
         resumeRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Resume version deleted successfully.");

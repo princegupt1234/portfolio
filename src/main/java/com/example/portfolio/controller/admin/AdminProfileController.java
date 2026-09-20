@@ -30,7 +30,16 @@ public class AdminProfileController {
 
     @GetMapping
     public String edit(Model model, Authentication auth) {
-        Admin admin = adminRepository.findByUsername(auth.getName()).orElseThrow();
+        Admin admin = null;
+        if (auth != null && auth.getName() != null) {
+            admin = adminRepository.findByUsername(auth.getName()).orElse(null);
+        }
+        if (admin == null) {
+            admin = adminRepository.findAll().stream().findFirst().orElse(null);
+        }
+        if (admin == null) {
+            return "redirect:/admin/login?logout=true";
+        }
         model.addAttribute("admin", admin);
         return "admin/profile/edit";
     }
@@ -41,16 +50,39 @@ public class AdminProfileController {
                         @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
                         Authentication auth,
                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        Admin admin = adminRepository.findByUsername(auth.getName()).orElseThrow();
-        admin.setUsername(username);
-        admin.setEmail(email);
+        Admin admin = null;
+        if (auth != null && auth.getName() != null) {
+            admin = adminRepository.findByUsername(auth.getName()).orElse(null);
+        }
+        if (admin == null) {
+            admin = adminRepository.findAll().stream().findFirst().orElse(null);
+        }
+        if (admin == null) {
+            return "redirect:/admin/login?logout=true";
+        }
+
+        String oldUsername = admin.getUsername();
+        admin.setUsername(username.trim());
+        admin.setEmail(email.trim());
         if (newPassword != null && !newPassword.isBlank()) {
-            admin.setPassword(passwordEncoder.encode(newPassword));
+            admin.setPassword(passwordEncoder.encode(newPassword.trim()));
         }
         if (photoFile != null && !photoFile.isEmpty()) {
             admin.setProfileImage(fileStorageService.store(photoFile, "admin"));
         }
         adminRepository.save(admin);
+
+        // If username changed, refresh Spring Security Authentication session so user stays logged in
+        if (auth != null && !admin.getUsername().equals(oldUsername)) {
+            org.springframework.security.authentication.UsernamePasswordAuthenticationToken newAuth =
+                    new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                            admin.getUsername(),
+                            auth.getCredentials(),
+                            auth.getAuthorities()
+                    );
+            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
+
         redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully.");
         return "redirect:/admin/profile?saved=true";
     }

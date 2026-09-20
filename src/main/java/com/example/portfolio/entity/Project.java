@@ -83,4 +83,6 @@ public class Project {
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
     public Boolean getVisible() { return visible; }
     public void setVisible(Boolean visible) { this.visible = visible; }
+    public String getCategory() { return tags; }
+    public void setCategory(String category) { this.tags = category; }
 }

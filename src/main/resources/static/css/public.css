@@ -141,6 +141,10 @@
     gap: 10px;
     padding: 8px 12px 8px 18px;
   }
+  .nav-actions {
+    margin-left: auto;
+    gap: 6px;
+  }
   .nav-links {
     position: fixed;
     top: 76px;
@@ -1816,6 +1820,29 @@
     width: calc(100vw - 24px);
     height: 480px;
   }
+}
+
+/* Dropdown / Select Global Visibility & Style */
+select, select.glass-input, .glass-select {
+  background-color: #0f172a;
+  color: #f8fafc;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm, 12px);
+  color-scheme: dark;
+}
+select option, .glass-select option, select.glass-input option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 10px 14px;
+}
+[data-theme="light"] select, [data-theme="light"] select.glass-input, [data-theme="light"] .glass-select {
+  background-color: #ffffff;
+  color: #0f172a;
+  color-scheme: light;
+}
+[data-theme="light"] select option, [data-theme="light"] .glass-select option, [data-theme="light"] select.glass-input option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 

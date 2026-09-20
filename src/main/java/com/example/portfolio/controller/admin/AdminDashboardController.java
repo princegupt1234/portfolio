@@ -2,6 +2,7 @@ package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.SiteStat;
 import com.example.portfolio.repository.AboutInfoRepository;
+import com.example.portfolio.repository.AiTrainingRepository;
 import com.example.portfolio.repository.CertificateRepository;
 import com.example.portfolio.repository.ContactMessageRepository;
 import com.example.portfolio.repository.ProjectRepository;
@@ -28,12 +29,14 @@ public class AdminDashboardController {
     private final AboutInfoRepository aboutInfoRepository;
     private final AnalyticsService analyticsService;
     private final GithubStatsService githubStatsService;
+    private final AiTrainingRepository aiTrainingRepository;
 
     public AdminDashboardController(ProjectRepository projectRepository, SkillRepository skillRepository,
                                      CertificateRepository certificateRepository,
                                      ContactMessageRepository contactMessageRepository,
                                      ResumeRepository resumeRepository, AboutInfoRepository aboutInfoRepository,
-                                     AnalyticsService analyticsService, GithubStatsService githubStatsService) {
+                                     AnalyticsService analyticsService, GithubStatsService githubStatsService,
+                                     AiTrainingRepository aiTrainingRepository) {
         this.projectRepository = projectRepository;
         this.skillRepository = skillRepository;
         this.certificateRepository = certificateRepository;
@@ -42,11 +45,13 @@ public class AdminDashboardController {
         this.aboutInfoRepository = aboutInfoRepository;
         this.analyticsService = analyticsService;
         this.githubStatsService = githubStatsService;
+        this.aiTrainingRepository = aiTrainingRepository;
     }
 
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
         var about = aboutInfoRepository.findAll().stream().findFirst().orElse(null);
+        model.addAttribute("about", about);
 
         model.addAttribute("projectCount", projectRepository.count());
         model.addAttribute("skillCount", skillRepository.count());
@@ -54,6 +59,8 @@ public class AdminDashboardController {
         model.addAttribute("unreadMessages", contactMessageRepository.countByIsReadFalse());
         model.addAttribute("totalMessages", contactMessageRepository.count());
         model.addAttribute("resumeVersions", resumeRepository.count());
+        model.addAttribute("aiTrainingCount", aiTrainingRepository != null ? aiTrainingRepository.count() : 0);
+        model.addAttribute("activeAiTrainingCount", aiTrainingRepository != null ? aiTrainingRepository.findByActiveTrueOrderBySortOrderAscIdDesc().size() : 0);
 
         List<SiteStat> last30 = analyticsService.last30Days();
         List<SiteStat> chronological = new java.util.ArrayList<>(last30);
@@ -76,10 +83,10 @@ public class AdminDashboardController {
         int completed = 0, total = 6;
         if (about != null) {
             if (about.getBio() != null && !about.getBio().isBlank()) completed++;
-            if (about.getProfileImage() != null) completed++;
-            if (about.getResumeUrl() != null) completed++;
-            if (about.getGithubUrl() != null) completed++;
-            if (about.getLinkedinUrl() != null) completed++;
+            if (about.getProfileImage() != null && !about.getProfileImage().isBlank()) completed++;
+            if (about.getResumeUrl() != null && !about.getResumeUrl().isBlank()) completed++;
+            if (about.getGithubUrl() != null && !about.getGithubUrl().isBlank()) completed++;
+            if (about.getLinkedinUrl() != null && !about.getLinkedinUrl().isBlank()) completed++;
         }
         if (projectRepository.count() > 0) completed++;
         model.addAttribute("profileCompletion", (int) (100.0 * completed / total));

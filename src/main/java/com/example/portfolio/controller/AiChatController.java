@@ -29,10 +29,12 @@ public class AiChatController {
             ));
         }
 
-        String reply = portfolioAiService.answer(message);
+        PortfolioAiService.AiAnswerResult result = portfolioAiService.answerWithDetails(message);
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "reply", reply
+                "reply", result.reply(),
+                "source", result.source(),
+                "model", result.model()
         ));
     }
 }

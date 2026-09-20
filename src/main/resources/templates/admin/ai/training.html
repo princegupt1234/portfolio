@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>AI Training &amp; Corrections | Admin Panel</title>
+  <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css(v='7')}">
+  <style>
+    .ai-train-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (min-width: 1024px) {
+      .ai-train-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+    }
+    .status-pill-badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+    }
+    .status-pill-green {
+      background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .status-pill-orange {
+      background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+    .status-pill-purple {
+      background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .status-pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .pulse-green {
+      background: #22c55e;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    .simulator-output-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 120px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .category-badge {
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .cat-Correction { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .cat-Hiring { background: rgba(34, 197, 94, 0.18); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .cat-Skills { background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .cat-Projects { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .cat-General { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .cat-FAQ { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+    .rule-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rule-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(168, 85, 247, 0.3);
+      transform: translateY(-2px);
+    .starter-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .starter-pill-btn:hover {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .test-prompt-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.74rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .test-prompt-chip:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div th:replace="~{admin/fragments/sidebar :: sidebar('ai-training')}"></div>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <div th:replace="~{admin/fragments/topbar :: topbar}"></div>
+
+    <div class="admin-content">
+      <div style="max-width: 1280px; margin: 0 auto;">
+
+        <!-- Workspace Tabs (5 Modular Sections) -->
+        <div class="workspace-tabs-strip">
+          <a th:href="@{/admin/hero}" class="tab-pill"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>1. Hero Section</span></a>
+          <a th:href="@{/admin/about}" class="tab-pill"><i class="fa-solid fa-user"></i> <span>2. About &amp; Story</span></a>
+          <a th:href="@{/admin/hiring}" class="tab-pill"><i class="fa-solid fa-briefcase"></i> <span>3. Hiring &amp; Availability</span></a>
+          <a th:href="@{/admin/interactive}" class="tab-pill"><i class="fa-solid fa-robot"></i> <span>4. AI &amp; Interactive</span></a>
+          <a th:href="@{/admin/ai-training}" class="tab-pill active"><i class="fa-solid fa-brain" style="color:#c084fc;"></i> <span>5. AI Training &amp; Corrections</span></a>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${successMessage}" class="alert alert-success" style="margin-bottom:20px;">
+          <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom:20px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Header -->
+        <div class="page-header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div style="color:#c084fc; font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px;">Autonomous AI Assistant &bull; Dedicated Training Workspace</div>
+            <h1 style="font-size:clamp(1.35rem,2.5vw,1.9rem); margin:0; letter-spacing:-.02em; display:flex; align-items:center; gap:10px;">
+              <i class="fa-solid fa-brain" style="color:#a855f7;"></i>
+              AI Training &amp; Corrections
+            </h1>
+            <p style="max-width:760px; color:var(--text-secondary); font-size:0.83rem; line-height:1.6; margin:6px 0 0;">
+              Did the AI give a wrong, hallucinated, or inaccurate answer? Train the exact verified ground-truth response here. Once saved, it strictly overrides AI answers in real-time across your live portfolio chatbot!
+            </p>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span th:if="${geminiConfigured}" class="status-pill-badge status-pill-green">
+              <span class="status-pulse-dot pulse-green"></span>
+              Gemini Connected (<span th:text="${geminiModel}"></span>)
+            </span>
+            <span th:unless="${geminiConfigured}" class="status-pill-badge status-pill-orange">
+              <i class="fa-solid fa-plug-circle-exclamation"></i>
+              No Gemini Key (Local Engine Active)
+            </span>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('settingsModal').style.display='flex'">
+              <i class="fa-solid fa-sliders"></i> Gemini Settings
+            </button>
+            <a th:href="@{/}" target="_blank" class="btn btn-secondary" style="text-decoration:none;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Test On Live Site
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Starter Templates Bar -->
+        <div style="background:rgba(168, 85, 247, 0.08); border:1px solid rgba(168, 85, 247, 0.25); border-radius:14px; padding:14px 16px; margin-bottom:22px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; font-weight:600; color:#c084fc;">
+            <i class="fa-solid fa-bolt"></i> Quick Training Starters:
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="starter-pill-btn" onclick="quickFillForm('What is your current CTC or salary expectation?', 'Prince is targeting competitive compensation aligned with senior/specialist software engineer roles. Open to discussing standard packages and equity.', 'Hiring', 'salary, ctc, expected, package, compensation')">
+              <i class="fa-solid fa-sack-dollar" style="color:#4ade80;"></i> Salary / CTC
+            </button>
+            <button type="button" class="starter-pill-btn" onclick="quickFillForm('Can you join immediately or what is your notice period?', 'Prince is available for immediate joining / quick start upon mutual agreement.', 'Hiring', 'notice, joining, available, immediate, when can you join')">
+              <i class="fa-solid fa-bolt" style="color:#fbbf24;"></i> Immediate Joining
+            </button>
+            <button type="button" class="starter-pill-btn" onclick="quickFillForm('Are you willing to relocate or work remote?', 'Prince is open to remote, hybrid, and relocation for exciting engineering opportunities in major tech hubs.', 'Hiring', 'relocate, relocation, remote, hybrid, onsite, bangalore, pune')">
+              <i class="fa-solid fa-location-dot" style="color:#60a5fa;"></i> Relocation / Remote
+            </button>
+            <button type="button" class="starter-pill-btn" onclick="quickFillForm('What is your core tech stack and expertise?', 'Prince specializes in Java, Spring Boot, Microservices, PostgreSQL/MySQL, Docker, Kafka, and modern responsive web applications.', 'Skills', 'stack, skills, tech, expertise, backend, java, spring')">
+              <i class="fa-solid fa-layer-group" style="color:#c084fc;"></i> Core Tech Stack
+            </button>
+            <button type="button" class="starter-pill-btn" onclick="quickFillForm('How can a recruiter or hiring manager contact Prince directly?', 'You can reach Prince directly via email at princegupt1234@gmail.com, via LinkedIn, or by using the direct contact form on this portfolio.', 'General', 'contact, email, phone, reach, call, message, recruiter')">
+              <i class="fa-solid fa-envelope" style="color:#38bdf8;"></i> Direct Contact Info
+            </button>
+            <button type="button" class="starter-pill-btn" onclick="quickFillForm('', '', 'Correction', '')" style="border-color:rgba(239,68,68,0.4); color:#f87171;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Fix Wrong Answer
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Metric Cards -->
+        <div class="dashboard-metrics" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="metric-card" style="background:var(--glass-surface); border:1px solid var(--glass-border); padding:18px; border-radius:14px;">
+            <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Total Trained Rules</div>
+            <div style="font-size:1.7rem; font-weight:700; color:var(--text);" th:text="${totalCount}">0</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">Ground truth answers</div>
+          </div>
+          <div class="metric-card" style="background:var(--glass-surface); border:1px solid var(--glass-border); padding:18px; border-radius:14px;">
+            <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Active Rules</div>
+            <div style="font-size:1.7rem; font-weight:700; color:#4ade80;" th:text="${activeCount}">0</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">Currently overriding/grounding AI</div>
+          </div>
+          <div class="metric-card" style="background:var(--glass-surface); border:1px solid var(--glass-border); padding:18px; border-radius:14px;">
+            <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Model Engine</div>
+            <div style="font-size:1.2rem; font-weight:700; color:#c084fc;" th:text="${geminiModel}">gemini-2.5-flash</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">Hybrid reasoning with fallback</div>
+          </div>
+        </div>
+
+      <!-- Two Column Layout: Simulator + Add/Edit Form -->
+      <div class="ai-train-grid">
+        <!-- Live AI Simulator -->
+        <div class="card" style="background:var(--glass-surface); border:1px solid var(--glass-border); border-radius:16px; padding:22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div style="font-size:1rem; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-vial-circle-check" style="color:#38bdf8;"></i> Live AI Response Simulator
+            </div>
+            <span style="font-size:0.75rem; color:var(--text-secondary);">Test how the AI answers</span>
+          </div>
+          <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:14px;">
+            Type any visitor or recruiter question below. If the response is wrong or missing details, click <strong>"Train / Correct This Answer"</strong> to save an instant verified override!
+          </p>
+
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" id="simQueryInput" class="form-control" placeholder="e.g. What is Prince's current salary expectation?" style="flex:1;" onkeydown="if(event.key==='Enter') testAiQuery();">
+            <button type="button" id="simTestBtn" class="btn btn-primary" onclick="testAiQuery();" style="display:inline-flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-paper-plane"></i> Test
+            </button>
+          </div>
+
+          <!-- Quick Test Chips -->
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+            <span style="font-size:0.73rem; color:var(--text-secondary);">Try asking:</span>
+            <button type="button" class="test-prompt-chip" onclick="testPrompt('What is your current CTC or salary expectation?')">💰 Salary</button>
+            <button type="button" class="test-prompt-chip" onclick="testPrompt('Can you join immediately or what is your notice period?')">⚡ Notice Period</button>
+            <button type="button" class="test-prompt-chip" onclick="testPrompt('Are you open to relocation or remote work?')">📍 Relocation</button>
+            <button type="button" class="test-prompt-chip" onclick="testPrompt('What is your core tech stack and expertise?')">🛠️ Tech Stack</button>
+            <button type="button" class="test-prompt-chip" onclick="testPrompt('How can I contact you directly?')">📞 Contact Info</button>
+          </div>
+
+          <div style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.78rem; font-weight:600; color:var(--text-secondary);">AI Output:</span>
+            <span id="simSourceBadge" style="display:none;" class="status-pill-badge status-pill-purple"></span>
+          </div>
+
+          <div id="simOutputBox" class="simulator-output-box">
+            <span style="color:var(--text-secondary); font-style:italic;">Enter a question above and click "Test" to preview the live generated answer...</span>
+          </div>
+
+          <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+            <button type="button" id="simCorrectBtn" class="btn btn-secondary" style="display:none; align-items:center; gap:8px;" onclick="copyToTrainingForm();">
+              <i class="fa-solid fa-graduation-cap" style="color:#c084fc;"></i> Train / Correct This Answer
+            </button>
+          </div>
+        </div>
+
+        <!-- Add / Edit Rule Form -->
+        <div class="card" id="trainingFormCard" style="background:var(--glass-surface); border:1px solid var(--glass-border); border-radius:16px; padding:22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div id="formCardTitle" style="font-size:1rem; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-plus-circle" style="color:#a855f7;"></i> Add New Training / Correction
+            </div>
+            <button type="button" id="cancelEditBtn" class="btn btn-sm btn-secondary" style="display:none;" onclick="resetTrainingForm();">
+              Cancel Edit
+            </button>
+          </div>
+
+          <form th:action="@{/admin/ai-training/save}" method="post" id="aiTrainingForm">
+            <input type="hidden" name="id" id="ruleId">
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="font-size:0.82rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">
+                Question / Query Trigger <span style="color:#ef4444;">*</span>
+              </label>
+              <input type="text" name="questionTrigger" id="ruleQuestion" class="form-control" required placeholder="e.g. What is Prince's current CTC or salary expectation?">
+              <span class="field-hint" style="font-size:0.74rem; color:var(--text-secondary); display:block; margin-top:4px;">
+                The question or phrase that should trigger this verified answer.
+              </span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+              <div class="form-group">
+                <label style="font-size:0.82rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">Category</label>
+                <select name="category" id="ruleCategory" class="glass-select">
+                  <option value="Correction" style="background-color:#0f172a; color:#f8fafc;">Correction (Fix wrong answer)</option>
+                  <option value="Hiring" style="background-color:#0f172a; color:#f8fafc;">Hiring &amp; Salary</option>
+                  <option value="Skills" style="background-color:#0f172a; color:#f8fafc;">Skills &amp; Tech Stack</option>
+                  <option value="Projects" style="background-color:#0f172a; color:#f8fafc;">Projects</option>
+                  <option value="Services" style="background-color:#0f172a; color:#f8fafc;">Services</option>
+                  <option value="FAQ" style="background-color:#0f172a; color:#f8fafc;">FAQ</option>
+                  <option value="General" selected style="background-color:#0f172a; color:#f8fafc;">General</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label style="font-size:0.82rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">Sort Order</label>
+                <input type="number" name="sortOrder" id="ruleSortOrder" class="form-control" value="0">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="font-size:0.82rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">
+                Trigger Keywords <span style="font-size:0.75rem; color:var(--text-secondary);">(Optional comma-separated)</span>
+              </label>
+              <input type="text" name="matchKeywords" id="ruleKeywords" class="form-control" placeholder="e.g. salary, ctc, expected, package, compensation">
+              <span class="field-hint" style="font-size:0.74rem; color:var(--text-secondary); display:block; margin-top:4px;">
+                Additional trigger words that trigger this answer even if phrased differently.
+              </span>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="font-size:0.82rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">
+                Correct Verified Answer <span style="color:#ef4444;">*</span> <span style="font-size:0.75rem; color:var(--text-secondary);">(Supports Markdown)</span>
+              </label>
+              <textarea name="correctAnswer" id="ruleAnswer" class="form-control" rows="4" required placeholder="Type the 100% verified ground truth answer... (e.g. Prince is targeting competitive roles with immediate joining...)"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; color:var(--text); cursor:pointer;">
+                <input type="checkbox" name="active" id="ruleActive" value="true" checked style="width:16px; height:16px; accent-color:#a855f7;">
+                <span>Active (Enable this rule)</span>
+              </label>
+
+              <button type="submit" id="saveRuleBtn" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Training Rule
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Trained Knowledge List -->
+      <div class="card" style="background:var(--glass-surface); border:1px solid var(--glass-border); border-radius:16px; padding:22px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="font-size:1.05rem; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-list-check" style="color:#a855f7;"></i> Trained Rules &amp; Corrections Library
+            </div>
+            <span style="font-size:0.78rem; color:var(--text-secondary);">Rules are prioritized in real-time when users ask questions.</span>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="text" id="ruleSearchInput" class="form-control" placeholder="Search rules..." style="width:220px; font-size:0.84rem;" oninput="filterRules();">
+          </div>
+        </div>
+
+        <div th:if="${trainings == null or #lists.isEmpty(trainings)}" style="text-align:center; padding:40px 20px; color:var(--text-secondary);">
+          <i class="fa-solid fa-brain" style="font-size:2.5rem; color:rgba(255,255,255,0.15); margin-bottom:12px; display:block;"></i>
+          <p style="margin:0; font-size:0.95rem;">No AI training rules yet. Add your first correction or Q&amp;A above!</p>
+        </div>
+
+        <div th:if="${trainings != null and !#lists.isEmpty(trainings)}" id="rulesListContainer" style="display:flex; flex-direction:column; gap:12px;">
+          <div th:each="rule : ${trainings}" class="rule-card" th:id="'rule-card-' + ${rule.id}" th:data-question="${rule.questionTrigger}" th:data-category="${rule.category}" th:data-keywords="${rule.matchKeywords}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span class="category-badge" th:classappend="'cat-' + ${rule.category}" th:text="${rule.category}">Category</span>
+                <span th:if="${rule.active}" class="status-pill-badge status-pill-green" style="padding:2px 8px; font-size:0.7rem;">Active</span>
+                <span th:unless="${rule.active}" class="status-pill-badge status-pill-orange" style="padding:2px 8px; font-size:0.7rem;">Disabled</span>
+                <span th:if="${rule.matchKeywords != null and !#strings.isEmpty(rule.matchKeywords)}" style="font-size:0.72rem; color:var(--text-secondary); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px;">
+                  <i class="fa-solid fa-tags"></i> <span th:text="${rule.matchKeywords}"></span>
+                </span>
+              </div>
+
+              <!-- Action buttons -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button type="button" class="btn btn-sm btn-secondary" style="padding:4px 10px; font-size:0.76rem;"
+                        th:data-query="${rule.questionTrigger}" onclick="testSpecificQuery(this.getAttribute('data-query'))" title="Test this rule in Simulator">
+                  <i class="fa-solid fa-play"></i> Test
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" style="padding:4px 10px; font-size:0.76rem;"
+                        th:data-id="${rule.id}"
+                        th:data-question="${rule.questionTrigger}"
+                        th:data-answer="${rule.correctAnswer}"
+                        th:data-category="${rule.category}"
+                        th:data-keywords="${rule.matchKeywords}"
+                        th:data-active="${rule.active}"
+                        th:data-sort="${rule.sortOrder}"
+                        onclick="populateEditForm(this)" title="Edit rule">
+                  <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <form th:action="@{'/admin/ai-training/toggle/' + ${rule.id}}" method="post" style="display:inline; margin:0;">
+                  <button type="submit" class="btn btn-sm btn-secondary" style="padding:4px 10px; font-size:0.76rem;" th:title="${rule.active ? 'Disable rule' : 'Enable rule'}">
+                    <i th:class="${rule.active ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'}" th:style="${rule.active ? 'color:#22c55e;' : 'color:var(--text-secondary);'}"></i>
+                  </button>
+                </form>
+                <form th:action="@{'/admin/ai-training/delete/' + ${rule.id}}" method="post" style="display:inline; margin:0;" onsubmit="return confirm('Are you sure you want to delete this training rule?');">
+                  <button type="submit" class="btn btn-sm btn-danger" style="padding:4px 10px; font-size:0.76rem; background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.3); color:#f87171;" title="Delete rule">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Question Trigger -->
+            <div style="font-weight:600; font-size:0.92rem; color:var(--text);">
+              <i class="fa-solid fa-circle-question" style="color:#a855f7; margin-right:6px;"></i>
+              <span th:text="${rule.questionTrigger}"></span>
+            </div>
+
+            <!-- Answer Snippet -->
+            <div style="font-size:0.84rem; color:var(--text-secondary); background:rgba(15,23,42,0.4); padding:10px 14px; border-radius:8px; border-left:3px solid #a855f7; white-space:pre-wrap;" th:text="${rule.correctAnswer}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Gemini Settings Modal -->
+<div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:var(--glass-surface); border:1px solid var(--glass-border); border-radius:18px; padding:28px; width:90%; max-width:560px; box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <h3 style="font-size:1.15rem; font-weight:700; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color:#a855f7;"></i> Gemini AI Engine Settings
+      </h3>
+      <button type="button" style="all:unset; cursor:pointer; color:var(--text-secondary); font-size:1.2rem;" onclick="document.getElementById('settingsModal').style.display='none'">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form th:action="@{/admin/ai-training/settings}" method="post">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:0.84rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">
+          Gemini API Key
+        </label>
+        <input type="password" name="geminiApiKey" id="geminiApiKeyInput" class="form-control" th:value="${about.geminiApiKey}" placeholder="AIzaSy... (leave blank to use system env var)">
+        <span class="field-hint" style="font-size:0.74rem; color:var(--text-secondary); display:block; margin-top:4px;">
+          Saved safely in your database. If left empty, the application automatically uses <code>GEMINI_API_KEY</code> from your environment.
+        </span>
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:0.84rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">
+          Model Selection
+        </label>
+        <select name="geminiModel" class="glass-select">
+          <option value="gemini-2.5-flash" th:selected="${about.geminiModel == 'gemini-2.5-flash'}" style="background-color:#0f172a; color:#f8fafc;">gemini-2.5-flash (Recommended - Hybrid Reasoning &amp; Fast)</option>
+          <option value="gemini-2.0-flash" th:selected="${about.geminiModel == 'gemini-2.0-flash'}" style="background-color:#0f172a; color:#f8fafc;">gemini-2.0-flash (High Throughput)</option>
+          <option value="gemini-1.5-flash" th:selected="${about.geminiModel == 'gemini-1.5-flash'}" style="background-color:#0f172a; color:#f8fafc;">gemini-1.5-flash (Legacy Fallback)</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:20px;">
+        <label style="font-size:0.84rem; font-weight:500; color:var(--text-secondary); margin-bottom:6px; display:block;">
+          Custom Personality &amp; Tone Instructions
+        </label>
+        <textarea name="aiCustomInstructions" class="form-control" rows="3" th:text="${about.aiCustomInstructions}" placeholder="e.g. Always emphasize Prince's passion for distributed systems and clean software craftsmanship."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-floppy-disk"></i> Save Settings
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let lastTestQuery = '';
+  let lastTestReply = '';
+
+  function testAiQuery() {
+    const input = document.getElementById('simQueryInput');
+    const btn = document.getElementById('simTestBtn');
+    const outBox = document.getElementById('simOutputBox');
+    const badge = document.getElementById('simSourceBadge');
+    const correctBtn = document.getElementById('simCorrectBtn');
+
+    const query = input.value.trim();
+    if (!query) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...';
+    outBox.innerHTML = '<span style="color:var(--text-secondary);"><i class="fa-solid fa-circle-notch fa-spin"></i> Generating response...</span>';
+    badge.style.display = 'none';
+    correctBtn.style.display = 'none';
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (csrfToken && csrfHeader) {
+      headers[csrfHeader] = csrfToken;
+    }
+
+    fetch('/admin/ai-training/test', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ query: query })
+    })
+      .then(res => res.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Test';
+
+        lastTestQuery = query;
+        lastTestReply = data.reply || '';
+
+        outBox.textContent = lastTestReply;
+
+        if (data.source) {
+          badge.style.display = 'inline-flex';
+          if (data.source === 'TRAINED_OVERRIDE') {
+            badge.className = 'status-pill-badge status-pill-green';
+            badge.innerHTML = '<i class="fa-solid fa-shield-check"></i> ' + (data.model || 'Verified Trained Ground Truth');
+          } else if (data.source === 'GEMINI_API') {
+            badge.className = 'status-pill-badge status-pill-purple';
+            badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> ' + (data.model || 'Gemini API');
+          } else {
+            badge.className = 'status-pill-badge status-pill-orange';
+            badge.innerHTML = '<i class="fa-solid fa-robot"></i> ' + (data.model || 'Local Domain Engine');
+          }
+        }
+
+        correctBtn.style.display = 'inline-flex';
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Test';
+        outBox.innerHTML = '<span style="color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Error communicating with AI service: ' + err.message + '</span>';
+      });
+  }
+
+  function testSpecificQuery(q) {
+    document.getElementById('simQueryInput').value = q;
+    testAiQuery();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function copyToTrainingForm() {
+    document.getElementById('ruleId').value = '';
+    document.getElementById('ruleQuestion').value = lastTestQuery;
+    document.getElementById('ruleAnswer').value = lastTestReply;
+    document.getElementById('ruleCategory').value = 'Correction';
+    document.getElementById('formCardTitle').innerHTML = '<i class="fa-solid fa-graduation-cap" style="color:#c084fc;"></i> Train Correction for Query';
+    document.getElementById('saveRuleBtn').innerHTML = '<i class="fa-solid fa-save"></i> Save Correction Rule';
+    document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+    const card = document.getElementById('trainingFormCard');
+    card.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('ruleAnswer').focus();
+  }
+
+  function populateEditForm(btn) {
+    document.getElementById('ruleId').value = btn.getAttribute('data-id');
+    document.getElementById('ruleQuestion').value = btn.getAttribute('data-question') || '';
+    document.getElementById('ruleAnswer').value = btn.getAttribute('data-answer') || '';
+    document.getElementById('ruleCategory').value = btn.getAttribute('data-category') || 'General';
+    document.getElementById('ruleKeywords').value = btn.getAttribute('data-keywords') || '';
+    document.getElementById('ruleSortOrder').value = btn.getAttribute('data-sort') || '0';
+    document.getElementById('ruleActive').checked = btn.getAttribute('data-active') === 'true';
+
+    document.getElementById('formCardTitle').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Edit Training Rule #' + btn.getAttribute('data-id');
+    document.getElementById('saveRuleBtn').innerHTML = '<i class="fa-solid fa-check"></i> Update Training Rule';
+    document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+    document.getElementById('trainingFormCard').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetTrainingForm() {
+    document.getElementById('aiTrainingForm').reset();
+    document.getElementById('ruleId').value = '';
+    document.getElementById('formCardTitle').innerHTML = '<i class="fa-solid fa-plus-circle" style="color:#a855f7;"></i> Add New Training / Correction';
+    document.getElementById('saveRuleBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Training Rule';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+  }
+
+  function filterRules() {
+    const q = document.getElementById('ruleSearchInput').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.rule-card');
+    cards.forEach(card => {
+      const question = (card.getAttribute('data-question') || '').toLowerCase();
+      const cat = (card.getAttribute('data-category') || '').toLowerCase();
+      const kw = (card.getAttribute('data-keywords') || '').toLowerCase();
+      if (!q || question.includes(q) || cat.includes(q) || kw.includes(q)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function testPrompt(q) {
+    document.getElementById('simQueryInput').value = q;
+    testAiQuery();
+  }
+
+  function quickFillForm(question, answer, category, keywords) {
+    document.getElementById('ruleId').value = '';
+    document.getElementById('ruleQuestion').value = question;
+    document.getElementById('ruleAnswer').value = answer;
+    if (category) document.getElementById('ruleCategory').value = category;
+    if (keywords) document.getElementById('ruleKeywords').value = keywords;
+    document.getElementById('ruleActive').checked = true;
+    document.getElementById('formCardTitle').innerHTML = '<i class="fa-solid fa-bolt" style="color:#c084fc;"></i> Quick Training Starter';
+    document.getElementById('saveRuleBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Training Rule';
+    document.getElementById('cancelEditBtn').style.display = 'inline-block';
+    const card = document.getElementById('trainingFormCard');
+    card.scrollIntoView({ behavior: 'smooth' });
+    if (!question) {
+      document.getElementById('ruleQuestion').focus();
+    } else if (!answer) {
+      document.getElementById('ruleAnswer').focus();
+    }
+  }
+</script>
+</body>
+</html>

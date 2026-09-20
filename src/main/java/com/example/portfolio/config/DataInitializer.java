@@ -1,35 +1,38 @@
 package com.example.portfolio.config;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
 import com.example.portfolio.entity.AboutInfo;
 import com.example.portfolio.entity.Admin;
+import com.example.portfolio.entity.AiTraining;
 import com.example.portfolio.entity.BuildingProject;
 import com.example.portfolio.entity.Certificate;
-import com.example.portfolio.entity.LearningProject;
 import com.example.portfolio.entity.EducationEntry;
 import com.example.portfolio.entity.Experience;
+import com.example.portfolio.entity.LearningProject;
 import com.example.portfolio.entity.Project;
 import com.example.portfolio.entity.ServiceItem;
 import com.example.portfolio.entity.Skill;
 import com.example.portfolio.entity.Testimonial;
 import com.example.portfolio.repository.AboutInfoRepository;
 import com.example.portfolio.repository.AdminRepository;
+import com.example.portfolio.repository.AiTrainingRepository;
 import com.example.portfolio.repository.BuildingProjectRepository;
 import com.example.portfolio.repository.CertificateRepository;
-import com.example.portfolio.repository.LearningProjectRepository;
 import com.example.portfolio.repository.EducationEntryRepository;
 import com.example.portfolio.repository.ExperienceRepository;
+import com.example.portfolio.repository.LearningProjectRepository;
 import com.example.portfolio.repository.ProjectRepository;
 import com.example.portfolio.repository.ServiceItemRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.repository.TestimonialRepository;
 import com.example.portfolio.service.GithubStatsService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.List;
 
 /**
  * Seeds the database with Prince Gupt's real resume content and a default
@@ -50,6 +53,7 @@ public class DataInitializer implements CommandLineRunner {
     private final TestimonialRepository testimonialRepository;
     private final BuildingProjectRepository buildingProjectRepository;
     private final LearningProjectRepository learningProjectRepository;
+    private final AiTrainingRepository aiTrainingRepository;
     private final GithubStatsService githubStatsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -67,6 +71,7 @@ public class DataInitializer implements CommandLineRunner {
                             TestimonialRepository testimonialRepository,
                             BuildingProjectRepository buildingProjectRepository,
                             LearningProjectRepository learningProjectRepository,
+                            AiTrainingRepository aiTrainingRepository,
                             GithubStatsService githubStatsService, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.aboutInfoRepository = aboutInfoRepository;
@@ -79,6 +84,7 @@ public class DataInitializer implements CommandLineRunner {
         this.testimonialRepository = testimonialRepository;
         this.buildingProjectRepository = buildingProjectRepository;
         this.learningProjectRepository = learningProjectRepository;
+        this.aiTrainingRepository = aiTrainingRepository;
         this.githubStatsService = githubStatsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -97,6 +103,7 @@ public class DataInitializer implements CommandLineRunner {
         seedCertificates();
         seedServices();
         seedTestimonials();
+        seedAiTraining();
         // Pre-warm external API caches asynchronously so first page load is fast
         aboutInfoRepository.findAll().stream().findFirst().ifPresent(about -> {
             if (about.getGithubUsername() != null) githubStatsService.fetchStats(about.getGithubUsername());
@@ -140,6 +147,11 @@ public class DataInitializer implements CommandLineRunner {
             info.setCurrentlyLearning("Advanced Spring Boot, System Design, DSA problem solving, and exploring React + Next.js for modern frontends.");
             info.setAvailabilityText("Open to opportunities");
             info.setAvailabilityVisible(true);
+            info.setHiringRoles("SDE-1 / Software Engineer / Java Backend / Full Stack Developer");
+            info.setHiringNoticePeriod("Immediate Joiner (0 days notice)");
+            info.setHiringLocationDetails("Lucknow, Uttar Pradesh (Open to Remote, Hybrid, or On-site Relocation)");
+            info.setHiringContactEmail("princegupt3052@gmail.com");
+            info.setHiringCustomNote("Click the 30s Recruiter Brief button in the header for the executive candidate summary!");
             info.setQuickStats("10+::Projects Built::fa-solid fa-folder-open|250+::DSA Solved::fa-solid fa-code|1+ Yrs::Hands-on Dev::fa-solid fa-laptop-code|100%::Delivery & Testing::fa-solid fa-circle-check");
             info.setQuickStatsVisible(true);
             info.setWorkPreference("Full-time (Remote / Hybrid / On-site)");
@@ -245,6 +257,26 @@ public class DataInitializer implements CommandLineRunner {
                     info.setRecruiterPitchCopyText(info.getRecruiterPitchCopyText().replace("350+ LeetCode DSA solved. ", "").replace("350+", ""));
                     changed = true;
                 }
+                if (info.getHiringRoles() == null || info.getHiringRoles().isBlank()) {
+                    info.setHiringRoles("SDE-1 / Software Engineer / Java Backend / Full Stack Developer");
+                    changed = true;
+                }
+                if (info.getHiringNoticePeriod() == null || info.getHiringNoticePeriod().isBlank()) {
+                    info.setHiringNoticePeriod("Immediate Joiner (0 days notice)");
+                    changed = true;
+                }
+                if (info.getHiringLocationDetails() == null || info.getHiringLocationDetails().isBlank()) {
+                    info.setHiringLocationDetails("Lucknow, Uttar Pradesh (Open to Remote, Hybrid, or On-site Relocation)");
+                    changed = true;
+                }
+                if (info.getHiringContactEmail() == null || info.getHiringContactEmail().isBlank()) {
+                    info.setHiringContactEmail(info.getEmail() != null && !info.getEmail().isBlank() ? info.getEmail() : "princegupt3052@gmail.com");
+                    changed = true;
+                }
+                if (info.getHiringCustomNote() == null || info.getHiringCustomNote().isBlank()) {
+                    info.setHiringCustomNote("Click the 30s Recruiter Brief button in the header for the executive candidate summary!");
+                    changed = true;
+                }
                 if (info.getAiChatEnabled() == null) {
                     info.setAiChatEnabled(true);
                     changed = true;
@@ -315,6 +347,19 @@ public class DataInitializer implements CommandLineRunner {
                     info.setCustomCliCommands("[{\"cmd\":\"blog\",\"desc\":\"Read technical articles & notes\",\"output\":\"<div style=\\\"color:var(--primary); font-weight:700;\\\">📝 Engineering Blog:</div><div>Check out technical writeups on Java 17+, Spring Boot internals, and DSA patterns!</div>\"},{\"cmd\":\"coffee\",\"desc\":\"Buy Prince a coffee / sponsor\",\"output\":\"☕ Thank you for the support! Connect with Prince at princegupt3052@gmail.com.\"},{\"cmd\":\"discord\",\"desc\":\"Join developer community\",\"output\":\"💬 Connect with developer communities and join coding discussions on GitHub: https://github.com/princegupt1234\"}]");
                     changed = true;
                 }
+                if (info.getSectionHeroVisible() == null) { info.setSectionHeroVisible(true); changed = true; }
+                if (info.getSectionQuickStatsVisible() == null) { info.setSectionQuickStatsVisible(true); changed = true; }
+                if (info.getSectionAboutVisible() == null) { info.setSectionAboutVisible(true); changed = true; }
+                if (info.getSectionSkillsVisible() == null) { info.setSectionSkillsVisible(true); changed = true; }
+                if (info.getSectionExperienceVisible() == null) { info.setSectionExperienceVisible(true); changed = true; }
+                if (info.getSectionProjectsVisible() == null) { info.setSectionProjectsVisible(true); changed = true; }
+                if (info.getSectionCodingVisible() == null) { info.setSectionCodingVisible(true); changed = true; }
+                if (info.getSectionCertificatesVisible() == null) { info.setSectionCertificatesVisible(true); changed = true; }
+                if (info.getSectionCurrentlyVisible() == null) { info.setSectionCurrentlyVisible(true); changed = true; }
+                if (info.getSectionServicesVisible() == null) { info.setSectionServicesVisible(true); changed = true; }
+                if (info.getSectionTestimonialsVisible() == null) { info.setSectionTestimonialsVisible(true); changed = true; }
+                if (info.getSectionContactVisible() == null) { info.setSectionContactVisible(true); changed = true; }
+                if (info.getSectionEducationVisible() == null) { info.setSectionEducationVisible(true); changed = true; }
                 if (changed) {
                     aboutInfoRepository.save(info);
                 }
@@ -428,10 +473,10 @@ public class DataInitializer implements CommandLineRunner {
             e.setCompany("Codveda Technologies");
             e.setRole("Full Stack Developer Intern");
             e.setDuration("Jan 2026 - Feb 2026");
-            e.setDescription(
-                    "Built and shipped full-stack web features end-to-end using React.js, Node.js, Express.js, and MongoDB\n" +
-                    "Designed and implemented RESTful APIs, integrating them with frontend interfaces for a seamless user experience\n" +
-                    "Managed MySQL and MongoDB databases, handling data modeling, query optimization, and storage design");
+            e.setDescription("""
+                             Built and shipped full-stack web features end-to-end using React.js, Node.js, Express.js, and MongoDB
+                             Designed and implemented RESTful APIs, integrating them with frontend interfaces for a seamless user experience
+                             Managed MySQL and MongoDB databases, handling data modeling, query optimization, and storage design""");
             e.setType("Internship");
             e.setSortOrder(1);
             e.setVisible(true);
@@ -588,6 +633,45 @@ public class DataInitializer implements CommandLineRunner {
                     "to database design, with strong ownership and attention to detail.");
             t.setPublished(true);
             testimonialRepository.save(t);
+        }
+    }
+
+    private void seedAiTraining() {
+        if (aiTrainingRepository.count() == 0) {
+            aiTrainingRepository.save(new AiTraining(
+                    "What is Prince's current CTC or salary expectation?",
+                    "Prince is targeting competitive, industry-standard compensation for SDE-1 / Java Backend roles. Exact compensation packages and salary expectations can be discussed directly with him via email at princegupt3052@gmail.com.",
+                    "Hiring",
+                    "salary, ctc, expected, package, compensation, rate"
+            ));
+
+            aiTrainingRepository.save(new AiTraining(
+                    "Is Prince available for immediate joining?",
+                    "Yes! Prince is available for immediate joining with a 0-day notice period.",
+                    "Hiring",
+                    "immediate, notice, joining, join, notice period"
+            ));
+
+            aiTrainingRepository.save(new AiTraining(
+                    "Can Prince work remotely or relocate?",
+                    "Yes, Prince is open to remote work, hybrid roles, and relocation across India or internationally for compelling software engineering opportunities.",
+                    "Hiring",
+                    "remote, relocate, relocation, location, hybrid, work from home, onsite"
+            ));
+
+            aiTrainingRepository.save(new AiTraining(
+                    "What are Prince's core strengths and technical specialties?",
+                    "Prince specializes in Java 17+, Spring Boot microservices, high-throughput REST APIs, MySQL relational database design & indexing, and Data Structures & Algorithms. He is known for clean code craftsmanship and solving problems efficiently.",
+                    "Skills",
+                    "strengths, specialty, best at, core skills, why hire"
+            ));
+
+            aiTrainingRepository.save(new AiTraining(
+                    "What questions can I ask you?",
+                    "You can ask me anything about Prince! Here are popular questions:\n• Technical Skills: 'What is Prince's core backend tech stack?'\n• Featured Projects: 'Tell me about Prince's top projects and live demos'\n• Problem Solving: 'What is Prince's LeetCode record and DSA focus?'\n• Hiring: 'Is Prince available for immediate joining and what is his notice period?'\n• Compensation: 'What is Prince's salary expectation?'\n• Contact: 'How can I contact Prince directly or download his resume?'\n\nYou can also click any of the prompt suggestion chips at the top to ask instantly!",
+                    "FAQ",
+                    "questions, question, help, faq, faqs, what to ask, topics, suggestions, menu"
+            ));
         }
     }
 }

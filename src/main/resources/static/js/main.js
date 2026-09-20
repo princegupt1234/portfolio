@@ -1259,6 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         messages.appendChild(botMsg);
         messages.scrollTop = messages.scrollHeight;
+        setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 80);
       })
       .catch(err => {
         const ind = document.getElementById('aiTypingIndicator');

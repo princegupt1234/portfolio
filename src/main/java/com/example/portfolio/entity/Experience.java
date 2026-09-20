@@ -47,4 +47,15 @@ public class Experience {
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
     public Boolean getVisible() { return visible; }
     public void setVisible(Boolean visible) { this.visible = visible; }
+    public String getStartDate() {
+        if (duration != null && duration.contains("-")) return duration.split("-")[0].trim();
+        return duration;
+    }
+    public String getEndDate() {
+        if (duration != null && duration.contains("-")) {
+            String[] parts = duration.split("-");
+            return parts.length > 1 ? parts[1].trim() : "";
+        }
+        return "";
+    }
 }

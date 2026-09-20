@@ -1,790 +1,512 @@
-# 📚 Prince Gupt - Full Stack Developer Portfolio - Complete Documentation
+# 📚 Prince Gupt - Full Stack Java Portfolio & Admin Panel — Complete Documentation
 
-## Table of Contents
-1. [Overview](#overview)
-2. [Quick Start (5 Minutes)](#quick-start)
-3. [Setup Guide](#setup-guide)
-4. [Features](#features)
-5. [API Documentation](#api-documentation)
-6. [Testing](#testing)
-7. [Admin Guide](#admin-guide)
-8. [Troubleshooting](#troubleshooting)
-9. [Configuration](#configuration)
-10. [Customization](#customization)
-11. [Deployment](#deployment)
+A modern, production-grade portfolio and Content Management System (CMS) engineered with **Java 21**, **Spring Boot 4.1**, **Spring Security 6**, **Spring Data JPA**, **MySQL**, **Thymeleaf**, and **Vanilla JavaScript & CSS**.
 
 ---
 
-## Overview
+## 📑 Table of Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Quick Start & Local Setup](#2-quick-start--local-setup)
+3. [Core Systems & Features](#3-core-systems--features)
+   - [Interactive Developer CLI Terminal](#interactive-developer-cli-terminal)
+   - [Dual-Engine "Ask Prince AI" Chatbot](#dual-engine-ask-prince-ai-chatbot)
+   - [Recruiter 30-Second Briefing Modal](#recruiter-30-second-briefing-modal)
+   - [Live LeetCode & GitHub Stats Sync](#live-leetcode--github-stats-sync)
+   - [Anti-Spam & Contact Form Security](#anti-spam--contact-form-security)
+   - [Resume Management & PDF Streaming](#resume-management--pdf-streaming)
+   - [Real-Time Frontend Sync](#real-time-frontend-sync)
+   - [Progressive Web App (PWA) & Open Graph SEO](#progressive-web-app-pwa--open-graph-seo)
+4. [Admin Panel Guide](#4-admin-panel-guide)
+5. [Database Schema & Data Model](#5-database-schema--data-model)
+6. [Security Architecture](#6-security-architecture)
+7. [API & Endpoints Reference](#7-api--endpoints-reference)
+8. [Configuration & Environment Variables](#8-configuration--environment-variables)
+9. [Deployment & Containerization](#9-deployment--containerization)
+10. [Testing & Quality Assurance](#10-testing--quality-assurance)
+11. [Troubleshooting & FAQs](#11-troubleshooting--faqs)
 
-A modern, professional portfolio website built with **Next.js**, **TypeScript**, and **Tailwind CSS**. Includes:
+---
 
-✅ **Resume Download System** - Secure email-based approval workflow
-✅ **Contact Form** - Email integration for inquiries
-✅ **Email Service** - Complete email system using Nodemailer
-✅ **Modern UI** - Animations, dark/light mode, responsive design
-✅ **Error Handling** - Robust error handling with helpful messages
+## 1. Overview & Architecture
 
 ### Tech Stack
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Email**: Nodemailer
-- **Icons**: Lucide React, react-icons
-- **Theme**: next-themes
+- **Backend**: Java 21, [Spring Boot 4.1.0](file:///c:/Users/princ/Desktop/trail/portfolio/pom.xml) (`spring-boot-starter-web`, `spring-boot-starter-data-jpa`, `spring-boot-starter-security`, `spring-boot-starter-validation`, `spring-boot-starter-mail`)
+- **Template Engine**: Thymeleaf 3 with `thymeleaf-extras-springsecurity6`
+- **Database & Persistence**: MySQL 8.x, Hibernate 6, HikariCP Connection Pool
+- **Frontend**: Vanilla JavaScript (ES6+), Modern CSS3 Design Tokens (`theme.css`), FontAwesome 6, Google Fonts (Poppins, Inter, JetBrains Mono)
+- **AI Integration**: Google Generative Language REST API (`gemini-2.0-flash`, `gemini-1.5-flash`) with internal rule-based domain fallback
+- **Containerization**: Multi-stage Docker build with Eclipse Temurin 21 JRE
 
-### Project Structure
+### System Architecture Diagram
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Client Browser (Desktop / Mobile / PWA)         │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │ HTTP/HTTPS
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                 Spring Security 6 (RBAC, CSRF, BCrypt)                  │
+└───────┬────────────────────────────┬────────────────────────────┬──────┘
+        │                            │                            │
+        ▼                            ▼                            ▼
+┌───────────────────┐      ┌───────────────────┐      ┌──────────────────┐
+│  HomeController   │      │  AiChatController │      │ AdminControllers │
+│  Public Views     │      │  /api/ai/chat     │      │ 14 Management    │
+│  Contact & Resume │      │                   │      │ Controllers      │
+└─────────┬─────────┘      └─────────┬─────────┘      └─────────┬────────┘
+          │                          │                          │
+          ▼                          ▼                          ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                             Service Layer                              │
+│ ┌──────────────────────────┐ ┌───────────────────────────────────────┐ │
+│ │ PortfolioAiService       │ │ ContactRateLimiterService             │ │
+│ │ (Gemini API + Fallback)  │ │ (IP Cooldown & Proxy Header Parsing)  │ │
+│ ├──────────────────────────┤ ├───────────────────────────────────────┤ │
+│ │ LeetCodeStatsService     │ │ MailService                           │ │
+│ │ (GraphQL + Proxy + Cache)│ │ (Contact Alerts & Direct Email Reply) │ │
+│ ├──────────────────────────┤ ├───────────────────────────────────────┤ │
+│ │ AnalyticsService         │ │ FileStorageService                    │ │
+│ │ (In-House Metrics)       │ │ (Sanitized UUID Disk Storage)         │ │
+│ └──────────────────────────┘ └───────────────────────────────────────┘ │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                     Spring Data JPA Repositories                       │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                          MySQL 8.x Database                            │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Project Directory Layout
 ```
 portfolio/
-├── app/
-│   ├── api/
-│   │   ├── resume/
-│   │   │   ├── request/route.ts          # Submit resume request
-│   │   │   ├── approve/route.ts          # Admin approval
-│   │   │   └── download/route.ts         # Secure download
-│   │   ├── contact/route.ts              # Contact form
-│   │   └── diagnostics/route.ts          # Config checker
-│   ├── resume-approved/page.tsx          # Success page
-│   ├── resume-error/page.tsx             # Error page
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
-├── components/
-│   ├── Hero.tsx                          # With resume modal
-│   ├── ResumeModal.tsx                   # Email input modal
-│   ├── Contact.tsx                       # Contact form
-│   ├── Navbar.tsx
-│   ├── About.tsx
-│   ├── Skills.tsx
-│   ├── Projects.tsx
-│   ├── Experience.tsx
-│   ├── Footer.tsx
-│   └── Providers.tsx
-├── lib/
-│   ├── email.ts                          # Email service
-│   ├── db.ts                             # Request storage
-│   └── ...
-├── public/
-│   ├── resume.pdf                        # Your resume
-│   └── ...
-├── .env.local                            # Configuration (gitignored)
-├── .env.local.example                    # Template
-├── package.json
-└── tsconfig.json
+├── pom.xml                                    # Maven dependencies & build config
+├── Dockerfile                                 # Multi-stage container deployment
+├── README.md                                  # Quick-start documentation
+├── DOCUMENTATION.md                           # Comprehensive technical manual
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/portfolio/
+│   │   │   ├── PortfolioApplication.java     # Spring Boot application entrypoint
+│   │   │   ├── config/                       # Security, Web MVC, and Data Seeding
+│   │   │   │   ├── SecurityConfig.java
+│   │   │   │   ├── WebConfig.java
+│   │   │   │   ├── DataInitializer.java
+│   │   │   │   ├── CustomUserDetailsService.java
+│   │   │   │   └── GlobalBindingInitializer.java
+│   │   │   ├── controller/                   # Public-facing web & REST controllers
+│   │   │   │   ├── HomeController.java
+│   │   │   │   ├── AiChatController.java
+│   │   │   │   ├── ApiController.java
+│   │   │   │   ├── PwaController.java
+│   │   │   │   └── admin/                    # 18 Admin panel controllers
+│   │   │   │       ├── AdminDashboardController.java
+│   │   │   │       ├── AdminSectionController.java
+│   │   │   │       ├── AdminHeroController.java
+│   │   │   │       ├── AdminAboutController.java
+│   │   │   │       ├── AdminHiringController.java
+│   │   │   │       ├── AdminInteractiveController.java
+│   │   │   │       ├── AdminSkillController.java
+│   │   │   │       ├── AdminProjectController.java
+│   │   │   │       ├── AdminExperienceController.java
+│   │   │   │       ├── AdminCertificateController.java
+│   │   │   │       ├── AdminServiceItemController.java
+│   │   │   │       ├── AdminTestimonialController.java
+│   │   │   │       ├── AdminMessageController.java
+│   │   │   │       ├── AdminResumeController.java
+│   │   │   │       ├── AdminAnalyticsController.java
+│   │   │   │       ├── AdminProfileController.java
+│   │   │   │       ├── AdminLoginController.java
+│   │   │   │       └── AdminGlobalModelAdvice.java
+│   │   │   ├── entity/                       # 14 JPA domain entities
+│   │   │   │   ├── AboutInfo.java
+│   │   │   │   ├── Admin.java
+│   │   │   │   ├── Project.java
+│   │   │   │   ├── Skill.java
+│   │   │   │   ├── Experience.java
+│   │   │   │   ├── EducationEntry.java
+│   │   │   │   ├── Certificate.java
+│   │   │   │   ├── ContactMessage.java
+│   │   │   │   ├── SiteStat.java
+│   │   │   │   ├── Resume.java
+│   │   │   │   ├── BuildingProject.java
+│   │   │   │   ├── LearningProject.java
+│   │   │   │   ├── ServiceItem.java
+│   │   │   │   └── Testimonial.java
+│   │   │   ├── repository/                   # 14 Spring Data repositories
+│   │   │   ├── service/                      # Business logic & external API clients
+│   │   │   │   ├── PortfolioAiService.java
+│   │   │   │   ├── LeetCodeRepositoryStatsService.java
+│   │   │   │   ├── GithubStatsService.java
+│   │   │   │   ├── ContactRateLimiterService.java
+│   │   │   │   ├── MailService.java
+│   │   │   │   ├── AnalyticsService.java
+│   │   │   │   ├── FileStorageService.java
+│   │   │   │   ├── DataVersionService.java
+│   │   │   │   └── ProjectService.java
+│   │   │   └── dto/                          # Form validation & request DTOs
+│   │   └── resources/
+│   │       ├── application.properties        # App properties & env variable bindings
+│   │       ├── static/                       # Static public assets
+│   │       │   ├── css/                      # theme.css, public.css, admin.css
+│   │       │   ├── js/                       # main.js, admin.js
+│   │       │   └── icons/                    # PWA icons & favicon
+│   │       └── templates/                    # Thymeleaf templates
+│   │           ├── index.html                # Main public single-page portfolio
+│   │           └── admin/                    # Admin panel views & fragments
+│   └── test/                                 # Unit and integration test suites
 ```
 
 ---
 
-## Quick Start
-
-### 5-Minute Setup
-
-#### Step 1: Configure Email (2 minutes)
-
-**For Gmail Users:**
-1. Go to https://myaccount.google.com/security
-2. Enable "2-Step Verification"
-3. Go to https://myaccount.google.com/apppasswords
-4. Select "Mail" → "Windows Computer"
-5. Copy 16-character password
-
-**Create `.env.local` file in project root:**
-```env
-EMAIL_SERVICE=gmail
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-16-char-app-password
-ADMIN_EMAIL=admin@example.com
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-```
-
-#### Step 2: Add Your Resume (1 minute)
-```bash
-cp /path/to/your/resume.pdf public/resume.pdf
-```
-
-Or manually: Copy your resume PDF to `public/resume.pdf`
-
-#### Step 3: Restart Dev Server (1 minute)
-```bash
-npm run dev
-```
-
-#### Step 4: Test (1 minute)
-1. Open http://localhost:3000
-2. Click "Download Resume" button
-3. Enter email → Submit
-4. Check your ADMIN_EMAIL inbox
-5. Click "Approve Request"
-6. Check test email for download link
-
-#### Verify Setup
-```bash
-curl http://localhost:3000/api/diagnostics
-```
-
-Should show: `"status": "✓ System Ready"`
-
----
-
-## Setup Guide
-
-### Environment Configuration
-
-Create `.env.local` in project root with:
-```env
-EMAIL_SERVICE=gmail
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password
-ADMIN_EMAIL=admin@example.com
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-```
-
-**File Location:** `portfolio/.env.local` (same level as `package.json`)
-
-### Get Gmail App Password
-
-1. **Enable 2FA** (if not already):
-   - Visit https://myaccount.google.com/security
-   - Enable "2-Step Verification"
-
-2. **Get App Password**:
-   - Visit https://myaccount.google.com/apppasswords
-   - Select "Mail" → "Windows Computer"
-   - Copy 16-character password
-   - Paste into `EMAIL_PASSWORD` in `.env.local`
-
-### Add Your Resume
-
-Place your resume PDF at:
-```
-public/resume.pdf
-```
+## 2. Quick Start & Local Setup
 
 ### Prerequisites
+- **JDK 21+** installed and available on `PATH`.
+- **MySQL 8.x** running locally (or via Docker).
+- **Maven** (or use the included `./mvnw` wrapper).
 
-- [ ] `.env.local` created with all 5 variables
-- [ ] All variables have values (not blank)
-- [ ] GMail App Password obtained (if using Gmail)
-- [ ] `public/resume.pdf` exists
-- [ ] Node.js and npm installed
+### Step 1: Configure MySQL
+Create a database named `portfolio_db`:
+```sql
+CREATE DATABASE portfolio_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-### Installation Steps
+In [`src/main/resources/application.properties`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/resources/application.properties), configure your database credentials or export environment variables:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/portfolio_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=YOUR_MYSQL_PASSWORD
+```
 
+### Step 2: Run Application
+Using the Maven wrapper:
 ```bash
-# 1. Install dependencies
-npm install
+./mvnw spring-boot:run
+```
+On Windows PowerShell:
+```powershell
+.\mvnw.cmd spring-boot:run
+```
 
-# 2. Create .env.local with credentials (see above)
+The application will start on port `8080`:
+- **Public Portfolio**: [http://localhost:8080/](http://localhost:8080/)
+- **Admin Panel Login**: [http://localhost:8080/admin/login](http://localhost:8080/admin/login)
 
-# 3. Add public/resume.pdf
+### Step 3: Default Admin Credentials
+On initial startup, [`DataInitializer.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/config/DataInitializer.java) automatically seeds the database with initial portfolio content and a default admin account:
+- **Username**: `admin` (or configured via `ADMIN_USERNAME`)
+- **Password**: `admin123` (or configured via `ADMIN_PASSWORD`)
 
-# 4. Start dev server
-npm run dev
+> [!IMPORTANT]
+> Change the default password immediately after first login from **Admin → Profile & Settings** (`/admin/profile`).
 
-# 5. Verify configuration
-curl http://localhost:3000/api/diagnostics
+---
 
-# 6. Open in browser
-# http://localhost:3000
+## 3. Core Systems & Features
+
+### Interactive Developer CLI Terminal
+- **Access**: Press `Ctrl + ~` anywhere on the site or click the floating **CLI** launcher button.
+- **Features**:
+  - Auto-complete via `Tab` key.
+  - Command history using `Up` / `Down` arrow keys.
+  - Built-in commands: `help`, `skills`, `projects`, `experience`, `hire`, `leetcode`, `arch`, `system`, `resume`, `contact`, `theme`, `clear`, and `matrix` (animated digital rain effect).
+  - **Dynamic Command Manager**: Custom terminal commands can be created, edited, and deleted from **Admin → AI & Interactive Tools** without code changes.
+
+### Dual-Engine "Ask Prince AI" Chatbot
+Implemented in [`PortfolioAiService.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/service/PortfolioAiService.java) and exposed via [`AiChatController.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/controller/AiChatController.java):
+1. **Google Gemini API**: Uses `gemini-2.0-flash` (or `gemini-1.5-flash`) to generate accurate, professional answers. Enforces strict zero-hallucination guardrails based on live database records.
+2. **Local Domain Fallback Engine**: If no API key is provided or if network latency spikes, an intelligent regex and keyword engine answers recruiter inquiries about DSA problem-solving counts, verified project stacks, availability, and contact details with zero downtime.
+
+### Recruiter 30-Second Briefing Modal
+Implemented in [`index.html`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/resources/templates/index.html#L842):
+- Presents an executive snapshot tailored for engineering managers and talent acquisition teams:
+  - Immediate availability badge (0-day notice).
+  - Live LeetCode solved metrics.
+  - Core technical competencies (Java, Spring Boot, MySQL, REST APIs, Microservices).
+  - One-click **"Copy Pitch"** button copying a structured Markdown summary directly to the recruiter's clipboard.
+
+### Live LeetCode & GitHub Stats Sync
+Implemented in [`LeetCodeRepositoryStatsService.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/service/LeetCodeRepositoryStatsService.java):
+- **Zero Latency**: Employs an in-memory `AtomicReference` cache so public page loads take 0ms for statistics.
+- **Asynchronous Refresh**: Updates asynchronously using a three-tier fallback:
+  1. Official LeetCode GraphQL API (`https://leetcode.com/graphql`).
+  2. Vercel REST Proxy (`https://leetcode-api-faisalshohag.vercel.app/`).
+  3. Pre-seeded verified statistics.
+
+### Anti-Spam & Contact Form Security
+Implemented in [`HomeController.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/controller/HomeController.java#L167) and [`ContactRateLimiterService.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/service/ContactRateLimiterService.java):
+- **Honeypot Trap**: Invisible field `websiteTrap`. Bot submissions are silently discarded without saving or emailing.
+- **IP Rate Limiter**: Inspects `X-Forwarded-For` and `X-Real-IP` behind reverse proxies (Render, Cloudflare) and applies a configurable cooldown (default 60 seconds).
+- **In-App Direct Reply**: Admins can reply to messages directly from `/admin/messages` using branded HTML email templates ([`MailService.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/service/MailService.java)).
+
+### Resume Management & PDF Streaming
+- Streaming endpoint at `/resume/preview` streams the active PDF inline with HTTP headers (`Cache-Control: public, max-age=3600`), rendering directly within an in-page modal iframe.
+- Endpoint at `/resume/download` increments the download counter, updates daily analytics, and triggers a file download attachment.
+
+### Real-Time Frontend Sync
+- Every admin update increments an in-memory version in [`DataVersionService.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/service/DataVersionService.java).
+- The public frontend polls `/api/data-version` every 30 seconds. If a change occurs in the admin panel, visitor tabs reload automatically without requiring a hard refresh.
+
+### Progressive Web App (PWA) & Open Graph SEO
+- Dynamically generates `/manifest.webmanifest` via [`PwaController.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/controller/PwaController.java) using settings from the admin panel.
+- Dynamic Open Graph and Twitter Card tags configured in [`AboutInfo.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/AboutInfo.java) ensure rich preview cards when shared on LinkedIn, WhatsApp, or X/Twitter.
+
+---
+
+## 4. Admin Panel Guide
+
+The admin panel is accessible at `/admin` (protected by Spring Security).
+
+```
+Admin Control Center
+├── Dashboard (/admin/dashboard)           - KPI summary, 30-day analytics chart, quick links
+├── Section Visibility (/admin/sections)   - Toggle any public section on/off
+├── Hero Section (/admin/hero)             - Typing phrases, speeds, intro bio, CTA links
+├── About & Story (/admin/about)           - Personal story, education, currently learning
+├── Hiring & Availability (/admin/hiring)  - Work preferences, notice period, target roles
+├── AI & Interactive (/admin/interactive)  - Gemini chatbot settings, custom CLI commands, SEO
+├── Skills (/admin/skills)                 - Category-grouped technical competencies & %
+├── Experience (/admin/experience)         - Career timeline & bullet points
+├── Projects (/admin/projects)             - Projects catalog, live demos, architecture diagrams
+├── Certificates (/admin/certificates)     - Credentials & verification URLs
+├── Services (/admin/services)             - Professional service offerings
+├── Testimonials (/admin/testimonials)     - Peer & mentor recommendations
+├── Messages (/admin/messages)             - Inquiries inbox & direct email composer
+├── Resume (/admin/resume)                 - Upload, preview, and set active PDF
+├── Analytics (/admin/analytics)           - Detailed 30-day view counts, clicks, and downloads
+└── Profile & Account (/admin/profile)     - Admin username, email, and password changes
 ```
 
 ---
 
-## Features
+## 5. Database Schema & Data Model
 
-### 1. Resume Download System
+The application uses 14 JPA entities mapped to MySQL:
 
-**User Flow:**
-```
-User clicks "Download Resume"
-        ↓
-Modal appears (enter email)
-        ↓
-User submits email
-        ↓
-Admin receives approval request email
-        ↓
-Admin clicks "Approve Request"
-        ↓
-User receives download link (24-hour valid)
-        ↓
-User downloads resume
-```
-
-**Security:**
-- 🔐 Secure token-based requests (32-byte cryptographic tokens)
-- ⏰ Download links valid for 24 hours only
-- ✅ Request tracking (pending → approved → downloaded)
-- 🙅 No direct downloads (requires approval)
-
-**Files:**
-- `components/Hero.tsx` - Download button
-- `components/ResumeModal.tsx` - Email modal
-- `app/api/resume/request/route.ts` - Submit request
-- `app/api/resume/approve/route.ts` - Admin approval
-- `app/api/resume/download/route.ts` - Secure download
-- `lib/db.ts` - Request storage
-- `lib/email.ts` - Email sending
-
-### 2. Contact Form System
-
-**User Flow:**
-```
-User fills contact form
-        ↓
-Submits (name, email, subject, message)
-        ↓
-Form validates all fields
-        ↓
-Email sent to ADMIN_EMAIL
-        ↓
-Confirmation email sent to user
-        ↓
-Success message shown
-```
-
-**Features:**
-- 📧 Form validation (client + server)
-- ✉️ Admin receives message with sender info
-- 📨 User receives confirmation
-- 🎯 Professional email templates
-
-**Files:**
-- `components/Contact.tsx` - Contact form component
-- `app/api/contact/route.ts` - Contact API endpoint
-
-### 3. Email Service
-
-**Powered by Nodemailer** with support for:
-- Gmail (easiest)
-- Outlook/Office365
-- Yahoo
-- Custom SMTP servers
-
-**Configuration:**
-```env
-EMAIL_SERVICE=gmail                    # Service provider
-EMAIL_USER=your-email@gmail.com        # Sender email
-EMAIL_PASSWORD=app-password            # App password
-ADMIN_EMAIL=admin@example.com       # Admin inbox
-```
+| Entity | Table Name | Key Fields | Description |
+|---|---|---|---|
+| [`AboutInfo`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/AboutInfo.java) | `about_info` | `fullName`, `title`, `bio`, `heroPhrases`, `hiringRoles`, `availabilityText`, `customCliCommands`, section flags | Core profile and dynamic feature toggles (singleton record). |
+| [`Admin`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Admin.java) | `admins` | `username`, `password`, `email`, `role` | Administrator credentials (passwords stored as BCrypt hashes). |
+| [`Project`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Project.java) | `projects` | `title`, `description`, `techStack`, `githubUrl`, `liveUrl`, `architectureImageUrl`, `sortOrder`, `featured` | Portfolio projects catalog. |
+| [`Skill`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Skill.java) | `skills` | `name`, `category`, `proficiency`, `iconClass`, `visible`, `sortOrder` | Technical skills with percentage proficiency. |
+| [`Experience`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Experience.java) | `experiences` | `role`, `company`, `duration`, `description`, `sortOrder`, `visible` | Career history and internships. |
+| [`EducationEntry`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/EducationEntry.java) | `education_entries` | `degree`, `institution`, `score`, `year`, `sortOrder` | Educational background. |
+| [`Certificate`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Certificate.java) | `certificates` | `title`, `issuer`, `issueDate`, `credentialUrl`, `imageUrl`, `visible` | Verified certifications and badges. |
+| [`Resume`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Resume.java) | `resumes` | `fileName`, `fileUrl`, `active`, `downloadCount` | Stored resume versions. |
+| [`ContactMessage`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/ContactMessage.java) | `contact_messages` | `name`, `email`, `subject`, `message`, `isRead`, `repliedAt`, `createdAt` | Messages submitted through the contact form. |
+| [`SiteStat`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/SiteStat.java) | `site_stats` | `statDate` (UNIQUE), `portfolioViews`, `resumeDownloads`, `messagesReceived`, `projectClicks` | Daily analytics counters. |
+| [`BuildingProject`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/BuildingProject.java) | `building_projects` | `title`, `description`, `techStack`, `progress`, `status` | "Currently Building" showcase cards. |
+| [`LearningProject`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/LearningProject.java) | `learning_projects` | `title`, `description`, `category`, `status` | "Currently Learning" roadmap items. |
+| [`ServiceItem`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/ServiceItem.java) | `service_items` | `title`, `description`, `iconClass`, `sortOrder`, `visible` | Professional offerings. |
+| [`Testimonial`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/entity/Testimonial.java) | `testimonials` | `name`, `role`, `company`, `content`, `rating`, `published` | Recommendations and peer reviews. |
 
 ---
 
-## API Documentation
+## 6. Security Architecture
 
-### Resume System APIs
+Configured in [`SecurityConfig.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/config/SecurityConfig.java):
 
-#### 1. POST `/api/resume/request`
-**Submit resume download request**
-
-Request:
-```json
-{
-  "userEmail": "user@example.com"
-}
+```java
+// Highlights from SecurityConfig.java
+http
+    .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+    .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/admin/login", "/css/**", "/js/**", "/images/**",
+                "/uploads/**", "/", "/about", "/skills", "/experience",
+                "/projects", "/projects/**", "/certificates", "/services", "/testimonials",
+                "/contact", "/contact/**", "/resume/download", "/resume/preview",
+                "/api/data-version", "/api/skills", "/api/ai/**").permitAll()
+        .requestMatchers("/admin/**").hasRole("ADMIN")
+        .anyRequest().permitAll()
+    )
+    .formLogin(form -> form
+        .loginPage("/admin/login")
+        .defaultSuccessUrl("/admin/dashboard", true)
+        .failureUrl("/admin/login?error=true")
+    )
+    .csrf(csrf -> csrf
+        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        .ignoringRequestMatchers("/contact/**", "/api/ai/**")
+    );
 ```
 
-Response (201):
-```json
-{
-  "success": true,
-  "message": "Resume request submitted...",
-  "requestId": "uuid"
-}
-```
-
-#### 2. GET/POST `/api/resume/approve`
-**Admin approval endpoint**
-
-GET Query Params:
-```
-token=approval-token&requestId=request-id
-```
-
-POST Request:
-```json
-{
-  "requestId": "uuid",
-  "approvalToken": "token"
-}
-```
-
-Response (200):
-```json
-{
-  "success": true,
-  "message": "Request approved. Download link sent to user."
-}
-```
-
-#### 3. GET `/api/resume/download`
-**Download secure PDF**
-
-Query Params:
-```
-token=download-token&requestId=request-id
-```
-
-Response: PDF file (binary)
-
-### Contact Form API
-
-#### POST `/api/contact`
-**Submit contact message**
-
-Request:
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "subject": "Project Inquiry",
-  "message": "Message content"
-}
-```
-
-Response (200):
-```json
-{
-  "success": true,
-  "message": "Message sent successfully! I'll get back to you soon."
-}
-```
-
-### Diagnostics API
-
-#### GET `/api/diagnostics`
-**Check configuration status**
-
-Response:
-```json
-{
-  "status": "✓ System Ready",
-  "environment": {
-    "EMAIL_SERVICE": "✓ Configured",
-    "EMAIL_USER": "✓ Configured",
-    "EMAIL_PASSWORD": "✓ Configured",
-    "ADMIN_EMAIL": "✓ Configured"
-  }
-}
-```
+1. **Authentication**: Form-based authentication against database admins with BCrypt password hashing.
+2. **CSRF Protection**: Cookie-based CSRF tokens (`XSRF-TOKEN`) for AJAX calls; stateless public APIs (`/api/ai/**`, `/contact/**`) are excluded.
+3. **Clickjacking Defense**: Configured with `frameOptions().sameOrigin()` allowing only local iframe rendering for resume PDF previews.
+4. **File Storage Safety**: In [`FileStorageService.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/java/com/example/portfolio/service/FileStorageService.java), original filenames are sanitized with `cleanPath` and saved under random `UUID` filenames to prevent directory traversal attacks.
 
 ---
 
-## Testing
+## 7. API & Endpoints Reference
 
-### Test Resume System
+### Public Endpoints
+| HTTP Method | Route | Description |
+|---|---|---|
+| `GET` | `/` | Renders the public portfolio homepage. |
+| `POST` | `/contact/submit` | Submits a contact form inquiry (protected by honeypot & IP rate limiter). |
+| `GET` | `/resume/preview` | Streams active resume PDF inline for browser viewing. |
+| `GET` | `/resume/download` | Increments download count and serves resume PDF attachment. |
+| `GET` | `/project/{id}/click` | Records a project link click for analytics. |
+| `GET` | `/manifest.webmanifest` | Dynamically returns PWA web manifest. |
+| `GET` | `/api/data-version` | Returns `{ "version": <timestamp> }` for live client refresh. |
+| `GET` | `/api/skills` | Returns list of all visible technical skills in JSON. |
+| `POST` | `/api/ai/chat` | Receives `{ "message": "..." }` and returns AI chatbot response. |
 
-1. Open http://localhost:3000
-2. Click "Download Resume" button
-3. Enter your test email
-4. Click "Submit Request"
-5. Check ADMIN_EMAIL inbox (within 5 seconds)
-6. Click "Approve Request" in email
-7. Check test email inbox
-8. Click download link to get PDF
+### Admin Endpoints (Requires `ROLE_ADMIN`)
+| HTTP Method | Route | Description |
+|---|---|---|
+| `GET` | `/admin/dashboard` | Main admin overview and metrics. |
+| `GET` / `POST` | `/admin/sections` | Section visibility controls. |
+| `POST` | `/admin/sections/toggle` | AJAX toggle for individual section visibility. |
+| `GET` / `POST` | `/admin/hero` | Hero text, typing animations, and CTA management. |
+| `GET` / `POST` | `/admin/about` | Bio, story, education, and social links. |
+| `GET` / `POST` | `/admin/hiring` | Hiring availability, target roles, and recruiter brief. |
+| `GET` / `POST` | `/admin/interactive` | AI chatbot, terminal CLI, and SEO/OG settings. |
+| `GET` / `POST` | `/admin/skills/**` | Skills CRUD operations. |
+| `GET` / `POST` | `/admin/projects/**` | Projects catalog CRUD operations. |
+| `GET` / `POST` | `/admin/experience/**` | Experience timeline CRUD operations. |
+| `GET` / `POST` | `/admin/certificates/**` | Certificates CRUD operations. |
+| `GET` / `POST` | `/admin/messages/**` | Message viewing, mark as read, delete, and email reply. |
+| `GET` / `POST` | `/admin/resume/**` | Resume upload, activation, and deletion. |
+| `GET` | `/admin/analytics` | 30-day analytics charts and raw logs. |
+| `GET` / `POST` | `/admin/profile` | Update username, email, and change admin password. |
 
-### Test Contact Form
+---
 
-1. Open http://localhost:3000
-2. Scroll to "Get In Touch"
-3. Fill form (name, email, subject, message)
-4. Click "Send Message"
-5. Check ADMIN_EMAIL inbox
-6. Verify form cleared and success message shown
+## 8. Configuration & Environment Variables
 
-### Test Configuration
+All settings are configured in [`src/main/resources/application.properties`](file:///c:/Users/princ/Desktop/trail/portfolio/src/main/resources/application.properties) with production-ready environment variable fallbacks:
 
+```properties
+# MySQL Connection
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/portfolio_db}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:1234}
+
+# Admin Account Seeding
+app.admin.default-username=${ADMIN_USERNAME:admin}
+app.admin.default-password=${ADMIN_PASSWORD:admin123}
+app.admin.default-email=${ADMIN_EMAIL:admin@example.com}
+
+# HTTPS Email APIs (Recommended on Render - Port 443, immune to SMTP port blocks)
+resend.api.key=${RESEND_API_KEY:}
+resend.from=${RESEND_FROM:Prince Gupt <onboarding@resend.dev>}
+
+brevo.api.key=${BREVO_API_KEY:}
+brevo.sender.email=${BREVO_SENDER_EMAIL:${MAIL_USERNAME:princegupt3052@gmail.com}}
+brevo.sender.name=${BREVO_SENDER_NAME:Prince Gupt}
+
+# Traditional SMTP (Fallback if API keys are not provided)
+spring.mail.host=${MAIL_HOST:smtp.gmail.com}
+spring.mail.port=${MAIL_PORT:587}
+spring.mail.username=${MAIL_USERNAME:princegupt3052@gmail.com}
+spring.mail.password=${MAIL_PASSWORD:}
+app.mail.notify-to=${MAIL_NOTIFY_TO:princegupt3052@gmail.com}
+app.mail.enabled=${MAIL_ENABLED:true}
+
+# AI Chatbot (Google Gemini)
+gemini.api.key=${GEMINI_API_KEY:}
+gemini.model=${GEMINI_MODEL:gemini-2.0-flash}
+
+# Server Port (Auto-injected by Render)
+server.port=${PORT:8080}
+```
+
+### Complete Environment Variables Table
+| Variable | Required | Description | Example |
+|---|---|---|---|
+| `SPRING_DATASOURCE_URL` | Yes (in prod) | JDBC URL to MySQL database | `jdbc:mysql://host:3306/db?useSSL=true` |
+| `SPRING_DATASOURCE_USERNAME` | Yes (in prod) | Database username | `admin` |
+| `SPRING_DATASOURCE_PASSWORD` | Yes (in prod) | Database password | `secret_password` |
+| `RESEND_API_KEY` | Recommended | Resend API Key for HTTPS email delivery on Render (Port 443) | `re_123456789abc` |
+| `RESEND_FROM` | No | Custom verified sender or onboarding test sender | `Prince Gupt <onboarding@resend.dev>` |
+| `BREVO_API_KEY` | No | Brevo API Key (alternative HTTPS email provider) | `xkeysib-abc...` |
+| `ADMIN_USERNAME` | No | Default admin username on first seed | `prince` |
+| `ADMIN_PASSWORD` | No | Default admin password on first seed | `StrongPassword123` |
+| `ADMIN_EMAIL` | No | Default admin contact email | `prince@example.com` |
+| `MAIL_USERNAME` | No | Gmail address for SMTP fallback | `you@gmail.com` |
+| `MAIL_PASSWORD` | No | 16-character Google App Password (no spaces) | `abcdefghijklmnop` |
+| `GEMINI_API_KEY` | No | Google AI Studio Gemini API Key | `AIzaSy...` |
+| `PORT` | Auto | Web server listen port (provided by Render) | `8080` or `10000` |
+
+---
+
+## 9. Deployment & Containerization
+
+### Docker Deployment
+The project includes a multi-stage [`Dockerfile`](file:///c:/Users/princ/Desktop/trail/portfolio/Dockerfile):
+```dockerfile
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Runtime
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 10000
+ENTRYPOINT ["java", "-Xms64m", "-Xmx256m", "-XX:+UseSerialGC", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+```
+
+> [!TIP]
+> Notice the JVM optimization flags `-Xms64m -Xmx256m -XX:+UseSerialGC`. These are tuned for low-memory container environments (such as Render's 512MB RAM free/starter instances), preventing Out-Of-Memory (OOM) container terminations.
+
+### Deploying to Render
+1. Push this repository to GitHub.
+2. In the Render Dashboard, create a **New Web Service** and connect your repository.
+3. Select **Docker** environment (Render automatically detects `./Dockerfile`).
+4. Attach a MySQL database (e.g. Render MySQL, Aiven, or Railway).
+5. Add the environment variables (`SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, `ADMIN_PASSWORD`, etc.).
+6. Click **Deploy**. Render will build the container and launch your service.
+
+---
+
+## 10. Testing & Quality Assurance
+
+The project includes unit and integration tests using Spring Boot Test, MockMvc, and an in-memory H2 database:
+
+- **Admin Controllers**:
+  - [`AdminAboutControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminAboutControllerTest.java)
+  - [`AdminHeroControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminHeroControllerTest.java)
+  - [`AdminHiringControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminHiringControllerTest.java)
+  - [`AdminInteractiveControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminInteractiveControllerTest.java)
+  - [`AdminMessageControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminMessageControllerTest.java)
+  - [`AdminProjectControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminProjectControllerTest.java)
+  - [`AdminSectionControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/admin/AdminSectionControllerTest.java)
+- **Services & Public APIs**:
+  - [`PortfolioAiServiceTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/service/PortfolioAiServiceTest.java)
+  - [`LeetCodeRepositoryStatsServiceTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/service/LeetCodeRepositoryStatsServiceTest.java)
+  - [`ContactRateLimiterServiceTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/service/ContactRateLimiterServiceTest.java)
+  - [`AiChatControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/AiChatControllerTest.java)
+  - [`PwaControllerTest.java`](file:///c:/Users/princ/Desktop/trail/portfolio/src/test/java/com/example/portfolio/controller/PwaControllerTest.java)
+
+Run the test suite with:
 ```bash
-# Check all environment variables are set
-curl http://localhost:3000/api/diagnostics
-```
-
-Should show: `"status": "✓ System Ready"`
-
-### Test API Endpoints
-
-```bash
-# Test resume request API
-curl -X POST http://localhost:3000/api/resume/request \
-  -H "Content-Type: application/json" \
-  -d '{"userEmail":"test@example.com"}'
-
-# Test contact API
-curl -X POST http://localhost:3000/api/contact \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test","email":"test@example.com","subject":"Test","message":"Test message"}'
+./mvnw test
 ```
 
 ---
 
-## Admin Guide
+## 11. Troubleshooting & FAQs
 
-### Resume Approval Process
+#### Q: The public page loads, but images or resume PDFs return 404 on Render after redeployment.
+**A**: Render's free tier uses ephemeral containers. Any files uploaded to `/uploads` are cleared upon redeployment. To persist uploads, mount a **Render Disk** at `/app/uploads` and configure `app.upload.dir=/app/uploads`, or integrate S3/Cloudflare R2 object storage.
 
-#### What You Receive
-Email with subject: `New Resume Download Request from user@email.com`
+#### Q: Contact form emails are not sending.
+**A**: Ensure you are using a Google **App Password** (16 characters without spaces) rather than your normal Google account password:
+1. Enable 2-Factor Authentication on your Google account.
+2. Go to **Google Account → Security → App Passwords**.
+3. Generate a password for "Mail" and set it as `MAIL_PASSWORD`.
 
-Email contains:
-- Sender's email address
-- "Approve Request" button
-- Request ID and token
+#### Q: How do I change the default admin credentials after initial startup?
+**A**: Log in at `/admin/login`, navigate to **Profile & Settings** (`/admin/profile`), enter your current password, and specify your new username and password.
 
-#### What To Do
-1. **Receive email** from user request
-2. **Check spam/promotions** folder if not in inbox
-3. **Click "Approve Request"** button
-4. See **"Request Approved!"** confirmation page
-5. **Done** - user automatically receives download link
-
-#### After Approval
-✅ User receives email with subject: "Your Resume Download Link - Prince Gupt"
-✅ Download link is valid for 24 hours
-✅ User can download your resume
-✅ Request status marked as "downloaded" after download
-
-#### Checking Request History
-
-Access: `.data/resume_requests.json`
-
-```json
-[
-  {
-    "id": "unique-id",
-    "userEmail": "user@example.com",
-    "status": "pending|approved|downloaded",
-    "createdAt": "2024-12-15T15:30:00Z",
-    "approvedAt": "2024-12-15T15:31:00Z",
-    "downloadedAt": "2024-12-15T15:32:00Z"
-  }
-]
-```
-
-#### Security Notes
-- ✅ All requests require your approval
-- ✅ Links have unique tokens
-- ✅ Download links expire after 24 hours
-- ✅ Invalid tokens show error to user
-- ✅ All actions are timestamped
-
-#### Troubleshooting
-
-**Q: I didn't receive approval email**
-- Check spam/promotions folder
-- Verify ADMIN_EMAIL in `.env.local` is correct
-- Check credentials in `.env.local`
-
-**Q: User didn't get download link**
-- Verify you clicked approve
-- Check `.data/resume_requests.json` for status
-- Make sure ADMIN_EMAIL credentials work
-
-**Q: Download link expired**
-- Valid for 24 hours from approval
-- User must request again if expired
-
----
-
-## Troubleshooting
-
-### Error: "Unexpected token '<', '<!DOCTYPE' is not valid JSON"
-
-**Cause:** API returning HTML instead of JSON
-
-**Fix:**
-1. Check `.env.local` has all 5 variables
-2. Verify credentials are correct
-3. Run: `curl http://localhost:3000/api/diagnostics`
-4. Restart dev server: `npm run dev`
-
-### Error: "Network error. Please check your connection and try again"
-
-**Cause:** Can't reach API endpoint or missing `.env.local`
-
-**Fix:**
-1. Verify `.env.local` exists and is configured
-2. Restart dev server: `npm run dev`
-3. Check server logs for errors
-4. Verify file is named `.env.local` (with dot at start)
-
-### Error: "Hydration mismatch" or "server rendered HTML didn't match"
-
-**Fix:** (Already fixed in current version)
-1. Clear cache: `rm -rf .next`
-2. Restart server: `npm run dev`
-
-### Email Not Sending
-
-**Debug Steps:**
-1. Run: `curl http://localhost:3000/api/diagnostics`
-2. Check all variables show "✓ Configured"
-3. Verify Gmail App Password (16 characters)
-4. Check spam/promotions folder
-5. Look at server logs for error messages
-
-**Solutions by Email Provider:**
-
-**Gmail:**
-- Enable 2FA: https://myaccount.google.com/security
-- Get App Password: https://myaccount.google.com/apppasswords
-- Use 16-char password as EMAIL_PASSWORD
-
-**Outlook/Office365:**
-```env
-EMAIL_SERVICE=outlook
-EMAIL_USER=your-email@outlook.com
-EMAIL_PASSWORD=your-password
-```
-
-**Yahoo:**
-```env
-EMAIL_SERVICE=yahoo
-EMAIL_USER=your-email@yahoo.com
-EMAIL_PASSWORD=your-app-password
-```
-
-### "public/resume.pdf" Not Found
-
-**Fix:**
-```bash
-cp /path/to/your/resume.pdf public/resume.pdf
-```
-
-Or manually copy file to `public/resume.pdf`
-
-### Modal or Buttons Not Appearing
-
-**Fix:**
-1. Clear browser cache: Ctrl+Shift+Delete
-2. Clear Next.js cache: `rm -rf .next`
-3. Restart server: `npm run dev`
-4. Try different browser
-
-### Cannot resolve module at path /lib/db
-
-**Fix:**
-1. Run: `npm install`
-2. Clear cache: `rm -rf .next`
-3. Restart server: `npm run dev`
-
----
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Required | Value | Example |
-|----------|----------|-------|---------|
-| EMAIL_SERVICE | Yes | Email provider | `gmail` |
-| EMAIL_USER | Yes | Sender email | `your-email@gmail.com` |
-| EMAIL_PASSWORD | Yes | App password | `abcd efgh ijkl mnop` |
-| ADMIN_EMAIL | Yes | Approval inbox | `admin@example.com` |
-| NEXT_PUBLIC_BASE_URL | Yes | Site URL | `http://localhost:3000` |
-
-### Email Providers
-
-**Gmail (Recommended):**
-```env
-EMAIL_SERVICE=gmail
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-16-char-app-password
-```
-
-**Outlook:**
-```env
-EMAIL_SERVICE=outlook
-EMAIL_USER=your-email@outlook.com
-EMAIL_PASSWORD=your-password
-```
-
-**Yahoo:**
-```env
-EMAIL_SERVICE=yahoo
-EMAIL_USER=your-email@yahoo.com
-EMAIL_PASSWORD=your-app-password
-```
-
-### Data Storage
-
-**Resume Requests:** `.data/resume_requests.json`
-- Auto-created on first request
-- Gitignored (not committed to version control)
-- Contains: request IDs, emails, tokens, status, timestamps
-
----
-
-## Customization
-
-### Change Admin Email
-
-Edit `.env.local`:
-```env
-ADMIN_EMAIL=new-email@example.com
-```
-
-### Change Resume Filename
-
-Edit `app/api/resume/download/route.ts`:
-```ts
-'attachment; filename="your-custom-name.pdf"'
-```
-
-### Change Email Templates
-
-Edit `lib/email.ts`:
-- `sendAdminApprovalEmail()` - Admin email template
-- `sendUserDownloadEmail()` - User email template
-
-Edit `app/api/contact/route.ts`:
-- Admin email template (lines ~50-85)
-- User confirmation template (lines ~106-145)
-
-### Change Modal Styling
-
-Edit `components/ResumeModal.tsx` - All Tailwind CSS classes
-
-### Change Button Text
-
-Edit `components/Hero.tsx` - Button text and labels
-
-### Add Custom Validation
-
-Edit `components/ResumeModal.tsx` or `components/Contact.tsx`:
-- Add/remove validation checks
-- Change error messages
-
-### Change Token Expiration
-
-Edit `lib/db.ts` (~line 95):
-```ts
-// Change 24 to desired hours
-request.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-```
-
----
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Push code to GitHub
-2. Connect to Vercel project
-3. Add environment variables in Vercel dashboard:
-   - `EMAIL_SERVICE`
-   - `EMAIL_USER`
-   - `EMAIL_PASSWORD`
-   - `ADMIN_EMAIL`
-   - `NEXT_PUBLIC_BASE_URL` (your domain)
-4. Deploy
-
-### Build
-
-```bash
-npm run build
-```
-
-### Production Start
-
-```bash
-npm start
-```
-
-### Other Platforms
-
-Works with any platform supporting Next.js:
-- Railway
-- Netlify
-- DigitalOcean App Platform
-
-**Important:** Set `.env` variables in platform's environment configuration (not `.env.local`)
-
----
-
-## All Issues Fixed ✅
-
-### 1. ✅ React Hydration Error
-**Fixed:** Floating animations now generate client-side only
-
-### 2. ✅ JSON Parse Error
-**Fixed:** All APIs return proper JSON with explicit error handling
-
-### 3. ✅ Contact Form Network Error
-**Fixed:** Created complete `/api/contact` endpoint
-
----
-
-## Files Created/Modified
-
-### API Routes (Backend)
-- `app/api/resume/request/route.ts` - Resume request
-- `app/api/resume/approve/route.ts` - Admin approval
-- `app/api/resume/download/route.ts` - Secure download
-- `app/api/contact/route.ts` - Contact form
-- `app/api/diagnostics/route.ts` - Config checker
-
-### Components (Frontend)
-- `components/Hero.tsx` - Updated with modal
-- `components/ResumeModal.tsx` - NEW: Email modal
-- `components/Contact.tsx` - Updated with validation
-
-### Core Libraries
-- `lib/email.ts` - Email service
-- `lib/db.ts` - Request storage
-
-### Pages
-- `app/resume-approved/page.tsx` - Success page
-- `app/resume-error/page.tsx` - Error page
-
----
-
-## Tech Stack Details
-
-```json
-{
-  "dependencies": {
-    "framer-motion": "^12.38.0",
-    "lucide-react": "^1.7.0",
-    "next": "16.2.2",
-    "next-themes": "^0.4.6",
-    "nodemailer": "^6.9.13",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-icons": "^5.6.0",
-    "react-type-animation": "^3.2.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@types/nodemailer": "^6.4.14",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.2",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
-}
-```
-
----
-
-## Contact & Support
-
-**Project Contact**
-- Email: your-email@example.com
-- LinkedIn: [Your Name](https://www.linkedin.com)
-- Location: Your City, Country
-
----
-
-## License
-
-This project is open source and available under the MIT License.
-
----
-
-**Status:** ✅ All Systems Operational
-**Portfolio:** Ready for Production
-**Documentation:** Complete
-**Time to Launch:** 🚀
+#### Q: The AI Chatbot shows fallback responses instead of Gemini responses.
+**A**: Verify that `GEMINI_API_KEY` is set in your environment variables. You can obtain a free API key from [Google AI Studio](https://aistudio.google.com/). The local fallback domain engine guarantees the assistant continues answering portfolio questions accurately even without an active key.

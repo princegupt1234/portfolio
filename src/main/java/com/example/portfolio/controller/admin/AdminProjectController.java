@@ -61,9 +61,16 @@ public class AdminProjectController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("project", projectRepository.findById(id).orElseThrow());
-        return "admin/projects/form";
+    public String editForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        return projectRepository.findById(id)
+                .map(project -> {
+                    model.addAttribute("project", project);
+                    return "admin/projects/form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Project not found.");
+                    return "redirect:/admin/projects";
+                });
     }
 
     @InitBinder
@@ -153,30 +160,44 @@ public class AdminProjectController {
 
     @PostMapping("/{id}/toggle-featured")
     public String toggleFeatured(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        projectRepository.findById(id).ifPresent(p -> {
-            p.setFeatured(!Boolean.TRUE.equals(p.getFeatured()));
-            projectRepository.save(p);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Project \"" + p.getTitle() + "\" is now " + (p.getFeatured() ? "featured." : "unfeatured."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/projects";
+        return projectRepository.findById(id)
+                .map(p -> {
+                    p.setFeatured(!Boolean.TRUE.equals(p.getFeatured()));
+                    projectRepository.save(p);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Project \"" + p.getTitle() + "\" is now " + (p.getFeatured() ? "featured." : "unfeatured."));
+                    return "redirect:/admin/projects";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Project not found.");
+                    return "redirect:/admin/projects";
+                });
     }
 
     @PostMapping("/{id}/toggle-visible")
     public String toggleVisible(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        projectRepository.findById(id).ifPresent(p -> {
-            p.setVisible(!Boolean.TRUE.equals(p.getVisible()));
-            projectRepository.save(p);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Project \"" + p.getTitle() + "\" visibility updated to " + (p.getVisible() ? "Visible." : "Hidden."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/projects";
+        return projectRepository.findById(id)
+                .map(p -> {
+                    p.setVisible(!Boolean.TRUE.equals(p.getVisible()));
+                    projectRepository.save(p);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Project \"" + p.getTitle() + "\" visibility updated to " + (p.getVisible() ? "Visible." : "Hidden."));
+                    return "redirect:/admin/projects";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Project not found.");
+                    return "redirect:/admin/projects";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        if (!projectRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Project not found.");
+            return "redirect:/admin/projects";
+        }
         projectRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Project deleted successfully.");

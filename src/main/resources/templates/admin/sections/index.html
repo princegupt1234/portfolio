@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Frontend Section Visibility | Admin</title>
+  <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css(v='6')}">
+  <style>
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .section-card {
+      border-radius: 16px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: var(--blur);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .section-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+    .section-card.is-disabled {
+      opacity: 0.72;
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    .section-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .section-card-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .section-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.15));
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      transition: all 0.2s;
+    }
+    .section-card.is-disabled .section-icon {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+    .section-anchor {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .section-desc {
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    .section-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+    }
+    .status-badge.visible {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-badge.hidden {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .status-dot-indicator {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status-badge.visible .status-dot-indicator {
+      box-shadow: 0 0 6px #10b981;
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-edit-btn {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .card-edit-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Master Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--glass-border);
+      transition: 0.25s;
+      border-radius: 26px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      transition: 0.25s;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    input:checked + .toggle-slider {
+      background: #10b981;
+      border-color: #10b981;
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="admin-body">
+<div class="admin-wrapper">
+  <div th:replace="~{admin/fragments/sidebar :: sidebar(active='sections')}"></div>
+
+  <div class="admin-main">
+    <div th:replace="~{admin/fragments/topbar :: topbar(pageTitle='Section Visibility', unread=0)}"></div>
+
+    <div class="admin-content">
+      <div style="max-width: 1280px; margin: 0 auto;">
+
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:20px; flex-wrap:wrap;">
+          <div>
+            <div style="color:var(--primary); font:600 .7rem var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px;">
+              Live Site Layout Control
+            </div>
+            <h1 style="font-size:clamp(1.35rem,2.5vw,1.9rem); margin:0; letter-spacing:-.02em;">
+              Frontend Section Visibility
+            </h1>
+            <p style="max-width:680px; color:var(--text-secondary); font-size:.82rem; line-height:1.6; margin:6px 0 0;">
+              Turn any section ON or OFF. If a section is toggled off, it is completely removed from the live website DOM and omitted from all navigation menus.
+            </p>
+          </div>
+          <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center;">
+            <button type="button" onclick="toggleAllSections(true)" class="glass-btn" style="font-size:0.8rem;"><i class="fa-solid fa-eye"></i> Enable All</button>
+            <button type="button" onclick="toggleAllSections(false)" class="glass-btn" style="font-size:0.8rem;"><i class="fa-solid fa-eye-slash"></i> Disable All</button>
+            <a th:href="@{/}" target="_blank" class="glass-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Site</a>
+            <button type="button" onclick="document.getElementById('sectionsForm').submit();" class="glass-btn primary" style="background:#10b981; border-color:#10b981; color:#000; font-weight:600;">
+              <i class="fa-solid fa-floppy-disk"></i> Save All
+            </button>
+          </div>
+        </div>
+
+        <div class="alert success" th:if="${successMessage}">
+          <div class="alert-content"><i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span></div>
+          <button type="button" class="alert-close">×</button>
+        </div>
+
+        <form id="sectionsForm" th:action="@{/admin/sections/save}" method="post">
+
+          <div class="sections-grid">
+
+            <!-- 1. HERO SECTION -->
+            <div class="section-card" id="card-hero" th:classappend="${about.sectionHeroVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(249,115,22,0.15); color:#f97316; border-color:rgba(249,115,22,0.3);"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                  <div>
+                    <div class="section-title">Hero Greeting &amp; Bio <span class="section-anchor">#home</span></div>
+                    <p class="section-desc">Introduction banner, animated typing headline, bio summary, CTA action buttons, and photo ring.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionHeroVisible" value="true" th:checked="${about.sectionHeroVisible != false}" onchange="handleToggle('hero', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionHeroVisible != false} ? 'visible' : 'hidden'" id="badge-hero">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionHeroVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/hero}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Hero</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. QUICK STATS -->
+            <div class="section-card" id="card-quickStats" th:classappend="${about.sectionQuickStatsVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(6,182,212,0.15); color:#06b6d4; border-color:rgba(6,182,212,0.3);"><i class="fa-solid fa-chart-simple"></i></div>
+                  <div>
+                    <div class="section-title">Quick Stats Strip <span class="section-anchor">#quick-stats</span></div>
+                    <p class="section-desc">Credibility counters directly below hero (LeetCode solved, projects count, and experience badges).</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionQuickStatsVisible" value="true" th:checked="${about.sectionQuickStatsVisible != false}" onchange="handleToggle('quickStats', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionQuickStatsVisible != false} ? 'visible' : 'hidden'" id="badge-quickStats">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionQuickStatsVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/about#sec-quickstats}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Stats</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. ABOUT & STORY -->
+            <div class="section-card" id="card-about" th:classappend="${about.sectionAboutVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(59,130,246,0.15); color:#3b82f6; border-color:rgba(59,130,246,0.3);"><i class="fa-solid fa-user"></i></div>
+                  <div>
+                    <div class="section-title">About &amp; Story <span class="section-anchor">#about</span></div>
+                    <p class="section-desc">Full narrative story, engineering principles, core focus areas, and education timeline cards.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionAboutVisible" value="true" th:checked="${about.sectionAboutVisible != false}" onchange="handleToggle('about', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionAboutVisible != false} ? 'visible' : 'hidden'" id="badge-about">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionAboutVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/about}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit About</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. SKILLS & TECH STACK -->
+            <div class="section-card" id="card-skills" th:classappend="${about.sectionSkillsVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(168,85,247,0.15); color:#a855f7; border-color:rgba(168,85,247,0.3);"><i class="fa-solid fa-layer-group"></i></div>
+                  <div>
+                    <div class="section-title">Skills &amp; Tech Stack <span class="section-anchor">#skills</span></div>
+                    <p class="section-desc">Interactive category-tabbed skills grid (Java, Spring Boot, React, MySQL, Docker, Git, Tools).</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionSkillsVisible" value="true" th:checked="${about.sectionSkillsVisible != false}" onchange="handleToggle('skills', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionSkillsVisible != false} ? 'visible' : 'hidden'" id="badge-skills">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionSkillsVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/skills}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Skills</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. EXPERIENCE & ROLES -->
+            <div class="section-card" id="card-experience" th:classappend="${about.sectionExperienceVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(234,179,8,0.15); color:#eab308; border-color:rgba(234,179,8,0.3);"><i class="fa-solid fa-briefcase"></i></div>
+                  <div>
+                    <div class="section-title">Experience &amp; Roles <span class="section-anchor">#experience</span></div>
+                    <p class="section-desc">Professional journey timeline, company details, key achievements, and technologies used in each role.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionExperienceVisible" value="true" th:checked="${about.sectionExperienceVisible != false}" onchange="handleToggle('experience', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionExperienceVisible != false} ? 'visible' : 'hidden'" id="badge-experience">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionExperienceVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/experience}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Experience</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. PROJECTS -->
+            <div class="section-card" id="card-projects" th:classappend="${about.sectionProjectsVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(99,102,241,0.15); color:#6366f1; border-color:rgba(99,102,241,0.3);"><i class="fa-solid fa-diagram-project"></i></div>
+                  <div>
+                    <div class="section-title">Featured Projects <span class="section-anchor">#projects</span></div>
+                    <p class="section-desc">Portfolio project showcase with category filters, architecture diagrams, live URLs, and GitHub links.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionProjectsVisible" value="true" th:checked="${about.sectionProjectsVisible != false}" onchange="handleToggle('projects', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionProjectsVisible != false} ? 'visible' : 'hidden'" id="badge-projects">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionProjectsVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/projects}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Projects</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7. CODING PROFILES -->
+            <div class="section-card" id="card-coding" th:classappend="${about.sectionCodingVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(16,185,129,0.15); color:#10b981; border-color:rgba(16,185,129,0.3);"><i class="fa-solid fa-code"></i></div>
+                  <div>
+                    <div class="section-title">Coding &amp; Problem Solving <span class="section-anchor">#coding</span></div>
+                    <p class="section-desc">Live LeetCode solved problems breakdown, GitHub repository stats, and coding platform links.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionCodingVisible" value="true" th:checked="${about.sectionCodingVisible != false}" onchange="handleToggle('coding', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionCodingVisible != false} ? 'visible' : 'hidden'" id="badge-coding">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionCodingVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/profile}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Handles</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 8. CERTIFICATES -->
+            <div class="section-card" id="card-certificates" th:classappend="${about.sectionCertificatesVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(236,72,153,0.15); color:#ec4899; border-color:rgba(236,72,153,0.3);"><i class="fa-solid fa-certificate"></i></div>
+                  <div>
+                    <div class="section-title">Certificates &amp; Credentials <span class="section-anchor">#certificates</span></div>
+                    <p class="section-desc">Verified certifications, issuing organizations, credential IDs, and certificate lightbox previews.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionCertificatesVisible" value="true" th:checked="${about.sectionCertificatesVisible != false}" onchange="handleToggle('certificates', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionCertificatesVisible != false} ? 'visible' : 'hidden'" id="badge-certificates">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionCertificatesVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/certificates}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Certs</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 9. CURRENTLY LEARNING / BUILDING -->
+            <div class="section-card" id="card-currently" th:classappend="${about.sectionCurrentlyVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(14,165,233,0.15); color:#0ea5e9; border-color:rgba(14,165,233,0.3);"><i class="fa-solid fa-book-open-reader"></i></div>
+                  <div>
+                    <div class="section-title">Currently Learning &amp; Building <span class="section-anchor">#currently</span></div>
+                    <p class="section-desc">Active in-progress side projects, technologies currently being explored, and learning paths.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionCurrentlyVisible" value="true" th:checked="${about.sectionCurrentlyVisible != false}" onchange="handleToggle('currently', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionCurrentlyVisible != false} ? 'visible' : 'hidden'" id="badge-currently">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionCurrentlyVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/about#sec-currently}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Currently</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 10. SERVICES -->
+            <div class="section-card" id="card-services" th:classappend="${about.sectionServicesVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border-color:rgba(139,92,246,0.3);"><i class="fa-solid fa-toolbox"></i></div>
+                  <div>
+                    <div class="section-title">Services &amp; Offerings <span class="section-anchor">#services</span></div>
+                    <p class="section-desc">Consulting and freelance service packages (Backend Development, Full Stack Apps, REST API Design).</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionServicesVisible" value="true" th:checked="${about.sectionServicesVisible != false}" onchange="handleToggle('services', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionServicesVisible != false} ? 'visible' : 'hidden'" id="badge-services">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionServicesVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/services}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Services</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 11. TESTIMONIALS -->
+            <div class="section-card" id="card-testimonials" th:classappend="${about.sectionTestimonialsVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(244,63,94,0.15); color:#f43f5e; border-color:rgba(244,63,94,0.3);"><i class="fa-solid fa-comment-dots"></i></div>
+                  <div>
+                    <div class="section-title">Testimonials &amp; Reviews <span class="section-anchor">#testimonials</span></div>
+                    <p class="section-desc">Recommendations from mentors, colleagues, clients, and collaborators.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionTestimonialsVisible" value="true" th:checked="${about.sectionTestimonialsVisible != false}" onchange="handleToggle('testimonials', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionTestimonialsVisible != false} ? 'visible' : 'hidden'" id="badge-testimonials">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionTestimonialsVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/testimonials}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Reviews</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 12. CONTACT SECTION -->
+            <div class="section-card" id="card-contact" th:classappend="${about.sectionContactVisible == false} ? 'is-disabled' : ''">
+              <div class="section-card-header">
+                <div class="section-card-left">
+                  <div class="section-icon" style="background:rgba(34,197,94,0.15); color:#22c55e; border-color:rgba(34,197,94,0.3);"><i class="fa-solid fa-paper-plane"></i></div>
+                  <div>
+                    <div class="section-title">Contact &amp; Connect <span class="section-anchor">#contact</span></div>
+                    <p class="section-desc">Interactive message form, email link, GitHub, LinkedIn, WhatsApp buttons, and 1:1 meeting scheduler.</p>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="sectionContactVisible" value="true" th:checked="${about.sectionContactVisible != false}" onchange="handleToggle('contact', this)"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="section-card-footer">
+                <span class="status-badge" th:classappend="${about.sectionContactVisible != false} ? 'visible' : 'hidden'" id="badge-contact">
+                  <span class="status-dot-indicator"></span>
+                  <span class="badge-text" th:text="${about.sectionContactVisible != false} ? 'Visible on site' : 'Hidden from site'">Visible</span>
+                </span>
+                <div class="card-actions">
+                  <a th:href="@{/admin/about#sec-contact}" class="card-edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit Contact</a>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /sections-grid -->
+
+          <!-- Sticky save bar -->
+          <div class="save-bar" style="margin-top:28px;">
+            <div class="save-bar-msg">Changes are saved instantly when toggling switches, or click Save All.</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <a th:href="@{/admin/dashboard}" class="glass-btn">Back to Dashboard</a>
+              <button type="submit" class="glass-btn primary" style="background:#10b981; border-color:#10b981; color:#000; font-weight:600;">
+                <i class="fa-solid fa-floppy-disk"></i> Save All Toggles
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toastPopup" class="toast-popup">
+  <i class="fa-solid fa-circle-check" style="color:#10b981; font-size:1.1rem;"></i>
+  <span id="toastMsg">Section visibility updated</span>
+</div>
+
+<script th:src="@{/js/admin.js(v='6')}"></script>
+<script>
+  function getCsrfToken() {
+    const meta = document.querySelector('meta[name="_csrf"]');
+    return meta ? meta.getAttribute('content') : '';
+  }
+
+  function getCsrfHeader() {
+    const meta = document.querySelector('meta[name="_csrf_header"]');
+    return meta ? meta.getAttribute('content') : 'X-CSRF-TOKEN';
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toastPopup');
+    const msg = document.getElementById('toastMsg');
+    if (!toast || !msg) return;
+    msg.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2800);
+  }
+
+  function updateCardUi(sectionKey, isVisible) {
+    const card = document.getElementById('card-' + sectionKey);
+    const badge = document.getElementById('badge-' + sectionKey);
+    if (card) {
+      if (isVisible) {
+        card.classList.remove('is-disabled');
+      } else {
+        card.classList.add('is-disabled');
+      }
+    }
+    if (badge) {
+      if (isVisible) {
+        badge.className = 'status-badge visible';
+        badge.querySelector('.badge-text').textContent = 'Visible on site';
+      } else {
+        badge.className = 'status-badge hidden';
+        badge.querySelector('.badge-text').textContent = 'Hidden from site';
+      }
+    }
+  }
+
+  function handleToggle(sectionKey, input) {
+    const isVisible = input.checked;
+    updateCardUi(sectionKey, isVisible);
+
+    const token = getCsrfToken();
+    const header = getCsrfHeader();
+
+    const formData = new URLSearchParams();
+    formData.append('section', sectionKey);
+    formData.append('visible', isVisible);
+
+    fetch('/admin/sections/toggle', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        [header]: token
+      },
+      body: formData.toString()
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showToast((isVisible ? 'Enabled' : 'Removed') + ' section on live site');
+      } else {
+        input.checked = !isVisible;
+        updateCardUi(sectionKey, !isVisible);
+        alert('Could not update section: ' + (data.error || 'Server error'));
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('State updated locally (click Save All to persist)');
+    });
+  }
+
+  function toggleAllSections(enable) {
+    const inputs = document.querySelectorAll('.sections-grid input[type="checkbox"]');
+    inputs.forEach(inp => {
+      inp.checked = enable;
+      const secKey = inp.getAttribute('onchange').match(/'([^']+)'/)[1];
+      updateCardUi(secKey, enable);
+    });
+    showToast(enable ? 'All sections enabled (click Save All to persist)' : 'All sections disabled (click Save All to persist)');
+  }
+</script>
+</body>
+</html>

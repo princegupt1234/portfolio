@@ -46,16 +46,16 @@
                     <div class="alert-content">
                         <i class="fa-solid fa-circle-exclamation"></i>
                         <span th:if="${param.reason != null and param.reason[0] == 'not_configured'}">
-                            Reply saved in database. <strong>SMTP is not configured</strong> on your server (set <code>MAIL_USERNAME</code> and <code>MAIL_PASSWORD</code> in Render Environment). Click <strong>"Open in Email App"</strong> below to send directly.
+                            Reply saved in database. <strong>No email provider is configured</strong> on your server (set <code>RESEND_API_KEY</code> or <code>MAIL_USERNAME</code>/<code>MAIL_PASSWORD</code> in Render Environment). Click <strong>"Open in Email App"</strong> below to send directly.
                         </span>
                         <span th:if="${param.reason != null and param.reason[0] == 'auth_error'}">
-                            Reply saved in database. <strong>Gmail authentication failed</strong>. Make sure you use a 16-character <strong>Google App Password</strong> (with no spaces). Click <strong>"Open in Email App"</strong> below to send directly.
+                            Reply saved in database. <strong>Email authentication failed</strong>. Verify your <code>RESEND_API_KEY</code> (or Google App Password). Click <strong>"Open in Email App"</strong> below to send directly.
                         </span>
                         <span th:if="${param.reason != null and param.reason[0] == 'timeout'}">
-                            Reply saved in database, but <strong>SMTP connection timed out</strong>. Click <strong>"Open in Email App"</strong> below to send directly.
+                            Reply saved in database, but <strong>email delivery timed out</strong>. On Render, standard SMTP is blocked — set <code>RESEND_API_KEY</code> in Render Environment to send instantly via HTTPS (Port 443), or click <strong>"Open in Email App"</strong> below.
                         </span>
                         <span th:if="${param.reason == null or (param.reason[0] != 'not_configured' and param.reason[0] != 'auth_error' and param.reason[0] != 'timeout')}">
-                            Reply saved in database, but SMTP delivery failed. Click <strong>"Open in Email App"</strong> below to send directly from your mail app.
+                            Reply saved in database, but outbound delivery failed. Click <strong>"Open in Email App"</strong> below to send directly from your mail app.
                         </span>
                     </div>
                     <button type="button" class="alert-close">×</button>
@@ -98,7 +98,7 @@
                         </div>
                         <div class="form-actions" style="margin-top:18px;">
                             <button type="submit" class="glass-btn primary" id="saveReplyBtn">
-                                <i class="fa-solid fa-paper-plane"></i> Send Reply via SMTP
+                                <i class="fa-solid fa-paper-plane"></i> Send Reply
                             </button>
                             <a id="openEmailBtn" href="#" class="glass-btn"
                                th:attr="data-email=${message.email}, data-subject=${'Re: ' + (message.subject ?: 'Your message')}">

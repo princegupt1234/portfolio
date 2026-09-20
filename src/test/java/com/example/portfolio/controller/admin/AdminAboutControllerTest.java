@@ -218,4 +218,43 @@ class AdminAboutControllerTest {
         ));
         verify(dataVersionService).bump();
     }
+
+    @Test
+    void savesCustomCliCommandsWithMultipleCommands() throws Exception {
+        AboutInfo existing = new AboutInfo();
+        existing.setId(1L);
+        when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
+
+        String customCommandsJson = "[{\"cmd\":\"instagram\",\"desc\":\"Connect on IG\",\"output\":\"https://instagram.com/_prince_gupt/\"}," +
+                "{\"cmd\":\"discord\",\"desc\":\"Join discord\",\"output\":\"https://discord.gg/\"}]";
+
+        mockMvc.perform(post("/admin/about/save")
+                        .param("customCliCommands", customCommandsJson)
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/about"));
+
+        verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
+                customCommandsJson.equals(info.getCustomCliCommands())
+        ));
+        verify(dataVersionService).bump();
+    }
+
+    @Test
+    void normalizesBlankCustomCliCommandsToEmptyJsonArray() throws Exception {
+        AboutInfo existing = new AboutInfo();
+        existing.setId(1L);
+        when(aboutInfoRepository.findAll()).thenReturn(List.of(existing));
+
+        mockMvc.perform(post("/admin/about/save")
+                        .param("customCliCommands", "   ")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/about"));
+
+        verify(aboutInfoRepository).save(org.mockito.ArgumentMatchers.argThat(info ->
+                "[]".equals(info.getCustomCliCommands())
+        ));
+        verify(dataVersionService).bump();
+    }
 }

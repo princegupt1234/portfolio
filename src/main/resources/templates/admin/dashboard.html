@@ -68,6 +68,10 @@
                         <div class="kpi-icon"><i class="fa-brands fa-github"></i></div>
                         <div><div class="kpi-value" th:text="${github != null and github.available} ? ${github.followers} : '—'">0</div><div class="kpi-label">GitHub Followers</div></div>
                     </div>
+                    <a th:href="@{/admin/ai-training}" class="glass-card kpi-card" style="text-decoration:none; cursor:pointer;" title="Manage AI Ground Truth Answers & Fix Wrong Responses">
+                        <div class="kpi-icon" style="background:rgba(192,132,252,0.15); color:#c084fc;"><i class="fa-solid fa-brain"></i></div>
+                        <div><div class="kpi-value" style="color:#c084fc;" th:text="${activeAiTrainingCount} + ' / ' + ${aiTrainingCount}">0 / 0</div><div class="kpi-label">AI Trained Answers</div></div>
+                    </a>
                 </div>
 
                 <div class="dash-grid">
@@ -91,11 +95,70 @@
                     </div>
                 </div>
 
+                <!-- Section Visibility Quick Overview -->
+                <div class="glass-card" style="margin-bottom:22px; padding:24px;" th:if="${about != null}">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                        <span class="toolbar-title"><i class="fa-solid fa-sliders" style="color:var(--primary);"></i> Frontend Sections Visibility</span>
+                        <a th:href="@{/admin/sections}" class="glass-btn" style="font-size:0.78rem; padding:5px 12px;"><i class="fa-solid fa-arrow-right"></i> Manage All Sections</a>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:10px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#f97316; margin-right:6px;"></i> Hero</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionHeroVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-chart-simple" style="color:#06b6d4; margin-right:6px;"></i> Quick Stats</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionQuickStatsVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-user" style="color:#3b82f6; margin-right:6px;"></i> About</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionAboutVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-layer-group" style="color:#a855f7; margin-right:6px;"></i> Skills</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionSkillsVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-briefcase" style="color:#eab308; margin-right:6px;"></i> Experience</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionExperienceVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-diagram-project" style="color:#6366f1; margin-right:6px;"></i> Projects</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionProjectsVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-code" style="color:#10b981; margin-right:6px;"></i> Coding</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionCodingVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-certificate" style="color:#ec4899; margin-right:6px;"></i> Certificates</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionCertificatesVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-book-open-reader" style="color:#0ea5e9; margin-right:6px;"></i> Currently</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionCurrentlyVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-toolbox" style="color:#8b5cf6; margin-right:6px;"></i> Services</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionServicesVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-comment-dots" style="color:#f43f5e; margin-right:6px;"></i> Testimonials</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionTestimonialsVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:10px;">
+                            <span style="font-size:0.83rem; font-weight:500;"><i class="fa-solid fa-paper-plane" style="color:#22c55e; margin-right:6px;"></i> Contact</span>
+                            <span style="width:8px; height:8px; border-radius:50%; display:inline-block;" th:styleappend="${about.sectionContactVisible != false} ? 'background:#10b981; box-shadow:0 0 6px #10b981;' : 'background:#ef4444;'"></span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="glass-card" style="margin-bottom:22px; padding:24px;">
                     <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
                         <span class="toolbar-title"><i class="fa-solid fa-bolt" style="color:var(--primary);"></i> Quick Actions</span>
                     </div>
                     <div class="quick-actions">
+                        <a th:href="@{/admin/ai-training}" class="glass-card quick-action" style="border-color:rgba(192,132,252,0.4);"><i class="fa-solid fa-brain" style="color:#c084fc;"></i><span>Teach AI / Fix Answers</span></a>
                         <a th:href="@{/admin/projects/new}" class="glass-card quick-action"><i class="fa-solid fa-diagram-project"></i><span>Add Project</span></a>
                         <a th:href="@{/admin/certificates/new}" class="glass-card quick-action"><i class="fa-solid fa-certificate"></i><span>Upload Certificate</span></a>
                         <a th:href="@{/admin/skills}" class="glass-card quick-action"><i class="fa-solid fa-layer-group"></i><span>Edit Skills</span></a>

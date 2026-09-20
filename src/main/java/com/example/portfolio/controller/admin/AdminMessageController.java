@@ -49,8 +49,13 @@ public class AdminMessageController {
     }
 
     @GetMapping("/{id}")
-    public String view(@PathVariable("id") Long id, Model model) {
-        ContactMessage msg = contactMessageRepository.findById(id).orElseThrow();
+    public String view(@PathVariable("id") Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        var msgOpt = contactMessageRepository.findById(id);
+        if (msgOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Message not found.");
+            return "redirect:/admin/messages";
+        }
+        ContactMessage msg = msgOpt.get();
         if (!Boolean.TRUE.equals(msg.getIsRead())) {
             msg.setIsRead(true);
             contactMessageRepository.save(msg);
@@ -61,8 +66,14 @@ public class AdminMessageController {
 
     @PostMapping("/{id}/reply")
     public String reply(@PathVariable("id") Long id,
-                        @RequestParam("replyText") String replyText) {
-        ContactMessage msg = contactMessageRepository.findById(id).orElseThrow();
+                        @RequestParam("replyText") String replyText,
+                        org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        var msgOpt = contactMessageRepository.findById(id);
+        if (msgOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Message not found.");
+            return "redirect:/admin/messages";
+        }
+        ContactMessage msg = msgOpt.get();
         msg.setReplyText(replyText);
         String replySubject = "Re: " + (msg.getSubject() == null || msg.getSubject().isBlank() ? "Your message" : msg.getSubject());
         MailService.MailResult result = mailService.sendReplyWithResult(msg.getEmail(), msg.getName(), replySubject, replyText, msg.getMessage());
@@ -86,8 +97,12 @@ public class AdminMessageController {
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        contactMessageRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Contact message deleted successfully.");
+        if (contactMessageRepository.existsById(id)) {
+            contactMessageRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Contact message deleted successfully.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Contact message not found.");
+        }
         return "redirect:/admin/messages";
     }
 

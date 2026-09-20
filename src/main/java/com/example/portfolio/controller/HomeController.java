@@ -71,6 +71,7 @@ public class HomeController {
     private final MailService mailService;
     private final DataVersionService dataVersionService;
     private final ContactRateLimiterService contactRateLimiterService;
+    private final com.example.portfolio.service.WhatsAppNotificationService whatsAppNotificationService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -85,7 +86,8 @@ public class HomeController {
                            AnalyticsService analyticsService, GithubStatsService githubStatsService,
                            LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
                            MailService mailService, DataVersionService dataVersionService,
-                           ContactRateLimiterService contactRateLimiterService) {
+                           ContactRateLimiterService contactRateLimiterService,
+                           com.example.portfolio.service.WhatsAppNotificationService whatsAppNotificationService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
         this.skillRepository = skillRepository;
@@ -104,6 +106,7 @@ public class HomeController {
         this.mailService = mailService;
         this.dataVersionService = dataVersionService;
         this.contactRateLimiterService = contactRateLimiterService;
+        this.whatsAppNotificationService = whatsAppNotificationService;
     }
 
     @GetMapping("/api/data-version")
@@ -199,6 +202,7 @@ public class HomeController {
         contactMessageRepository.save(msg);
         analyticsService.recordMessageReceived();
         mailService.notifyNewMessage(form.getName(), form.getEmail(), form.getSubject(), form.getMessage());
+        whatsAppNotificationService.sendContactAlert(form.getName(), form.getEmail(), form.getSubject(), form.getMessage());
 
         return "redirect:/?contactSuccess=true";
     }

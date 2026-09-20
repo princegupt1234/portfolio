@@ -48,4 +48,6 @@ public class Certificate {
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
     public Boolean getVisible() { return visible; }
     public void setVisible(Boolean visible) { this.visible = visible; }
+    public String getIssuer() { return organization; }
+    public void setIssuer(String issuer) { this.organization = issuer; }
 }

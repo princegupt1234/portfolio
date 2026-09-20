@@ -36,9 +36,16 @@ public class AdminServiceItemController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("service", serviceItemRepository.findById(id).orElseThrow());
-        return "admin/services/form";
+    public String editForm(@PathVariable("id") Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        return serviceItemRepository.findById(id)
+                .map(service -> {
+                    model.addAttribute("service", service);
+                    return "admin/services/form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Service not found.");
+                    return "redirect:/admin/services";
+                });
     }
 
     @PostMapping("/save")
@@ -51,18 +58,27 @@ public class AdminServiceItemController {
 
     @PostMapping("/{id}/toggle-visible")
     public String toggleVisible(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        serviceItemRepository.findById(id).ifPresent(s -> {
-            s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
-            serviceItemRepository.save(s);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Service \"" + s.getTitle() + "\" visibility set to " + (s.getVisible() ? "Visible." : "Hidden."));
-        });
-        dataVersionService.bump();
-        return "redirect:/admin/services";
+        return serviceItemRepository.findById(id)
+                .map(s -> {
+                    s.setVisible(!Boolean.TRUE.equals(s.getVisible()));
+                    serviceItemRepository.save(s);
+                    dataVersionService.bump();
+                    redirectAttributes.addFlashAttribute("successMessage",
+                            "Service \"" + s.getTitle() + "\" visibility set to " + (s.getVisible() ? "Visible." : "Hidden."));
+                    return "redirect:/admin/services";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Service not found.");
+                    return "redirect:/admin/services";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!serviceItemRepository.existsById(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Service not found.");
+            return "redirect:/admin/services";
+        }
         serviceItemRepository.deleteById(id);
         dataVersionService.bump();
         redirectAttributes.addFlashAttribute("successMessage", "Service deleted successfully.");

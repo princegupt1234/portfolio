@@ -35,14 +35,16 @@ class AiChatControllerTest {
 
     @Test
     void testChatReturnsValidResponse() throws Exception {
-        when(portfolioAiService.answer(anyString())).thenReturn("Prince is an experienced Java & Spring Boot engineer.");
+        when(portfolioAiService.answerWithDetails(anyString()))
+                .thenReturn(new PortfolioAiService.AiAnswerResult("Prince is an experienced Java & Spring Boot engineer.", "GEMINI_API", "gemini-2.5-flash"));
 
         mockMvc.perform(post("/api/ai/chat")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"message\": \"What are Prince's skills?\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("success"))
-                .andExpect(jsonPath("$.reply").value("Prince is an experienced Java & Spring Boot engineer."));
+                .andExpect(jsonPath("$.reply").value("Prince is an experienced Java & Spring Boot engineer."))
+                .andExpect(jsonPath("$.source").value("GEMINI_API"));
     }
 
     @Test

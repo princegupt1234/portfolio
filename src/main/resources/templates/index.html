@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     <link rel="stylesheet" th:href="@{/css/theme.css(v='12')}">
-    <link rel="stylesheet" th:href="@{/css/public.css(v='16')}">
+    <link rel="stylesheet" th:href="@{/css/public.css(v='18')}">
     <script>
         (function() {
             try {
@@ -60,13 +60,13 @@
 <nav class="navbar">
     <a href="#home" class="logo"><span th:text="${about.fullName != null and #strings.contains(about.fullName, ' ') ? #strings.substringBefore(about.fullName, ' ') : (about.fullName ?: 'Prince')}">Prince</span><span class="gradient-text">.</span></a>
     <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#coding">Coding</a></li>
-        <li><a href="#certificates">Certificates</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li th:if="${about.sectionAboutVisible != false}"><a href="#about">About</a></li>
+        <li th:if="${about.sectionSkillsVisible != false}"><a href="#skills">Skills</a></li>
+        <li th:if="${about.sectionExperienceVisible != false}"><a href="#experience">Experience</a></li>
+        <li th:if="${about.sectionProjectsVisible != false}"><a href="#projects">Projects</a></li>
+        <li th:if="${about.sectionCodingVisible != false}"><a href="#coding">Coding</a></li>
+        <li th:if="${about.sectionCertificatesVisible != false}"><a href="#certificates">Certificates</a></li>
+        <li th:if="${about.sectionContactVisible != false}"><a href="#contact">Contact</a></li>
         <li class="mobile-nav-resume" style="display:none;"><a th:href="@{/resume/download}" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-file-arrow-down" style="margin-right:6px;"></i> Download Resume</a></li>
         <li class="mobile-nav-resume" style="display:none;" th:if="${about.recruiterPitchEnabled != false}"><a href="javascript:void(0)" onclick="openRecruiterModal()" style="color:#f59e0b; font-weight:600;"><i class="fa-solid fa-bolt" style="margin-right:6px;"></i> 30s Recruiter Brief</a></li>
     </ul>
@@ -75,12 +75,12 @@
         <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
         <button type="button" class="glass-btn nav-resume-btn" onclick="openResumeModal()" title="Preview Resume in browser"><i class="fa-solid fa-eye"></i> View</button>
         <a th:href="@{/resume/download}" class="glass-btn primary nav-resume-btn"><i class="fa-solid fa-download"></i> Resume</a>
+        <button type="button" class="nav-toggle" aria-label="Toggle navigation menu"><i class="fa-solid fa-bars"></i></button>
     </div>
-    <button class="nav-toggle" aria-label="Toggle navigation menu"><i class="fa-solid fa-bars"></i></button>
 </nav>
 
 <!-- ===================== HERO ===================== -->
-<section class="hero" id="home">
+<section class="hero" id="home" th:if="${about.sectionHeroVisible != false}">
     <div class="hero-grid">
         <div data-reveal>
             <div class="hero-eyebrow" th:text="${about.heroEyebrow} ?: '// Hello, I\'m'">// Hello, I'm</div>
@@ -137,7 +137,7 @@
 </section>
 
 <!-- ===================== QUICK CREDIBILITY STATS ===================== -->
-<section class="quick-stats-section" id="quick-stats" th:if="${about.quickStatsVisible != false and about.quickStats != null and !#strings.isEmpty(about.quickStats)}">
+<section class="quick-stats-section" id="quick-stats" th:if="${about.sectionQuickStatsVisible != false and about.quickStatsVisible != false and about.quickStats != null and !#strings.isEmpty(about.quickStats)}">
     <div class="quick-stats-grid" data-reveal>
         <div class="quick-stat-card" th:each="stat : ${#strings.arraySplit(about.quickStats, '|')}">
             <th:block th:with="parts=${#strings.arraySplit(stat, '::')}">
@@ -152,7 +152,7 @@
 </section>
 
 <!-- ===================== ABOUT ===================== -->
-<section class="section" id="about">
+<section class="section" id="about" th:if="${about.sectionAboutVisible != false}">
     <div class="container">
         <div class="section-tag">About Me</div>
         <h2 class="section-title" data-reveal>A little about me</h2>
@@ -163,6 +163,8 @@
                     <div th:if="${about.email != null and !#strings.isEmpty(#strings.trim(about.email))}"><div class="label">Email</div><div class="value" th:text="${about.email}"></div></div>
                     <div th:if="${about.location != null and !#strings.isEmpty(#strings.trim(about.location))}"><div class="label">Location</div><div class="value" th:text="${about.location}"></div></div>
                     <div th:if="${(about.workPreferencesSectionVisible != false) and (about.availabilityVisible != false) and about.availabilityText != null and !#strings.isEmpty(#strings.trim(about.availabilityText))}"><div class="label">Availability</div><div class="value" style="color:var(--success);" th:text="${about.availabilityText}">Open to opportunities</div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.availabilityVisible != false) and about.hiringRoles != null and !#strings.isEmpty(#strings.trim(about.hiringRoles))}"><div class="label">Target Roles</div><div class="value" th:text="${about.hiringRoles}"></div></div>
+                    <div th:if="${(about.workPreferencesSectionVisible != false) and (about.availabilityVisible != false) and about.hiringNoticePeriod != null and !#strings.isEmpty(#strings.trim(about.hiringNoticePeriod))}"><div class="label">Notice Period</div><div class="value" style="color:#34d399; font-weight:600;" th:text="${about.hiringNoticePeriod}"></div></div>
                     <div th:if="${about.phone != null and !#strings.isEmpty(#strings.trim(about.phone))}"><div class="label">Phone</div><div class="value" th:text="${about.phone}"></div></div>
                     <div th:if="${(about.workPreferencesSectionVisible != false) and (about.workPreferenceVisible != false) and about.workPreference != null and !#strings.isEmpty(#strings.trim(about.workPreference))}"><div class="label">Work Preference</div><div class="value" th:text="${about.workPreference}"></div></div>
                     <div th:if="${(about.workPreferencesSectionVisible != false) and (about.preferredLocationsVisible != false) and about.preferredLocations != null and !#strings.isEmpty(#strings.trim(about.preferredLocations))}"><div class="label">Preferred Locations</div><div class="value" th:text="${about.preferredLocations}"></div></div>
@@ -184,7 +186,7 @@
 </section>
 
 <!-- ===================== SKILLS ===================== -->
-<section class="section" id="skills">
+<section class="section" id="skills" th:if="${about.sectionSkillsVisible != false}">
     <div class="container">
         <div class="section-tag">Skills</div>
         <h2 class="section-title" data-reveal>Technologies I work with</h2>
@@ -207,7 +209,7 @@
 </section>
 
 <!-- ===================== EXPERIENCE ===================== -->
-<section class="section" id="experience">
+<section class="section" id="experience" th:if="${about.sectionExperienceVisible != false}">
     <div class="container">
         <div class="section-tag">Experience</div>
         <h2 class="section-title" data-reveal>Where I've worked</h2>
@@ -227,7 +229,7 @@
 </section>
 
 <!-- ===================== PROJECTS ===================== -->
-<section class="section" id="projects">
+<section class="section" id="projects" th:if="${about.sectionProjectsVisible != false}">
     <div class="container">
         <div class="section-tag">Featured Work</div>
         <h2 class="section-title" data-reveal>What I've built</h2>
@@ -272,7 +274,7 @@
 </section>
 
 <!-- ===================== CODING PROFILES ===================== -->
-<section class="section" id="coding">
+<section class="section" id="coding" th:if="${about.sectionCodingVisible != false}">
     <div class="container">
         <div class="section-tag">Coding Profiles</div>
         <h2 class="section-title" data-reveal>Where I practice &amp; contribute</h2>
@@ -354,7 +356,7 @@
 </section>
 
 <!-- ===================== CERTIFICATES ===================== -->
-<section class="section" id="certificates">
+<section class="section" id="certificates" th:if="${about.sectionCertificatesVisible != false}">
     <div class="container">
         <div class="section-tag">Certifications</div>
         <h2 class="section-title" data-reveal>Certifications &amp; achievements</h2>
@@ -557,7 +559,7 @@ function zoomCert(dir) {
 </script>
 
 <!-- ===================== CURRENTLY BUILDING ===================== -->
-<section class="section" id="currently">
+<section class="section" id="currently" th:if="${about.sectionCurrentlyVisible != false}">
     <div class="container">
         <div class="section-tag">Currently</div>
         <h2 class="section-title" data-reveal>What I'm working on</h2>
@@ -652,7 +654,7 @@ function zoomCert(dir) {
 </section>
 
 <!-- ===================== SERVICES ===================== -->
-<section class="section" id="services" th:if="${services != null and !services.isEmpty()}">
+<section class="section" id="services" th:if="${about.sectionServicesVisible != false and services != null and !services.isEmpty()}">
     <div class="container">
         <div class="section-tag">Services</div>
         <h2 class="section-title" data-reveal>What I can do for you</h2>
@@ -667,7 +669,7 @@ function zoomCert(dir) {
 </section>
 
 <!-- ===================== TESTIMONIALS ===================== -->
-<section class="section" id="testimonials" th:if="${testimonials != null and !testimonials.isEmpty()}">
+<section class="section" id="testimonials" th:if="${about.sectionTestimonialsVisible != false and testimonials != null and !testimonials.isEmpty()}">
     <div class="container">
         <div class="section-tag">Testimonials</div>
         <h2 class="section-title" data-reveal>What people say</h2>
@@ -693,7 +695,7 @@ function zoomCert(dir) {
 </section>
 
 <!-- ===================== CONTACT ===================== -->
-<section class="section" id="contact">
+<section class="section" id="contact" th:if="${about.sectionContactVisible != false}">
     <div class="container">
         <div class="section-tag">Contact</div>
         <h2 class="section-title" data-reveal>Let's build something together</h2>
@@ -974,6 +976,7 @@ function zoomCert(dir) {
         <div class="cli-chips-bar">
             <span class="cli-chip-label">Quick:</span>
             <button type="button" class="cli-chip" onclick="execCliCommand('help')">help</button>
+            <button type="button" class="cli-chip" onclick="execCliCommand('algo')" style="border-color:rgba(59,130,246,0.4); color:#60a5fa;"><i class="fa-solid fa-code-merge"></i> algo</button>
             <button type="button" class="cli-chip" onclick="execCliCommand('leetcode')" style="border-color:rgba(16,185,129,0.4); color:#34d399;"><i class="fa-solid fa-code"></i> leetcode</button>
             <button type="button" class="cli-chip" onclick="execCliCommand('hire')" style="border-color:rgba(16,185,129,0.4); color:#34d399;"><i class="fa-solid fa-bolt"></i> hire</button>
             <button type="button" class="cli-chip" onclick="execCliCommand('arch')" style="border-color:rgba(59,130,246,0.4); color:#60a5fa;"><i class="fa-solid fa-network-wired"></i> arch</button>
@@ -988,7 +991,7 @@ function zoomCert(dir) {
         <div class="cli-body" id="cliBody">
             <div class="cli-output" style="color:var(--primary); font-weight:700; font-size:0.92rem;" th:text="'⚡ ' + (${about.fullName} ?: 'Prince') + ' Developer Shell [v2.5.0]'">⚡ Prince Developer Shell [v2.5.0]</div>
             <div class="cli-output" style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:12px;">
-                Type <span class="cli-cmd-tag" onclick="execCliCommand('help')">help</span> to view all commands, or click any quick chip above. You can also type <span class="cli-cmd-tag" onclick="execCliCommand('skills')">skills</span>, <span class="cli-cmd-tag" onclick="execCliCommand('projects')">projects</span>, <span class="cli-cmd-tag" onclick="execCliCommand('contact')">contact</span>, <span class="cli-cmd-tag" onclick="execCliCommand('ls')">ls</span>, <span class="cli-cmd-tag" onclick="execCliCommand('resume')">resume</span>.
+                Type <span class="cli-cmd-tag" onclick="execCliCommand('help')">help</span> to view all commands, or click any quick chip above. You can also type <span class="cli-cmd-tag" onclick="execCliCommand('algo')">algo</span>, <span class="cli-cmd-tag" onclick="execCliCommand('skills')">skills</span>, <span class="cli-cmd-tag" onclick="execCliCommand('projects')">projects</span>, <span class="cli-cmd-tag" onclick="execCliCommand('contact')">contact</span>, <span class="cli-cmd-tag" onclick="execCliCommand('ls')">ls</span>, <span class="cli-cmd-tag" onclick="execCliCommand('resume')">resume</span>.
             </div>
         </div>
         <div class="cli-prompt-line">
@@ -1092,14 +1095,14 @@ function zoomCert(dir) {
             <div class="footer-col nav-col">
                 <h4 class="footer-col-title"><i class="fa-solid fa-compass"></i> Explore</h4>
                 <ul class="footer-links footer-links-grid">
-                    <li><a href="#home"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
-                    <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About</a></li>
-                    <li><a href="#skills"><i class="fa-solid fa-chevron-right"></i> Skills</a></li>
-                    <li><a href="#experience"><i class="fa-solid fa-chevron-right"></i> Experience</a></li>
-                    <li><a href="#projects"><i class="fa-solid fa-chevron-right"></i> Projects</a></li>
-                    <li><a href="#coding"><i class="fa-solid fa-chevron-right"></i> Coding</a></li>
-                    <li><a href="#certificates"><i class="fa-solid fa-chevron-right"></i> Certificates</a></li>
-                    <li><a href="#contact"><i class="fa-solid fa-chevron-right"></i> Contact</a></li>
+                    <li th:if="${about.sectionHeroVisible != false}"><a href="#home"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
+                    <li th:if="${about.sectionAboutVisible != false}"><a href="#about"><i class="fa-solid fa-chevron-right"></i> About</a></li>
+                    <li th:if="${about.sectionSkillsVisible != false}"><a href="#skills"><i class="fa-solid fa-chevron-right"></i> Skills</a></li>
+                    <li th:if="${about.sectionExperienceVisible != false}"><a href="#experience"><i class="fa-solid fa-chevron-right"></i> Experience</a></li>
+                    <li th:if="${about.sectionProjectsVisible != false}"><a href="#projects"><i class="fa-solid fa-chevron-right"></i> Projects</a></li>
+                    <li th:if="${about.sectionCodingVisible != false}"><a href="#coding"><i class="fa-solid fa-chevron-right"></i> Coding</a></li>
+                    <li th:if="${about.sectionCertificatesVisible != false}"><a href="#certificates"><i class="fa-solid fa-chevron-right"></i> Certificates</a></li>
+                    <li th:if="${about.sectionContactVisible != false}"><a href="#contact"><i class="fa-solid fa-chevron-right"></i> Contact</a></li>
                 </ul>
             </div>
 
@@ -1167,8 +1170,15 @@ document.querySelectorAll('.exp-desc').forEach(el => {
     }
 });
 </script>
-<script id="customCliCommandsData" type="application/json" th:text="${about.customCliCommands != null ? about.customCliCommands : '[]'}"></script>
-<script th:src="@{/js/main.js(v='16')}" defer></script>
+<div id="hiringAvailabilityMeta" style="display:none;"
+     th:attr="data-status=${about.availabilityText ?: 'Open to opportunities'},
+              data-roles=${about.hiringRoles ?: 'SDE-1 / Software Engineer / Java Backend / Full Stack Developer'},
+              data-notice=${about.hiringNoticePeriod ?: 'Immediate Joiner (0 days notice)'},
+              data-location=${about.hiringLocationDetails ?: (about.location ?: 'India')},
+              data-email=${about.hiringContactEmail ?: (about.email ?: 'princegupt3052@gmail.com')},
+              data-note=${about.hiringCustomNote ?: ''}"></div>
+<script id="customCliCommandsData" type="application/json" th:utext="${about.customCliCommands != null and !about.customCliCommands.isBlank() ? about.customCliCommands : '[]'}"></script>
+<script th:src="@{/js/main.js(v='19')}" defer></script>
 <script>
 (function() {
   var v = null;

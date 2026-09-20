@@ -136,6 +136,32 @@ public class AboutInfo {
     @Column(columnDefinition = "TEXT")
     private String footerSub;
 
+    // ----- Master Frontend Section Visibility Toggles -----
+    private Boolean sectionHeroVisible = true;
+    private Boolean sectionQuickStatsVisible = true;
+    private Boolean sectionAboutVisible = true;
+    private Boolean sectionSkillsVisible = true;
+    private Boolean sectionExperienceVisible = true;
+    private Boolean sectionProjectsVisible = true;
+    private Boolean sectionCodingVisible = true;
+    private Boolean sectionCertificatesVisible = true;
+    private Boolean sectionCurrentlyVisible = true;
+    private Boolean sectionServicesVisible = true;
+    private Boolean sectionTestimonialsVisible = true;
+    private Boolean sectionContactVisible = true;
+
+    // ----- Complete Hiring Availability Controls -----
+    @Column(columnDefinition = "TEXT")
+    private String hiringRoles;
+    @Column(columnDefinition = "TEXT")
+    private String hiringNoticePeriod;
+    @Column(columnDefinition = "TEXT")
+    private String hiringLocationDetails;
+    @Column(columnDefinition = "TEXT")
+    private String hiringContactEmail;
+    @Column(columnDefinition = "TEXT")
+    private String hiringCustomNote;
+
     // ----- Recruiter 30-Second Pitch Modal Controls -----
     private Boolean recruiterPitchEnabled = true;
     @Column(columnDefinition = "TEXT")
@@ -167,6 +193,45 @@ public class AboutInfo {
     private Boolean contactSpamProtectionEnabled = true;
     private Boolean contactHoneypotEnabled = true;
     private Integer contactRateLimitSeconds = 60;
+
+    // ----- Admin WhatsApp Notification Alert Settings -----
+    private Boolean whatsappNotificationEnabled = false;
+    @Column(columnDefinition = "TEXT")
+    private String whatsappNotificationPhone;
+    @Column(columnDefinition = "TEXT")
+    private String whatsappNotificationApiKey;
+    @Column(columnDefinition = "TEXT")
+    private String whatsappNotificationWebhookUrl;
+
+
+    // ----- Outbound Email & Notification Settings (Admin Controlled) -----
+    @Column(columnDefinition = "TEXT")
+    private String mailNotificationEmail;
+    @Column(columnDefinition = "TEXT")
+    private String resendApiKey;
+    @Column(columnDefinition = "TEXT")
+    private String resendFrom;
+    @Column(columnDefinition = "TEXT")
+    private String brevoApiKey;
+    @Column(columnDefinition = "TEXT")
+    private String brevoSenderEmail;
+    @Column(columnDefinition = "TEXT")
+    private String brevoSenderName;
+    @Column(columnDefinition = "TEXT")
+    private String mailSendingMethod = "AUTO"; // AUTO, RESEND, BREVO, SMTP
+
+    // ----- AI Chatbot & Gemini Credentials -----
+    @Column(columnDefinition = "TEXT")
+    private String geminiApiKey;
+    @Column(columnDefinition = "TEXT")
+    private String geminiModel = "gemini-1.5-flash";
+    @Column(columnDefinition = "TEXT")
+    private String aiCustomInstructions;
+
+    // ----- LeetCode & Education Visibility -----
+    @Column(columnDefinition = "TEXT")
+    private String leetcodeUrl = "https://leetcode.com/u/princegupt1234/";
+    private Boolean sectionEducationVisible = true;
 
     // ----- Mobile Web App & PWA Settings -----
     private Boolean pwaEnabled = true;
@@ -322,4 +387,77 @@ public class AboutInfo {
     public void setPwaThemeColor(String pwaThemeColor) { this.pwaThemeColor = pwaThemeColor; }
     public String getPwaBackgroundColor() { return pwaBackgroundColor; }
     public void setPwaBackgroundColor(String pwaBackgroundColor) { this.pwaBackgroundColor = pwaBackgroundColor; }
+
+    public String getHiringRoles() { return hiringRoles; }
+    public void setHiringRoles(String hiringRoles) { this.hiringRoles = hiringRoles; }
+    public String getHiringNoticePeriod() { return hiringNoticePeriod; }
+    public void setHiringNoticePeriod(String hiringNoticePeriod) { this.hiringNoticePeriod = hiringNoticePeriod; }
+    public String getHiringLocationDetails() { return hiringLocationDetails; }
+    public void setHiringLocationDetails(String hiringLocationDetails) { this.hiringLocationDetails = hiringLocationDetails; }
+    public String getHiringContactEmail() { return hiringContactEmail; }
+    public void setHiringContactEmail(String hiringContactEmail) { this.hiringContactEmail = hiringContactEmail; }
+    public String getHiringCustomNote() { return hiringCustomNote; }
+    public void setHiringCustomNote(String hiringCustomNote) { this.hiringCustomNote = hiringCustomNote; }
+
+    public Boolean getSectionHeroVisible() { return sectionHeroVisible != null ? sectionHeroVisible : true; }
+    public void setSectionHeroVisible(Boolean sectionHeroVisible) { this.sectionHeroVisible = sectionHeroVisible; }
+    public Boolean getSectionQuickStatsVisible() { return sectionQuickStatsVisible != null ? sectionQuickStatsVisible : true; }
+    public void setSectionQuickStatsVisible(Boolean sectionQuickStatsVisible) { this.sectionQuickStatsVisible = sectionQuickStatsVisible; }
+    public Boolean getSectionAboutVisible() { return sectionAboutVisible != null ? sectionAboutVisible : true; }
+    public void setSectionAboutVisible(Boolean sectionAboutVisible) { this.sectionAboutVisible = sectionAboutVisible; }
+    public Boolean getSectionSkillsVisible() { return sectionSkillsVisible != null ? sectionSkillsVisible : true; }
+    public void setSectionSkillsVisible(Boolean sectionSkillsVisible) { this.sectionSkillsVisible = sectionSkillsVisible; }
+    public Boolean getSectionExperienceVisible() { return sectionExperienceVisible != null ? sectionExperienceVisible : true; }
+    public void setSectionExperienceVisible(Boolean sectionExperienceVisible) { this.sectionExperienceVisible = sectionExperienceVisible; }
+    public Boolean getSectionProjectsVisible() { return sectionProjectsVisible != null ? sectionProjectsVisible : true; }
+    public void setSectionProjectsVisible(Boolean sectionProjectsVisible) { this.sectionProjectsVisible = sectionProjectsVisible; }
+    public Boolean getSectionCodingVisible() { return sectionCodingVisible != null ? sectionCodingVisible : true; }
+    public void setSectionCodingVisible(Boolean sectionCodingVisible) { this.sectionCodingVisible = sectionCodingVisible; }
+    public Boolean getSectionCertificatesVisible() { return sectionCertificatesVisible != null ? sectionCertificatesVisible : true; }
+    public void setSectionCertificatesVisible(Boolean sectionCertificatesVisible) { this.sectionCertificatesVisible = sectionCertificatesVisible; }
+    public Boolean getSectionCurrentlyVisible() { return sectionCurrentlyVisible != null ? sectionCurrentlyVisible : true; }
+    public void setSectionCurrentlyVisible(Boolean sectionCurrentlyVisible) { this.sectionCurrentlyVisible = sectionCurrentlyVisible; }
+    public Boolean getSectionServicesVisible() { return sectionServicesVisible != null ? sectionServicesVisible : true; }
+    public void setSectionServicesVisible(Boolean sectionServicesVisible) { this.sectionServicesVisible = sectionServicesVisible; }
+    public Boolean getSectionTestimonialsVisible() { return sectionTestimonialsVisible != null ? sectionTestimonialsVisible : true; }
+    public void setSectionTestimonialsVisible(Boolean sectionTestimonialsVisible) { this.sectionTestimonialsVisible = sectionTestimonialsVisible; }
+    public Boolean getSectionContactVisible() { return sectionContactVisible != null ? sectionContactVisible : true; }
+    public void setSectionContactVisible(Boolean sectionContactVisible) { this.sectionContactVisible = sectionContactVisible; }
+
+    public Boolean getWhatsappNotificationEnabled() { return whatsappNotificationEnabled != null ? whatsappNotificationEnabled : false; }
+    public void setWhatsappNotificationEnabled(Boolean whatsappNotificationEnabled) { this.whatsappNotificationEnabled = whatsappNotificationEnabled; }
+    public String getWhatsappNotificationPhone() { return whatsappNotificationPhone; }
+    public void setWhatsappNotificationPhone(String whatsappNotificationPhone) { this.whatsappNotificationPhone = whatsappNotificationPhone; }
+    public String getWhatsappNotificationApiKey() { return whatsappNotificationApiKey; }
+    public void setWhatsappNotificationApiKey(String whatsappNotificationApiKey) { this.whatsappNotificationApiKey = whatsappNotificationApiKey; }
+    public String getWhatsappNotificationWebhookUrl() { return whatsappNotificationWebhookUrl; }
+    public void setWhatsappNotificationWebhookUrl(String whatsappNotificationWebhookUrl) { this.whatsappNotificationWebhookUrl = whatsappNotificationWebhookUrl; }
+
+
+    public String getMailNotificationEmail() { return mailNotificationEmail; }
+    public void setMailNotificationEmail(String mailNotificationEmail) { this.mailNotificationEmail = mailNotificationEmail; }
+    public String getResendApiKey() { return resendApiKey; }
+    public void setResendApiKey(String resendApiKey) { this.resendApiKey = resendApiKey; }
+    public String getResendFrom() { return resendFrom; }
+    public void setResendFrom(String resendFrom) { this.resendFrom = resendFrom; }
+    public String getBrevoApiKey() { return brevoApiKey; }
+    public void setBrevoApiKey(String brevoApiKey) { this.brevoApiKey = brevoApiKey; }
+    public String getBrevoSenderEmail() { return brevoSenderEmail; }
+    public void setBrevoSenderEmail(String brevoSenderEmail) { this.brevoSenderEmail = brevoSenderEmail; }
+    public String getBrevoSenderName() { return brevoSenderName; }
+    public void setBrevoSenderName(String brevoSenderName) { this.brevoSenderName = brevoSenderName; }
+    public String getMailSendingMethod() { return mailSendingMethod != null && !mailSendingMethod.isBlank() ? mailSendingMethod : "AUTO"; }
+    public void setMailSendingMethod(String mailSendingMethod) { this.mailSendingMethod = mailSendingMethod; }
+
+    public String getGeminiApiKey() { return geminiApiKey; }
+    public void setGeminiApiKey(String geminiApiKey) { this.geminiApiKey = geminiApiKey; }
+    public String getGeminiModel() { return geminiModel != null && !geminiModel.isBlank() ? geminiModel : "gemini-1.5-flash"; }
+    public void setGeminiModel(String geminiModel) { this.geminiModel = geminiModel; }
+    public String getAiCustomInstructions() { return aiCustomInstructions; }
+    public void setAiCustomInstructions(String aiCustomInstructions) { this.aiCustomInstructions = aiCustomInstructions; }
+
+    public String getLeetcodeUrl() { return leetcodeUrl != null && !leetcodeUrl.isBlank() ? leetcodeUrl : "https://leetcode.com/u/princegupt1234/"; }
+    public void setLeetcodeUrl(String leetcodeUrl) { this.leetcodeUrl = leetcodeUrl; }
+    public Boolean getSectionEducationVisible() { return sectionEducationVisible != null ? sectionEducationVisible : true; }
+    public void setSectionEducationVisible(Boolean sectionEducationVisible) { this.sectionEducationVisible = sectionEducationVisible; }
 }

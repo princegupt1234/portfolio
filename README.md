@@ -127,7 +127,11 @@ ADMIN_PASSWORD=your-strong-admin-password
 ADMIN_EMAIL=you@example.com
 JAVA_TOOL_OPTIONS=-Xmx256m
 
-# Optional — only needed for contact form email notifications
+# Email Configuration on Render (HTTPS API - Port 443, no SMTP port blocks)
+RESEND_API_KEY=re_123456789                  # Free 3,000 emails/mo at https://resend.com
+RESEND_FROM=Prince Gupt <onboarding@resend.dev>  # Or your verified domain email
+
+# Traditional SMTP (Optional fallback - blocked on Render free tier)
 MAIL_USERNAME=your-email@gmail.com
 MAIL_PASSWORD=your-app-password
 ```

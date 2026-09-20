@@ -2,15 +2,26 @@ package com.example.portfolio.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MailService {
@@ -18,7 +29,27 @@ public class MailService {
     private static final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private final JavaMailSender mailSender;
+    private final RestClient restClient;
+    private final com.example.portfolio.repository.AboutInfoRepository aboutInfoRepository;
 
+    // Resend HTTPS API (Port 443 - Recommended for Render)
+    @Value("${resend.api.key:}")
+    private String resendApiKey;
+
+    @Value("${resend.from:Prince Gupt <onboarding@resend.dev>}")
+    private String resendFrom;
+
+    // Brevo HTTPS API (Port 443 - Alternative for Render)
+    @Value("${brevo.api.key:}")
+    private String brevoApiKey;
+
+    @Value("${brevo.sender.email:princegupt3052@gmail.com}")
+    private String brevoSenderEmail;
+
+    @Value("${brevo.sender.name:Prince Gupt}")
+    private String brevoSenderName;
+
+    // Traditional SMTP Configuration
     @Value("${app.mail.enabled:false}")
     private boolean mailEnabled;
 
@@ -31,12 +62,104 @@ public class MailService {
     @Value("${app.mail.reply-from:${spring.mail.username:}}")
     private String replyFrom;
 
-    public MailService(JavaMailSender mailSender) {
+    public MailService(@Autowired(required = false) JavaMailSender mailSender,
+                       @Autowired(required = false) com.example.portfolio.repository.AboutInfoRepository aboutInfoRepository) {
         this.mailSender = mailSender;
+        this.aboutInfoRepository = aboutInfoRepository;
+
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(6));
+        requestFactory.setReadTimeout(Duration.ofSeconds(12));
+        this.restClient = RestClient.builder()
+                .requestFactory(requestFactory)
+                .build();
     }
 
-    private boolean isConfigured() {
-        return mailEnabled && mailUsername != null && !mailUsername.isBlank();
+    private com.example.portfolio.entity.AboutInfo getAboutInfo() {
+        if (aboutInfoRepository == null) return null;
+        try {
+            return aboutInfoRepository.findAll().stream().findFirst().orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String getEffectiveResendApiKey() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getResendApiKey() != null && !about.getResendApiKey().isBlank()) {
+            return about.getResendApiKey().trim();
+        }
+        return resendApiKey != null ? resendApiKey.trim() : "";
+    }
+
+    public String getEffectiveResendFrom() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getResendFrom() != null && !about.getResendFrom().isBlank()) {
+            return about.getResendFrom().trim();
+        }
+        return resendFrom != null && !resendFrom.isBlank() ? resendFrom.trim() : "Prince Gupt <onboarding@resend.dev>";
+    }
+
+    public String getEffectiveBrevoApiKey() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getBrevoApiKey() != null && !about.getBrevoApiKey().isBlank()) {
+            return about.getBrevoApiKey().trim();
+        }
+        return brevoApiKey != null ? brevoApiKey.trim() : "";
+    }
+
+    public String getEffectiveBrevoSenderEmail() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getBrevoSenderEmail() != null && !about.getBrevoSenderEmail().isBlank()) {
+            return about.getBrevoSenderEmail().trim();
+        }
+        return brevoSenderEmail != null && !brevoSenderEmail.isBlank() ? brevoSenderEmail.trim() : "princegupt3052@gmail.com";
+    }
+
+    public String getEffectiveBrevoSenderName() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getBrevoSenderName() != null && !about.getBrevoSenderName().isBlank()) {
+            return about.getBrevoSenderName().trim();
+        }
+        return brevoSenderName != null && !brevoSenderName.isBlank() ? brevoSenderName.trim() : "Prince Gupt";
+    }
+
+    public String getEffectiveNotifyTo() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getMailNotificationEmail() != null && !about.getMailNotificationEmail().isBlank()) {
+            return about.getMailNotificationEmail().trim();
+        }
+        if (notifyTo != null && !notifyTo.isBlank()) {
+            return notifyTo.trim();
+        }
+        if (about != null && about.getEmail() != null && !about.getEmail().isBlank()) {
+            return about.getEmail().trim();
+        }
+        return (mailUsername != null && !mailUsername.isBlank()) ? mailUsername.trim() : "princegupt3052@gmail.com";
+    }
+
+    public String getEffectiveSendingMethod() {
+        com.example.portfolio.entity.AboutInfo about = getAboutInfo();
+        if (about != null && about.getMailSendingMethod() != null && !about.getMailSendingMethod().isBlank()) {
+            return about.getMailSendingMethod().trim().toUpperCase();
+        }
+        return "AUTO";
+    }
+
+    public boolean isConfigured() {
+        return isResendConfigured() || isBrevoConfigured() || isSmtpConfigured();
+    }
+
+    public boolean isResendConfigured() {
+        return !getEffectiveResendApiKey().isBlank();
+    }
+
+    public boolean isBrevoConfigured() {
+        return !getEffectiveBrevoApiKey().isBlank();
+    }
+
+    public boolean isSmtpConfigured() {
+        return mailSender != null && mailEnabled && mailUsername != null && !mailUsername.isBlank();
     }
 
     @Async
@@ -44,23 +167,60 @@ public class MailService {
         if (!isConfigured()) {
             return;
         }
-        String recipient = (notifyTo != null && !notifyTo.isBlank()) ? notifyTo : mailUsername;
-        if (recipient == null || recipient.isBlank()) {
+        String recipient = getEffectiveNotifyTo();
+
+        String mailSubject = "New portfolio contact: " + (subject == null || subject.isBlank() ? "No subject" : subject);
+        String textContent = "From: " + fromName + " <" + fromEmail + ">\n\n" + message;
+        String htmlContent = "<div style='font-family:sans-serif; line-height:1.6; color:#1f2937; max-width:600px; padding:20px; border:1px solid #e5e7eb; border-radius:12px;'>"
+                + "<h2 style='color:#2563eb; margin-top:0;'>New Portfolio Contact Message</h2>"
+                + "<p><strong>From:</strong> " + toHtmlEscape(fromName) + " (&lt;" + toHtmlEscape(fromEmail) + "&gt;)</p>"
+                + "<p><strong>Subject:</strong> " + toHtmlEscape(subject) + "</p>"
+                + "<hr style='border:none; border-top:1px solid #e5e7eb; margin:16px 0;'/>"
+                + "<p style='white-space:pre-wrap; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;'>" + toHtmlEscape(message) + "</p>"
+                + "<p style='font-size:12px; color:#6b7280; margin-bottom:0;'>Submitted from live portfolio.</p>"
+                + "</div>";
+
+        String method = getEffectiveSendingMethod();
+        if ("RESEND".equals(method) && isResendConfigured()) {
+            sendViaResend(recipient, "Portfolio Admin", mailSubject, htmlContent, textContent, fromEmail);
+            return;
+        } else if ("BREVO".equals(method) && isBrevoConfigured()) {
+            sendViaBrevo(recipient, "Portfolio Admin", mailSubject, htmlContent, textContent, fromEmail);
+            return;
+        } else if ("SMTP".equals(method) && isSmtpConfigured()) {
+            sendNotificationViaSmtp(recipient, mailSubject, textContent, fromEmail);
             return;
         }
+
+        // AUTO: Resend -> Brevo -> SMTP
+        if (isResendConfigured()) {
+            MailResult res = sendViaResend(recipient, "Portfolio Admin", mailSubject, htmlContent, textContent, fromEmail);
+            if (res == MailResult.SUCCESS) return;
+            log.warn("Resend notification failed with {}. Trying Brevo fallback...", res);
+        }
+        if (isBrevoConfigured()) {
+            MailResult res = sendViaBrevo(recipient, "Portfolio Admin", mailSubject, htmlContent, textContent, fromEmail);
+            if (res == MailResult.SUCCESS) return;
+            log.warn("Brevo notification failed with {}. Trying SMTP fallback...", res);
+        }
+        if (isSmtpConfigured()) {
+            sendNotificationViaSmtp(recipient, mailSubject, textContent, fromEmail);
+        }
+    }
+
+    private void sendNotificationViaSmtp(String recipient, String mailSubject, String textContent, String fromEmail) {
         try {
             SimpleMailMessage mail = new SimpleMailMessage();
             mail.setTo(recipient);
-            mail.setSubject("New portfolio contact: " + (subject == null || subject.isBlank() ? "No subject" : subject));
-            mail.setText("From: " + fromName + " <" + fromEmail + ">\n\n" + message);
+            mail.setSubject(mailSubject);
+            mail.setText(textContent);
             if (fromEmail != null && !fromEmail.isBlank()) {
                 mail.setReplyTo(fromEmail);
             }
             applyFrom(mail);
             mailSender.send(mail);
         } catch (Exception e) {
-            log.warn("Failed to deliver contact notification email: {}", e.getMessage());
-            // Never let a mail failure break the contact form submission.
+            log.warn("Failed to deliver contact notification email via SMTP: {}", e.getMessage());
         }
     }
 
@@ -78,20 +238,161 @@ public class MailService {
 
     public MailResult sendReplyWithResult(String toEmail, String toName, String subject, String body, String originalMessage) {
         if (!isConfigured()) {
-            log.warn("Mail sending is disabled or not configured. Reply email not sent to {}", toEmail);
+            log.warn("Mail sending is disabled or not configured. Set RESEND_API_KEY, BREVO_API_KEY, or SMTP credentials in admin panel.");
             return MailResult.NOT_CONFIGURED;
         }
         if (toEmail == null || toEmail.isBlank()) {
             log.warn("Reply email not sent because recipient address is missing");
             return MailResult.FAILED;
         }
+
+        String html = buildReplyHtml(toName, body, originalMessage);
+        String plain = buildReplyPlainText(toName, body, originalMessage);
+        String replyToAddress = (replyFrom != null && !replyFrom.isBlank()) ? replyFrom : mailUsername;
+        if (replyToAddress == null || replyToAddress.isBlank()) {
+            replyToAddress = getEffectiveNotifyTo();
+        }
+
+        String method = getEffectiveSendingMethod();
+        if ("RESEND".equals(method)) {
+            return isResendConfigured() ? sendViaResend(toEmail, toName, subject, html, plain, replyToAddress) : MailResult.NOT_CONFIGURED;
+        } else if ("BREVO".equals(method)) {
+            return isBrevoConfigured() ? sendViaBrevo(toEmail, toName, subject, html, plain, replyToAddress) : MailResult.NOT_CONFIGURED;
+        } else if ("SMTP".equals(method)) {
+            return isSmtpConfigured() ? sendReplyViaSmtp(toEmail, toName, subject, html, plain) : MailResult.NOT_CONFIGURED;
+        }
+
+        // AUTO: Resend (HTTPS 443) -> Brevo (HTTPS 443) -> SMTP
+        MailResult lastResult = MailResult.NOT_CONFIGURED;
+        if (isResendConfigured()) {
+            lastResult = sendViaResend(toEmail, toName, subject, html, plain, replyToAddress);
+            if (lastResult == MailResult.SUCCESS) {
+                return lastResult;
+            }
+            log.warn("Resend attempt failed with result {}. Falling back to next method...", lastResult);
+        }
+        if (isBrevoConfigured()) {
+            MailResult brevoRes = sendViaBrevo(toEmail, toName, subject, html, plain, replyToAddress);
+            if (brevoRes == MailResult.SUCCESS) {
+                return brevoRes;
+            }
+            lastResult = brevoRes;
+            log.warn("Brevo attempt failed with result {}. Falling back to SMTP...", lastResult);
+        }
+        if (isSmtpConfigured()) {
+            MailResult smtpRes = sendReplyViaSmtp(toEmail, toName, subject, html, plain);
+            if (smtpRes == MailResult.SUCCESS) {
+                return smtpRes;
+            }
+            lastResult = smtpRes;
+        }
+        return lastResult;
+    }
+
+    private MailResult sendViaResend(String toEmail, String toName, String subject, String htmlContent, String textContent, String replyToAddress) {
+        try {
+            String apiKey = getEffectiveResendApiKey();
+            String from = getEffectiveResendFrom();
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("from", from);
+            payload.put("to", List.of(toEmail.trim()));
+            payload.put("subject", subject);
+            payload.put("html", htmlContent);
+            payload.put("text", textContent);
+            if (replyToAddress != null && !replyToAddress.isBlank()) {
+                payload.put("reply_to", replyToAddress.trim());
+            }
+
+            ResponseEntity<String> response = restClient.post()
+                    .uri("https://api.resend.com/emails")
+                    .header("Authorization", "Bearer " + apiKey.trim())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .toEntity(String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Email delivered successfully via Resend HTTPS API to {}", toEmail);
+                return MailResult.SUCCESS;
+            } else {
+                log.error("Resend API returned non-2xx status: {}", response.getStatusCode());
+                return MailResult.FAILED;
+            }
+        } catch (HttpClientErrorException.Unauthorized ex) {
+            log.error("Resend API authentication failed. Verify RESEND_API_KEY in admin panel: {}", ex.getMessage());
+            return MailResult.AUTH_ERROR;
+        } catch (HttpClientErrorException.Forbidden ex) {
+            log.error("Resend API forbidden: {}", ex.getResponseBodyAsString());
+            return MailResult.FAILED;
+        } catch (ResourceAccessException ex) {
+            log.error("Resend API network timeout: {}", ex.getMessage());
+            return MailResult.TIMEOUT;
+        } catch (Exception ex) {
+            log.error("Failed to send email via Resend API to {}: {}", toEmail, ex.getMessage(), ex);
+            return MailResult.FAILED;
+        }
+    }
+
+    private MailResult sendViaBrevo(String toEmail, String toName, String subject, String htmlContent, String textContent, String replyToAddress) {
+        try {
+            String apiKey = getEffectiveBrevoApiKey();
+            String senderName = getEffectiveBrevoSenderName();
+            String senderEmail = getEffectiveBrevoSenderEmail();
+            Map<String, Object> sender = Map.of(
+                    "name", senderName,
+                    "email", senderEmail
+            );
+            Map<String, Object> recipient = Map.of(
+                    "email", toEmail.trim(),
+                    "name", toName != null ? toName.trim() : ""
+            );
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("sender", sender);
+            payload.put("to", List.of(recipient));
+            payload.put("subject", subject);
+            payload.put("htmlContent", htmlContent);
+            payload.put("textContent", textContent);
+            if (replyToAddress != null && !replyToAddress.isBlank()) {
+                payload.put("replyTo", Map.of("email", replyToAddress.trim()));
+            }
+
+            ResponseEntity<String> response = restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey.trim())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .toEntity(String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Email delivered successfully via Brevo HTTPS API to {}", toEmail);
+                return MailResult.SUCCESS;
+            } else {
+                log.error("Brevo API returned non-2xx status: {}", response.getStatusCode());
+                return MailResult.FAILED;
+            }
+        } catch (HttpClientErrorException.Unauthorized ex) {
+            log.error("Brevo API authentication failed. Verify BREVO_API_KEY: {}", ex.getMessage());
+            return MailResult.AUTH_ERROR;
+        } catch (ResourceAccessException ex) {
+            log.error("Brevo API network timeout: {}", ex.getMessage());
+            return MailResult.TIMEOUT;
+        } catch (Exception ex) {
+            log.error("Failed to send email via Brevo API to {}: {}", toEmail, ex.getMessage(), ex);
+            return MailResult.FAILED;
+        }
+    }
+
+    private MailResult sendReplyViaSmtp(String toEmail, String toName, String subject, String html, String plain) {
+        if (!isSmtpConfigured()) {
+            return MailResult.NOT_CONFIGURED;
+        }
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(toEmail);
             helper.setSubject(subject);
-            String html = buildReplyHtml(toName, body, originalMessage);
-            helper.setText(buildReplyPlainText(toName, body, originalMessage), html);
+            helper.setText(plain, html);
             applyFrom(helper);
             mailSender.send(message);
             return MailResult.SUCCESS;
@@ -99,12 +400,12 @@ public class MailService {
             log.error("SMTP Authentication failed when replying to {}. Verify MAIL_PASSWORD/App Password.", toEmail, ex);
             return MailResult.AUTH_ERROR;
         } catch (MessagingException ex) {
-            log.error("Failed to compose/send reply email to {}", toEmail, ex);
+            log.error("Failed to compose/send reply email via SMTP to {}", toEmail, ex);
             if (isTimeout(ex)) return MailResult.TIMEOUT;
             if (isAuth(ex)) return MailResult.AUTH_ERROR;
             return MailResult.FAILED;
         } catch (Exception ex) {
-            log.error("Failed to send reply email to {}", toEmail, ex);
+            log.error("Failed to send reply email via SMTP to {}", toEmail, ex);
             if (isTimeout(ex)) return MailResult.TIMEOUT;
             if (isAuth(ex)) return MailResult.AUTH_ERROR;
             return MailResult.FAILED;
