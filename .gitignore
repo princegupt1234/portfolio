@@ -23,6 +23,19 @@ uploads/
 .env.local
 .env.*.local
 
+# ===== Application secrets (never commit real credentials) =====
+src/main/resources/application-prod.properties
+src/main/resources/application-local.properties
+src/main/resources/application-secrets.properties
+
+# ===== API keys / credentials =====
+*.pem
+*.key
+*.p12
+*.jks
+secrets.yml
+secrets.yaml
+
 # ===== IntelliJ IDEA =====
 .idea/
 *.iws
