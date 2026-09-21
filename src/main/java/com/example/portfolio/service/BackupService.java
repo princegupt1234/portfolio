@@ -269,19 +269,37 @@ public class BackupService {
                 restoredCount += payload.messages.size();
             }
 
-            // 12. Site Stats
+            // 12. Site Stats — upsert by statDate to avoid duplicate key on unique constraint
             if (payload.siteStats != null && !payload.siteStats.isEmpty()) {
-                siteStatRepository.deleteAll();
-                payload.siteStats.forEach(ss -> ss.setId(null));
-                siteStatRepository.saveAll(payload.siteStats);
-                restoredCount += payload.siteStats.size();
+                int inserted = 0, updated = 0;
+                for (SiteStat incoming : payload.siteStats) {
+                    if (incoming.getStatDate() == null) continue;
+                    java.util.Optional<SiteStat> existing = siteStatRepository.findByStatDate(incoming.getStatDate());
+                    if (existing.isPresent()) {
+                        SiteStat row = existing.get();
+                        row.setPortfolioViews(incoming.getPortfolioViews() != null ? incoming.getPortfolioViews() : 0L);
+                        row.setResumeDownloads(incoming.getResumeDownloads() != null ? incoming.getResumeDownloads() : 0L);
+                        row.setMessagesReceived(incoming.getMessagesReceived() != null ? incoming.getMessagesReceived() : 0L);
+                        row.setProjectClicks(incoming.getProjectClicks() != null ? incoming.getProjectClicks() : 0L);
+                        siteStatRepository.save(row);
+                        log.info("Restore: UPDATED site_stats row for date {}", incoming.getStatDate());
+                        updated++;
+                    } else {
+                        incoming.setId(null);
+                        siteStatRepository.save(incoming);
+                        log.info("Restore: INSERTED site_stats row for date {}", incoming.getStatDate());
+                        inserted++;
+                    }
+                }
+                restoredCount += inserted + updated;
+                log.info("Restore: site_stats — {} inserted, {} updated", inserted, updated);
             }
 
             dataVersionService.bump();
-            log.info("Database restore completed successfully. Total entities processed: {}", restoredCount);
+            log.info("Database restore completed successfully. Total entities restored: {}", restoredCount);
             return restoredCount;
         } catch (Exception e) {
-            log.error("Failed to restore database from backup JSON: {}", e.getMessage(), e);
+            log.error("Database restore FAILED: {}", e.getMessage(), e);
             throw new RuntimeException("Restore failed: " + e.getMessage(), e);
         }
     }
