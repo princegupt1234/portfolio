@@ -124,19 +124,33 @@
               </div>
               <h2 style="font-size:1.3rem; margin:0 0 8px;">Export Database Backup</h2>
               <p style="color:var(--text-secondary); font-size:0.88rem; margin:0 0 16px;">
-                Download a complete, structured JSON snapshot containing your profile bio, skills, projects, career experience, credentials, and inbound messages.
+                Download a versioned JSON snapshot of all supported database records and uploaded files.
               </p>
 
               <div style="background:rgba(0,0,0,0.25); border-radius:12px; padding:12px 16px; border:1px solid rgba(255,255,255,0.06);">
                 <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:6px;">Current Catalog Snapshot:</div>
                 <table class="count-table">
+                  <tr><td><i class="fa-solid fa-user"></i> Profile &amp; Settings</td><td th:text="${counts['aboutInfos']}">0</td></tr>
                   <tr><td><i class="fa-solid fa-diagram-project"></i> Projects</td><td th:text="${counts['projects']}">0</td></tr>
                   <tr><td><i class="fa-solid fa-layer-group"></i> Skills</td><td th:text="${counts['skills']}">0</td></tr>
                   <tr><td><i class="fa-solid fa-briefcase"></i> Experience</td><td th:text="${counts['experiences']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-graduation-cap"></i> Education</td><td th:text="${counts['education']}">0</td></tr>
                   <tr><td><i class="fa-solid fa-certificate"></i> Certificates</td><td th:text="${counts['certificates']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-screwdriver-wrench"></i> Services</td><td th:text="${counts['services']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-star"></i> Testimonials</td><td th:text="${counts['testimonials']}">0</td></tr>
                   <tr><td><i class="fa-solid fa-envelope"></i> Inbound Messages</td><td th:text="${counts['messages']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-hammer"></i> Building Projects</td><td th:text="${counts['buildingProjects']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-book-open"></i> Learning Projects</td><td th:text="${counts['learningProjects']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-chart-line"></i> Site Statistics</td><td th:text="${counts['siteStats']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-robot"></i> AI Training Rules</td><td th:text="${counts['aiTrainingRules']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-file-pdf"></i> Resume Metadata</td><td th:text="${counts['resumes']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-photo-film"></i> Uploaded Files</td><td th:text="${counts['files']}">0</td></tr>
+                  <tr><td><i class="fa-solid fa-user-shield"></i> Admin Accounts (kept unchanged)</td><td th:text="${counts['adminsExcluded']}">0</td></tr>
                 </table>
               </div>
+              <p style="color:var(--text-secondary); font-size:0.78rem; margin:12px 0 0;">
+                Files under the configured upload directory are embedded. Files served from deployment assets or remote URLs remain references and must be recovered from their source. Admin credentials and API/webhook secrets are excluded; restore secrets securely through admin settings or environment variables.
+              </p>
             </div>
 
             <div style="margin-top:24px;">
@@ -154,7 +168,7 @@
               </div>
               <h2 style="font-size:1.3rem; margin:0 0 8px;">Restore from Backup</h2>
               <p style="color:var(--text-secondary); font-size:0.88rem; margin:0 0 16px;">
-                Upload a previously exported <code>portfolio-backup.json</code> file to restore your portfolio content, projects, and settings.
+                Upload a versioned backup. Database categories present in the file are replaced as a single transaction; older backups preserve categories they never contained.
               </p>
 
               <div style="background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.3); border-radius:12px; padding:14px 16px; margin-bottom:18px;">
@@ -162,7 +176,7 @@
                   <i class="fa-solid fa-triangle-exclamation"></i> Warning: Overwrite Mode
                 </div>
                 <div style="color:rgba(255,255,255,0.7); font-size:0.8rem; margin-top:4px;">
-                  Restoring will overwrite current portfolio records with the data inside your backup file. Be sure to export your current state first if needed.
+                  Current records in included categories will be replaced. Admin accounts and existing secret credentials are kept unchanged; uploaded files not listed in the backup are left untouched. Export the current state before restoring.
                 </div>
               </div>
 
@@ -170,7 +184,7 @@
                 <div class="upload-zone" onclick="document.getElementById('backupFile').click()">
                   <i class="fa-solid fa-file-code" style="font-size:2rem; color:var(--primary); margin-bottom:8px;"></i>
                   <div style="font-size:0.9rem; font-weight:500;" id="fileChosenText">Choose or drag .json backup file here</div>
-                  <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">Only JSON backup files exported from this system are supported</div>
+                  <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">Only system JSON backups are supported; maximum size 100 MiB</div>
                   <input type="file" id="backupFile" name="backupFile" accept=".json,application/json" style="display:none;" onchange="updateFileName(this)"/>
                 </div>
 
@@ -196,15 +210,36 @@ function updateFileName(input) {
   }
 }
 document.getElementById('restoreForm').addEventListener('submit', function(e) {
+  e.preventDefault();
   var fileInput = document.getElementById('backupFile');
   if (!fileInput.files || fileInput.files.length === 0) {
-    e.preventDefault();
     alert('Please select a JSON backup file first.');
     return;
   }
-  if (!confirm('Are you sure you want to restore the database from this backup? Current records will be replaced.')) {
-    e.preventDefault();
+  if (!confirm('Are you sure you want to restore this backup? Records in included categories will be replaced. Admin accounts, secrets, and uploaded files not in the backup are kept unchanged. Export the current state first if needed.')) {
+    return;
   }
+  var submitButton = this.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  var csrfToken = document.querySelector('meta[name="_csrf"]');
+  var csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+  var headers = {'Content-Type': 'application/json'};
+  if (csrfToken && csrfHeader) headers[csrfHeader.content] = csrfToken.content;
+  fetch(this.action, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: headers,
+    body: fileInput.files[0]
+  }).then(function(response) {
+    return response.json().then(function(result) {
+      alert(result.message || (response.ok ? 'Restore completed.' : 'Restore failed.'));
+      if (response.ok) window.location.reload();
+      else submitButton.disabled = false;
+    });
+  }).catch(function() {
+    alert('Restore request failed. No success was reported; check the connection and try again.');
+    submitButton.disabled = false;
+  });
 });
 </script>
 </body>

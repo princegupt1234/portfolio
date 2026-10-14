@@ -10,6 +10,7 @@ import com.example.portfolio.repository.ResumeRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.service.AnalyticsService;
 import com.example.portfolio.service.GithubStatsService;
+import com.example.portfolio.service.VisitorAnalyticsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,13 +31,15 @@ public class AdminDashboardController {
     private final AnalyticsService analyticsService;
     private final GithubStatsService githubStatsService;
     private final AiTrainingRepository aiTrainingRepository;
+    private final VisitorAnalyticsService visitorAnalyticsService;
 
     public AdminDashboardController(ProjectRepository projectRepository, SkillRepository skillRepository,
                                      CertificateRepository certificateRepository,
                                      ContactMessageRepository contactMessageRepository,
                                      ResumeRepository resumeRepository, AboutInfoRepository aboutInfoRepository,
                                      AnalyticsService analyticsService, GithubStatsService githubStatsService,
-                                     AiTrainingRepository aiTrainingRepository) {
+                                     AiTrainingRepository aiTrainingRepository,
+                                     VisitorAnalyticsService visitorAnalyticsService) {
         this.projectRepository = projectRepository;
         this.skillRepository = skillRepository;
         this.certificateRepository = certificateRepository;
@@ -46,6 +49,7 @@ public class AdminDashboardController {
         this.analyticsService = analyticsService;
         this.githubStatsService = githubStatsService;
         this.aiTrainingRepository = aiTrainingRepository;
+        this.visitorAnalyticsService = visitorAnalyticsService;
     }
 
     @GetMapping({"", "/", "/dashboard"})
@@ -78,6 +82,16 @@ public class AdminDashboardController {
                 .filter(s -> s.getStatDate().isEqual(java.time.LocalDate.now()))
                 .mapToLong(SiteStat::getPortfolioViews).sum();
         model.addAttribute("todayViews", todayViews);
+
+        VisitorAnalyticsService.TrafficSummary traffic = visitorAnalyticsService.summary();
+        model.addAttribute("visitorClassificationAvailable", traffic.available());
+        model.addAttribute("visitorClassificationStart", traffic.trackingStarted());
+        model.addAttribute("visitorClassificationPartial",
+                traffic.available() && traffic.trackingStarted().isAfter(java.time.LocalDate.now().minusDays(29)));
+        model.addAttribute("humanVisitorsToday", traffic.humanToday());
+        model.addAttribute("botTrafficToday", traffic.botsToday());
+        model.addAttribute("humanVisitors30d", traffic.human30Days());
+        model.addAttribute("botTraffic30d", traffic.bots30Days());
 
         // profile completion heuristic
         int completed = 0, total = 6;

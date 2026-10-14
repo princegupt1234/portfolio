@@ -49,8 +49,24 @@
                         <div><div class="kpi-value" th:text="${todayViews}">0</div><div class="kpi-label">Today's Visitors</div></div>
                     </div>
                     <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${humanVisitorsToday} : '—'">—</div><div class="kpi-label">Human-like Visitors — Today</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-robot"></i></div>
+                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${botTrafficToday} : '—'">—</div><div class="kpi-label">Detected Bot Traffic — Today</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
                         <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <div><div class="kpi-value" th:text="${totalViews30d}">0</div><div class="kpi-label">Portfolio Views (30d)</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${humanVisitors30d} : '—'">—</div><div class="kpi-label">Human-like Visitors — Last 30 Days</div></div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-robot"></i></div>
+                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${botTraffic30d} : '—'">—</div><div class="kpi-label">Detected Bot Traffic — Last 30 Days</div></div>
                     </div>
                     <div class="glass-card kpi-card">
                         <div class="kpi-icon"><i class="fa-solid fa-diagram-project"></i></div>
@@ -73,6 +89,17 @@
                         <div><div class="kpi-value" style="color:#c084fc;" th:text="${activeAiTrainingCount} + ' / ' + ${aiTrainingCount}">0 / 0</div><div class="kpi-label">AI Trained Answers</div></div>
                     </a>
                 </div>
+                <p class="page-desc" style="margin:-8px 0 22px; font-size:0.78rem;"
+                   th:if="${visitorClassificationAvailable}">
+                    Classification is tracked since <strong th:text="${#temporals.format(visitorClassificationStart, 'dd MMM yyyy')}"></strong>
+                    <span th:if="${visitorClassificationPartial}">; earlier traffic in the 30-day window is unavailable.</span>
+                    Unknown user agents are excluded from both counts. Browser-based bots may appear human-like.
+                </p>
+                <p class="page-desc" style="margin:-8px 0 22px; font-size:0.78rem;"
+                   th:unless="${visitorClassificationAvailable}">
+                    Visitor classification starts with the first tracked public visit. Earlier historical bot/human counts are unavailable.
+                    Browser-based bots may appear human-like.
+                </p>
 
                 <div class="dash-grid">
                     <div class="glass-card" style="padding:24px;">

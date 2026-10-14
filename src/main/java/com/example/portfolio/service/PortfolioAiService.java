@@ -33,9 +33,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -44,6 +48,13 @@ public class PortfolioAiService {
 
     private static final Logger log = LoggerFactory.getLogger(PortfolioAiService.class);
     private static final String PORTFOLIO_HOST_URL = "https://portfolio-gx88.onrender.com";
+    private static final Set<String> GENERIC_TRAINING_TERMS = Set.of(
+            "hi", "hello", "hey", "fake", "ai", "portfolio"
+    );
+    private static final Set<String> TRAINING_STOP_WORDS = Set.of(
+            "a", "an", "and", "are", "about", "can", "do", "does", "for", "how", "i",
+            "is", "me", "of", "or", "the", "to", "what", "who", "you", "your"
+    );
 
     private final AboutInfoRepository aboutInfoRepository;
     private final SkillRepository skillRepository;
@@ -185,53 +196,81 @@ public class PortfolioAiService {
         List<AiTraining> activeRules = aiTrainingRepository.findByActiveTrueOrderBySortOrderAscIdDesc();
         if (activeRules.isEmpty()) return null;
 
-        String cleanQuery = userQuery.trim().toLowerCase(Locale.ROOT);
-        String normQuery = cleanQuery.replaceAll("[^a-z0-9\\s]", " ").replaceAll("\\s+", " ").trim();
+        String normQuery = normalizeTrainingText(userQuery);
+        if (normQuery.isEmpty()) return null;
 
-        // 1. Direct or substring match on question trigger
-        for (AiTraining rule : activeRules) {
-            if (rule.getQuestionTrigger() == null || rule.getQuestionTrigger().isBlank()) continue;
-            String normTrigger = rule.getQuestionTrigger().trim().toLowerCase(Locale.ROOT)
-                    .replaceAll("[^a-z0-9\\s]", " ").replaceAll("\\s+", " ").trim();
+        AiTraining exactMatch = findTrainingRule(activeRules, rule -> {
+            String trigger = normalizeTrainingText(rule.getQuestionTrigger());
+            return !trigger.isEmpty() && trigger.equals(normQuery);
+        });
+        if (exactMatch != null) return exactMatch;
 
-            if (normQuery.equals(normTrigger) || normQuery.contains(normTrigger) || (normTrigger.length() >= 6 && normTrigger.contains(normQuery))) {
-                return rule;
+        Set<String> queryWords = new HashSet<>(Arrays.asList(normQuery.split(" ")));
+        return findTrainingRule(activeRules, rule -> matchesTrainingRule(rule, normQuery, queryWords));
+    }
+
+    private boolean matchesTrainingRule(AiTraining rule, String normalizedQuery, Set<String> queryWords) {
+        String trigger = normalizeTrainingText(rule.getQuestionTrigger());
+        if (!trigger.isEmpty()) {
+            List<String> relevantTriggerWords = getRelevantTriggerWords(trigger);
+            if (trigger.split(" ").length >= 2
+                    && !relevantTriggerWords.isEmpty()
+                    && containsPhrase(normalizedQuery, trigger)) {
+                return true;
+            }
+
+            if (relevantTriggerWords.size() >= 2) {
+                long matches = relevantTriggerWords.stream().filter(queryWords::contains).count();
+                if ((double) matches / relevantTriggerWords.size() >= 0.75) return true;
             }
         }
 
-        // 2. Keyword trigger match if comma-separated keywords defined
-        for (AiTraining rule : activeRules) {
-            if (rule.getMatchKeywords() == null || rule.getMatchKeywords().isBlank()) continue;
-            String[] keywords = rule.getMatchKeywords().split(",");
-            for (String kw : keywords) {
-                String k = kw.trim().toLowerCase(Locale.ROOT);
-                if (!k.isEmpty() && normQuery.matches(".*\\b" + Pattern.quote(k) + "\\b.*")) {
-                    return rule;
-                }
-            }
+        if (rule.getMatchKeywords() == null || rule.getMatchKeywords().isBlank()) return false;
+        for (String keyword : rule.getMatchKeywords().split(",")) {
+            String normalizedKeyword = normalizeTrainingText(keyword);
+            if (normalizedKeyword.isEmpty() || GENERIC_TRAINING_TERMS.contains(normalizedKeyword)) continue;
+            if (containsPhrase(normalizedQuery, normalizedKeyword)) return true;
         }
+        return false;
+    }
 
-        // 3. Significant word overlap match (>= 75% of non-trivial words)
-        for (AiTraining rule : activeRules) {
-            if (rule.getQuestionTrigger() == null || rule.getQuestionTrigger().isBlank()) continue;
-            String normTrigger = rule.getQuestionTrigger().trim().toLowerCase(Locale.ROOT)
-                    .replaceAll("[^a-z0-9\\s]", " ").replaceAll("\\s+", " ").trim();
-            String[] triggerWords = normTrigger.split("\\s+");
-            int nonTrivialCount = 0;
-            int matches = 0;
-            for (String tw : triggerWords) {
-                if (tw.length() <= 2) continue; // skip 'is', 'a', 'to'
-                nonTrivialCount++;
-                if (normQuery.contains(tw)) {
-                    matches++;
-                }
-            }
-            if (nonTrivialCount >= 2 && ((double) matches / nonTrivialCount) >= 0.75) {
-                return rule;
-            }
-        }
+    private List<String> getRelevantTriggerWords(String normalizedTrigger) {
+        return Arrays.stream(normalizedTrigger.split(" "))
+                .filter(word -> word.length() > 2)
+                .filter(word -> !GENERIC_TRAINING_TERMS.contains(word))
+                .filter(word -> !TRAINING_STOP_WORDS.contains(word))
+                .distinct()
+                .toList();
+    }
 
-        return null;
+    private AiTraining findTrainingRule(List<AiTraining> rules, Predicate<AiTraining> matches) {
+        AiTraining correctionMatch = rules.stream()
+                .filter(this::isCorrectionRule)
+                .filter(matches)
+                .findFirst()
+                .orElse(null);
+        if (correctionMatch != null) return correctionMatch;
+        return rules.stream()
+                .filter(rule -> !isCorrectionRule(rule))
+                .filter(matches)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private boolean isCorrectionRule(AiTraining rule) {
+        return rule.getCategory() != null && "correction".equalsIgnoreCase(rule.getCategory().trim());
+    }
+
+    private String normalizeTrainingText(String text) {
+        if (text == null) return "";
+        return text.trim().toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9\\s]", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
+
+    private boolean containsPhrase(String normalizedText, String normalizedPhrase) {
+        return (" " + normalizedText + " ").contains(" " + normalizedPhrase + " ");
     }
 
     private record GeminiResponse(String text, String model) {}
@@ -511,6 +550,7 @@ public class PortfolioAiService {
 
     public String buildLocalFallbackResponse(String query) {
         String q = query.toLowerCase(Locale.ROOT);
+        String normalizedQuery = normalizeTrainingText(query);
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElse(new AboutInfo());
         List<Project> allVisible = projectRepository.findByVisibleTrueOrderBySortOrderAsc();
 
@@ -518,6 +558,10 @@ public class PortfolioAiService {
         AiTraining trained = findTrainedOverride(query);
         if (trained != null && trained.getCorrectAnswer() != null && !trained.getCorrectAnswer().isBlank()) {
             return trained.getCorrectAnswer().trim();
+        }
+
+        if (normalizedQuery.matches(".*\\b(are you real|real or fake|real person|human|bot|ai assistant|artificial intelligence)\\b.*")) {
+            return "Haha, bro! I'm an AI assistant, not a human. I'm here to help you explore Prince Gupt's portfolio, projects, and technical skills.";
         }
 
         // 2. Check for specific project query by title from database
@@ -554,7 +598,7 @@ public class PortfolioAiService {
         }
 
         // Greetings
-        if (q.matches(".*\\b(hi|hello|hey|greetings|hola|namaste|who are you|intro)\\b.*")) {
+        if (normalizedQuery.matches("(hi|hello|hey|greetings|hola|namaste)( there| bro| friend)?|who are you|intro")) {
             return "👋 **Hello!** I'm Prince's official AI Portfolio Assistant for [" + PORTFOLIO_HOST_URL + "](" + PORTFOLIO_HOST_URL + ").\n\n"
                     + "Prince is a **" + (about.getTitle() != null ? about.getTitle() : "Full Stack Software Engineer") + "** specializing in **Java, Spring Boot, MySQL, and React**.\n\n"
                     + "You can ask me about his **backend skills**, **top projects**, **services offered**, **LeetCode DSA record**, or **hiring availability**!";
@@ -808,17 +852,6 @@ public class PortfolioAiService {
                     + "You can also tap any of the quick suggestion chips above!";
         }
 
-        // Default courteous summary
-        String shortBio = (about.getBio() != null && !about.getBio().isBlank())
-                ? (about.getBio().length() > 160 ? about.getBio().substring(0, 160).trim() + "..." : about.getBio().trim())
-                : "Specialized in high-throughput Spring Boot microservices, MySQL architecture, and modern responsive frontends.";
-
-        return "✨ **Prince Gupt** — **" + (about.getTitle() != null ? about.getTitle() : "Full Stack Software Engineer") + "**\n\n"
-                + shortBio + "\n\n"
-                + "💡 **Try asking:**\n"
-                + "• _\"What are your core backend skills?\"_\n"
-                + "• _\"Tell me about your top projects\"_\n"
-                + "• _\"What is your hiring availability?\"_\n"
-                + "• _\"How do I contact you?\"_";
+        return "I'm Prince Gupt's AI portfolio assistant. I can help with questions about his skills, projects, experience, services, or hiring. What would you like to know?";
     }
 }

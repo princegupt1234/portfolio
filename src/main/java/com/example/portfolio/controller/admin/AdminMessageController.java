@@ -1,6 +1,7 @@
 package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.ContactMessage;
+import com.example.portfolio.entity.ContactMessageStatus;
 import com.example.portfolio.repository.ContactMessageRepository;
 import com.example.portfolio.service.MailService;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +33,17 @@ public class AdminMessageController {
     }
 
     @GetMapping
-    public String inbox(@RequestParam(value = "q", required = false) String q, Model model) {
-        List<ContactMessage> messages = contactMessageRepository.findAllByOrderByCreatedAtDesc();
+    public String inbox(@RequestParam(value = "q", required = false) String q,
+                        @RequestParam(value = "status", required = false) ContactMessageStatus status,
+                        Model model) {
+        List<ContactMessage> messages;
+        if (status == null) {
+            messages = contactMessageRepository.findAllByOrderByCreatedAtDesc();
+        } else if (status == ContactMessageStatus.NEW) {
+            messages = contactMessageRepository.findAllByStatusOrStatusIsNullOrderByCreatedAtDesc(status);
+        } else {
+            messages = contactMessageRepository.findAllByStatusOrderByCreatedAtDesc(status);
+        }
         if (q != null && !q.isBlank()) {
             String needle = q.toLowerCase();
             messages = messages.stream()
@@ -45,6 +55,8 @@ public class AdminMessageController {
         }
         model.addAttribute("messages", messages);
         model.addAttribute("q", q);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("messageStatuses", ContactMessageStatus.values());
         return "admin/messages/list";
     }
 
@@ -61,7 +73,25 @@ public class AdminMessageController {
             contactMessageRepository.save(msg);
         }
         model.addAttribute("message", msg);
+        model.addAttribute("messageStatuses", ContactMessageStatus.values());
         return "admin/messages/view";
+    }
+
+    @PostMapping("/{id}/status")
+    public String updateStatus(@PathVariable("id") Long id,
+                               @RequestParam("status") ContactMessageStatus status,
+                               @RequestParam(value = "filter", required = false) ContactMessageStatus filter,
+                               org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        var msgOpt = contactMessageRepository.findById(id);
+        if (msgOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Message not found.");
+        } else {
+            ContactMessage message = msgOpt.get();
+            message.setStatus(status);
+            contactMessageRepository.save(message);
+            redirectAttributes.addFlashAttribute("successMessage", "Message status updated to " + status + ".");
+        }
+        return filter == null ? "redirect:/admin/messages" : "redirect:/admin/messages?status=" + filter.name();
     }
 
     @PostMapping("/{id}/reply")

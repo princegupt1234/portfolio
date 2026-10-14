@@ -300,7 +300,7 @@ public class AdminAboutController {
         if (!buildingProjectRepository.existsById(id))
             return ResponseEntity.notFound().build();
         if (!isValidBuildingProject(project))
-            return ResponseEntity.<BuildingProject>badRequest().build();
+            return ResponseEntity.badRequest().build();
         BuildingProject existing = buildingProjectRepository.findById(id).get();
         existing.setTitle(project.getTitle());
         existing.setStatus(project.getStatus());

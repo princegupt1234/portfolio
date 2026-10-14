@@ -24,6 +24,13 @@
                         <p class="page-desc">Inbound message from <strong th:text="${message.name}" style="color:var(--text);">Name</strong></p>
                     </div>
                     <div class="header-actions" style="display:flex; gap:10px; align-items:center;">
+                        <form th:action="@{'/admin/messages/' + ${message.id} + '/status'}" method="post" style="display:flex; gap:6px; margin:0;">
+                            <select class="glass-input" name="status" aria-label="Message workflow status">
+                                <option th:each="statusOption : ${messageStatuses}" th:value="${statusOption}"
+                                        th:text="${statusOption}" th:selected="${statusOption == message.status}">NEW</option>
+                            </select>
+                            <button type="submit" class="glass-btn">Save Status</button>
+                        </form>
                         <form th:action="@{'/admin/messages/' + ${message.id} + '/toggle-read'}" method="post" style="margin:0;">
                             <button type="submit" class="glass-btn" title="Toggle read/unread status">
                                 <i class="fa-solid" th:classappend="${message.isRead} ? 'fa-envelope' : 'fa-envelope-open'"></i>

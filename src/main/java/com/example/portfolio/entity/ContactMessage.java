@@ -2,6 +2,8 @@ package com.example.portfolio.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,6 +38,13 @@ public class ContactMessage {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(unique = true, length = 32)
+    private String referenceId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 16)
+    private ContactMessageStatus status = ContactMessageStatus.NEW;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
@@ -54,4 +63,10 @@ public class ContactMessage {
     public void setRepliedAt(LocalDateTime repliedAt) { this.repliedAt = repliedAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getReferenceId() { return referenceId; }
+    public void setReferenceId(String referenceId) { this.referenceId = referenceId; }
+    public ContactMessageStatus getStatus() {
+        return status == null ? ContactMessageStatus.NEW : status;
+    }
+    public void setStatus(ContactMessageStatus status) { this.status = status; }
 }

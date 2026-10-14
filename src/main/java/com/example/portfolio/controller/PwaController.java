@@ -2,7 +2,6 @@ package com.example.portfolio.controller;
 
 import com.example.portfolio.entity.AboutInfo;
 import com.example.portfolio.repository.AboutInfoRepository;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

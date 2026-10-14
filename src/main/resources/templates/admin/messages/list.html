@@ -42,6 +42,13 @@
                     <button type="button" class="alert-close">×</button>
                 </div>
 
+                <div class="header-actions" style="margin-bottom:16px;">
+                    <a th:href="@{/admin/messages}" class="glass-btn" th:classappend="${selectedStatus == null} ? 'primary'">All</a>
+                    <a th:href="@{/admin/messages(status='NEW')}" class="glass-btn" th:classappend="${selectedStatus != null and selectedStatus.name() == 'NEW'} ? 'primary'">New</a>
+                    <a th:href="@{/admin/messages(status='REPLIED')}" class="glass-btn" th:classappend="${selectedStatus != null and selectedStatus.name() == 'REPLIED'} ? 'primary'">Replied</a>
+                    <a th:href="@{/admin/messages(status='ARCHIVED')}" class="glass-btn" th:classappend="${selectedStatus != null and selectedStatus.name() == 'ARCHIVED'} ? 'primary'">Archived</a>
+                </div>
+
                 <div class="glass-card table-card glass-table-wrap">
                     <div class="table-toolbar">
                         <span class="toolbar-title"><i class="fa-solid fa-inbox" style="color:var(--primary);"></i> Inbound Inquiries</span>
@@ -71,6 +78,15 @@
                                         <span class="status-dot"></span>
                                         <span>Replied</span>
                                     </span>
+                                    <span class="status-pill" style="margin-top:4px; display:inline-flex;" th:text="${m.status}">NEW</span>
+                                    <form th:action="@{'/admin/messages/' + ${m.id} + '/status'}" method="post" style="margin-top:6px;">
+                                        <input th:if="${selectedStatus != null}" type="hidden" name="filter" th:value="${selectedStatus}" />
+                                        <select class="glass-input" name="status" aria-label="Message workflow status" style="padding:4px 6px; font-size:0.72rem;">
+                                            <option th:each="statusOption : ${messageStatuses}" th:value="${statusOption}"
+                                                    th:text="${statusOption}" th:selected="${statusOption == m.status}">NEW</option>
+                                        </select>
+                                        <button type="submit" class="glass-btn" style="padding:3px 7px; font-size:0.7rem;">Save</button>
+                                    </form>
                                 </td>
                                 <td>
                                     <strong th:text="${m.name}" style="color:var(--text); display:block;">Sender Name</strong>

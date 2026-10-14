@@ -11,6 +11,7 @@ import com.example.portfolio.repository.ResumeRepository;
 import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.service.AnalyticsService;
 import com.example.portfolio.service.GithubStatsService;
+import com.example.portfolio.service.VisitorAnalyticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,6 +62,9 @@ class AdminDashboardControllerTest {
     @Mock
     private AiTrainingRepository aiTrainingRepository;
 
+    @Mock
+    private VisitorAnalyticsService visitorAnalyticsService;
+
     @InjectMocks
     private AdminDashboardController controller;
 
@@ -84,12 +88,16 @@ class AdminDashboardControllerTest {
         when(aiTrainingRepository.count()).thenReturn(7L);
         when(aiTrainingRepository.findByActiveTrueOrderBySortOrderAscIdDesc())
                 .thenReturn(List.of(new AiTraining("Q1", "A1", "Hiring", "kw1"), new AiTraining("Q2", "A2", "Skills", "kw2")));
+        when(visitorAnalyticsService.summary()).thenReturn(
+                new VisitorAnalyticsService.TrafficSummary(3, 2, 18, 5, java.time.LocalDate.now()));
 
         mockMvc.perform(get("/admin/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/dashboard"))
                 .andExpect(model().attribute("aiTrainingCount", 7L))
                 .andExpect(model().attribute("activeAiTrainingCount", 2))
+                .andExpect(model().attribute("humanVisitorsToday", 3L))
+                .andExpect(model().attribute("botTrafficToday", 2L))
                 .andExpect(model().attribute("projectCount", 5L));
     }
 }

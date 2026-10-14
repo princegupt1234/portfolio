@@ -1,6 +1,7 @@
 package com.example.portfolio.controller.admin;
 
 import com.example.portfolio.entity.ContactMessage;
+import com.example.portfolio.entity.ContactMessageStatus;
 import com.example.portfolio.repository.ContactMessageRepository;
 import com.example.portfolio.service.MailService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.ui.ExtendedModelMap;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -158,5 +162,49 @@ class AdminMessageControllerTest {
                 .andExpect(flash().attribute("successMessage", "Contact message deleted successfully."));
 
         verify(contactMessageRepository).deleteById(10L);
+    }
+
+    @Test
+    void statusCanBeChangedAndArchivedMessagesCanBeRestored() throws Exception {
+        ContactMessage message = new ContactMessage();
+        message.setId(14L);
+        when(contactMessageRepository.findById(14L)).thenReturn(Optional.of(message));
+
+        mockMvc.perform(post("/admin/messages/14/status").param("status", "REPLIED"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages"));
+        assertTrue(message.getStatus() == ContactMessageStatus.REPLIED);
+        verify(contactMessageRepository).save(message);
+
+        mockMvc.perform(post("/admin/messages/14/status")
+                        .param("status", "ARCHIVED")
+                        .param("filter", "ARCHIVED"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/messages?status=ARCHIVED"));
+        assertTrue(message.getStatus() == ContactMessageStatus.ARCHIVED);
+
+        mockMvc.perform(post("/admin/messages/14/status").param("status", "NEW"))
+                .andExpect(status().is3xxRedirection());
+        assertTrue(message.getStatus() == ContactMessageStatus.NEW);
+    }
+
+    @Test
+    void invalidWorkflowStatusIsRejected() throws Exception {
+        mockMvc.perform(post("/admin/messages/14/status").param("status", "DELETED"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void newFilterIncludesLegacyMessagesWithNullStatus() {
+        ContactMessage legacy = new ContactMessage();
+        legacy.setStatus(null);
+        when(contactMessageRepository.findAllByStatusOrStatusIsNullOrderByCreatedAtDesc(ContactMessageStatus.NEW))
+                .thenReturn(List.of(legacy));
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        String viewName = controller.inbox(null, ContactMessageStatus.NEW, model);
+
+        assertEquals("admin/messages/list", viewName);
+        assertEquals(List.of(legacy), model.get("messages"));
     }
 }

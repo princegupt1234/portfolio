@@ -31,18 +31,21 @@ import com.example.portfolio.service.GithubStatsService;
 import com.example.portfolio.service.LeetCodeRepositoryStatsService;
 import com.example.portfolio.service.MailService;
 import com.example.portfolio.service.ContactRateLimiterService;
+import com.example.portfolio.service.ContactReferenceIdGenerator;
+import com.example.portfolio.service.VisitorAnalyticsService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,6 +55,8 @@ import java.util.Optional;
 
 @Controller
 public class HomeController {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HomeController.class);
 
     private final AboutInfoRepository aboutInfoRepository;
     private final EducationEntryRepository educationEntryRepository;
@@ -71,6 +76,8 @@ public class HomeController {
     private final MailService mailService;
     private final DataVersionService dataVersionService;
     private final ContactRateLimiterService contactRateLimiterService;
+    private final ContactReferenceIdGenerator contactReferenceIdGenerator;
+    private final VisitorAnalyticsService visitorAnalyticsService;
     private final com.example.portfolio.service.WhatsAppNotificationService whatsAppNotificationService;
 
     @Value("${app.upload.dir}")
@@ -87,6 +94,8 @@ public class HomeController {
                            LeetCodeRepositoryStatsService leetCodeRepositoryStatsService,
                            MailService mailService, DataVersionService dataVersionService,
                            ContactRateLimiterService contactRateLimiterService,
+                           ContactReferenceIdGenerator contactReferenceIdGenerator,
+                           VisitorAnalyticsService visitorAnalyticsService,
                            com.example.portfolio.service.WhatsAppNotificationService whatsAppNotificationService) {
         this.aboutInfoRepository = aboutInfoRepository;
         this.educationEntryRepository = educationEntryRepository;
@@ -106,6 +115,8 @@ public class HomeController {
         this.mailService = mailService;
         this.dataVersionService = dataVersionService;
         this.contactRateLimiterService = contactRateLimiterService;
+        this.contactReferenceIdGenerator = contactReferenceIdGenerator;
+        this.visitorAnalyticsService = visitorAnalyticsService;
         this.whatsAppNotificationService = whatsAppNotificationService;
     }
 
@@ -116,19 +127,27 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(@RequestParam(value = "contactSuccess", required = false) Boolean contactSuccess,
-                       Model model, HttpServletResponse response) {
+    public String home(Model model, HttpServletResponse response, jakarta.servlet.http.HttpServletRequest request) {
         response.setHeader("Cache-Control", "no-store");
-        return renderHome(contactSuccess, model);
+        if (!request.isUserInRole("ADMIN")) {
+            VisitorAnalyticsService.VisitIdentity visit = visitorAnalyticsService.capture(request, response);
+            java.util.concurrent.CompletableFuture.runAsync(() -> {
+                try {
+                    analyticsService.recordPortfolioView();
+                } catch (DataAccessException e) {
+                    log.warn("Could not record public portfolio visit analytics.", e);
+                }
+                try {
+                    visitorAnalyticsService.record(visit);
+                } catch (Exception e) {
+                    log.warn("Could not record visitor classification analytics.", e);
+                }
+            });
+        }
+        return renderHome(model);
     }
 
-    private String renderHome(Boolean contactSuccess, Model model) {
-        java.util.concurrent.CompletableFuture.runAsync(() -> {
-            try {
-                analyticsService.recordPortfolioView();
-            } catch (Exception ignored) {}
-        });
-
+    private String renderHome(Model model) {
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElse(new AboutInfo());
         List<EducationEntry> education = educationEntryRepository.findAllByOrderBySortOrderAsc();
         List<Skill> skills = skillRepository.findByVisibleTrueOrderByCategoryAscSortOrderAsc();
@@ -159,10 +178,6 @@ public class HomeController {
         if (!model.containsAttribute("contactForm")) {
             model.addAttribute("contactForm", new ContactForm());
         }
-        if (Boolean.TRUE.equals(contactSuccess)) {
-            model.addAttribute("contactSuccess", true);
-        }
-
         return "index";
     }
 
@@ -170,9 +185,11 @@ public class HomeController {
     public String submitContact(@Valid @ModelAttribute("contactForm") ContactForm form,
                                  BindingResult result,
                                  jakarta.servlet.http.HttpServletRequest request,
-                                 Model model) {
+                                 HttpServletResponse response,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            return renderHome(null, model);
+            return renderHome(model);
         }
 
         AboutInfo about = aboutInfoRepository.findAll().stream().findFirst().orElseGet(AboutInfo::new);
@@ -181,7 +198,7 @@ public class HomeController {
         if (about.getContactSpamProtectionEnabled() != false && about.getContactHoneypotEnabled() != false) {
             if (form.getWebsiteTrap() != null && !form.getWebsiteTrap().isBlank()) {
                 // Silently discard automated bot submission
-                return "redirect:/?contactSuccess=true";
+                return "redirect:/#contact";
             }
         }
 
@@ -199,12 +216,22 @@ public class HomeController {
         msg.setEmail(form.getEmail());
         msg.setSubject(form.getSubject());
         msg.setMessage(form.getMessage());
+        String referenceId;
+        do {
+            referenceId = contactReferenceIdGenerator.generate();
+        } while (contactMessageRepository.existsByReferenceId(referenceId));
+        msg.setReferenceId(referenceId);
         contactMessageRepository.save(msg);
-        analyticsService.recordMessageReceived();
+        try {
+            analyticsService.recordMessageReceived();
+        } catch (Exception e) {
+            log.warn("Contact message was saved, but its analytics counter could not be updated.", e);
+        }
         mailService.notifyNewMessage(form.getName(), form.getEmail(), form.getSubject(), form.getMessage());
         whatsAppNotificationService.sendContactAlert(form.getName(), form.getEmail(), form.getSubject(), form.getMessage());
 
-        return "redirect:/?contactSuccess=true";
+        redirectAttributes.addFlashAttribute("contactReference", referenceId);
+        return "redirect:/#contact";
     }
 
     @GetMapping("/project/{id}/click")
