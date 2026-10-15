@@ -26,7 +26,7 @@
                     <div>
                         <div class="page-kicker">Overview / Control Center</div>
                         <h1 th:text="'Welcome back, ' + ${currentAdminUsername ?: 'Prince'} + ' 👋'">Welcome back, Prince 👋</h1>
-                        <p class="page-desc">Here is what is happening across your portfolio, visitor statistics, and contact requests today.</p>
+                        <p class="page-desc">Here is what is happening across your portfolio and contact requests today.</p>
                     </div>
                     <div class="header-actions">
                         <a th:href="@{/admin/projects/new}" class="glass-btn primary"><i class="fa-solid fa-plus"></i> Add Project</a>
@@ -49,62 +49,31 @@
                         <div><div class="kpi-value" th:text="${todayViews}">0</div><div class="kpi-label">Today's Visitors</div></div>
                     </div>
                     <div class="glass-card kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-user-check"></i></div>
-                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${humanVisitorsToday} : '—'">—</div><div class="kpi-label">Human-like Visitors — Today</div></div>
-                    </div>
-                    <div class="glass-card kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-robot"></i></div>
-                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${botTrafficToday} : '—'">—</div><div class="kpi-label">Detected Bot Traffic — Today</div></div>
-                    </div>
-                    <div class="glass-card kpi-card">
                         <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <div><div class="kpi-value" th:text="${totalViews30d}">0</div><div class="kpi-label">Portfolio Views (30d)</div></div>
-                    </div>
-                    <div class="glass-card kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
-                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${humanVisitors30d} : '—'">—</div><div class="kpi-label">Human-like Visitors — Last 30 Days</div></div>
-                    </div>
-                    <div class="glass-card kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-robot"></i></div>
-                        <div><div class="kpi-value" th:text="${visitorClassificationAvailable} ? ${botTraffic30d} : '—'">—</div><div class="kpi-label">Detected Bot Traffic — Last 30 Days</div></div>
                     </div>
                     <div class="glass-card kpi-card">
                         <div class="kpi-icon"><i class="fa-solid fa-diagram-project"></i></div>
                         <div><div class="kpi-value" th:text="${totalClicks30d}">0</div><div class="kpi-label">Project Views (30d)</div></div>
                     </div>
-                    <div class="glass-card kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-download"></i></div>
-                        <div><div class="kpi-value" th:text="${totalDownloads30d}">0</div><div class="kpi-label">Resume Downloads (30d)</div></div>
-                    </div>
-                    <div class="glass-card kpi-card">
+                    <a th:href="@{/admin/messages}" class="glass-card kpi-card kpi-card-link">
                         <div class="kpi-icon"><i class="fa-solid fa-envelope"></i></div>
-                        <div><div class="kpi-value" th:text="${unreadMessages} + ' / ' + ${totalMessages}">0</div><div class="kpi-label">Unread Messages</div></div>
-                    </div>
+                        <div><div class="kpi-value" th:text="${unreadMessages}">0</div><div class="kpi-label">Unread Messages</div></div>
+                    </a>
                     <div class="glass-card kpi-card">
                         <div class="kpi-icon"><i class="fa-brands fa-github"></i></div>
                         <div><div class="kpi-value" th:text="${github != null and github.available} ? ${github.followers} : '—'">0</div><div class="kpi-label">GitHub Followers</div></div>
                     </div>
-                    <a th:href="@{/admin/ai-training}" class="glass-card kpi-card" style="text-decoration:none; cursor:pointer;" title="Manage AI Ground Truth Answers & Fix Wrong Responses">
-                        <div class="kpi-icon" style="background:rgba(192,132,252,0.15); color:#c084fc;"><i class="fa-solid fa-brain"></i></div>
-                        <div><div class="kpi-value" style="color:#c084fc;" th:text="${activeAiTrainingCount} + ' / ' + ${aiTrainingCount}">0 / 0</div><div class="kpi-label">AI Trained Answers</div></div>
+                    <a th:href="@{/admin/ai-training}" class="glass-card kpi-card kpi-card-link kpi-card-ai" title="Manage AI Ground Truth Answers & Fix Wrong Responses">
+                        <div class="kpi-icon"><i class="fa-solid fa-brain"></i></div>
+                        <div><div class="kpi-value" th:text="${activeAiTrainingCount} + ' / ' + ${aiTrainingCount}">0 / 0</div><div class="kpi-label">AI Trained Answers</div></div>
                     </a>
                 </div>
-                <p class="page-desc" style="margin:-8px 0 22px; font-size:0.78rem;"
-                   th:if="${visitorClassificationAvailable}">
-                    Classification is tracked since <strong th:text="${#temporals.format(visitorClassificationStart, 'dd MMM yyyy')}"></strong>
-                    <span th:if="${visitorClassificationPartial}">; earlier traffic in the 30-day window is unavailable.</span>
-                    Unknown user agents are excluded from both counts. Browser-based bots may appear human-like.
-                </p>
-                <p class="page-desc" style="margin:-8px 0 22px; font-size:0.78rem;"
-                   th:unless="${visitorClassificationAvailable}">
-                    Visitor classification starts with the first tracked public visit. Earlier historical bot/human counts are unavailable.
-                    Browser-based bots may appear human-like.
-                </p>
 
                 <div class="dash-grid">
                     <div class="glass-card" style="padding:24px;">
                         <div class="table-toolbar" style="background:none; border:none; padding:0 0 16px;">
-                            <span class="toolbar-title"><i class="fa-solid fa-chart-area" style="color:var(--primary);"></i> Visitors — Last 30 Days</span>
+                            <span class="toolbar-title"><i class="fa-solid fa-chart-area" style="color:var(--primary);"></i> Portfolio Views — Last 30 Days</span>
                         </div>
                         <canvas id="visitorsChart" height="90"></canvas>
                     </div>

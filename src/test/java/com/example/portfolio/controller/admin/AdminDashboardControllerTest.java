@@ -4,14 +4,10 @@ import com.example.portfolio.entity.AboutInfo;
 import com.example.portfolio.entity.AiTraining;
 import com.example.portfolio.repository.AboutInfoRepository;
 import com.example.portfolio.repository.AiTrainingRepository;
-import com.example.portfolio.repository.CertificateRepository;
 import com.example.portfolio.repository.ContactMessageRepository;
 import com.example.portfolio.repository.ProjectRepository;
-import com.example.portfolio.repository.ResumeRepository;
-import com.example.portfolio.repository.SkillRepository;
 import com.example.portfolio.service.AnalyticsService;
 import com.example.portfolio.service.GithubStatsService;
-import com.example.portfolio.service.VisitorAnalyticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,16 +35,7 @@ class AdminDashboardControllerTest {
     private ProjectRepository projectRepository;
 
     @Mock
-    private SkillRepository skillRepository;
-
-    @Mock
-    private CertificateRepository certificateRepository;
-
-    @Mock
     private ContactMessageRepository contactMessageRepository;
-
-    @Mock
-    private ResumeRepository resumeRepository;
 
     @Mock
     private AboutInfoRepository aboutInfoRepository;
@@ -62,9 +49,6 @@ class AdminDashboardControllerTest {
     @Mock
     private AiTrainingRepository aiTrainingRepository;
 
-    @Mock
-    private VisitorAnalyticsService visitorAnalyticsService;
-
     @InjectMocks
     private AdminDashboardController controller;
 
@@ -74,30 +58,25 @@ class AdminDashboardControllerTest {
     }
 
     @Test
-    void rendersDashboardWithAiTrainingMetrics() throws Exception {
+    void rendersDashboardWithSixRequestedMetrics() throws Exception {
         AboutInfo info = new AboutInfo();
         info.setFullName("Prince Gupt");
         when(aboutInfoRepository.findAll()).thenReturn(List.of(info));
         when(projectRepository.count()).thenReturn(5L);
-        when(skillRepository.count()).thenReturn(12L);
-        when(certificateRepository.count()).thenReturn(4L);
         when(contactMessageRepository.countByIsReadFalse()).thenReturn(2L);
-        when(contactMessageRepository.count()).thenReturn(10L);
-        when(resumeRepository.count()).thenReturn(1L);
         when(analyticsService.last30Days()).thenReturn(Collections.emptyList());
         when(aiTrainingRepository.count()).thenReturn(7L);
         when(aiTrainingRepository.findByActiveTrueOrderBySortOrderAscIdDesc())
                 .thenReturn(List.of(new AiTraining("Q1", "A1", "Hiring", "kw1"), new AiTraining("Q2", "A2", "Skills", "kw2")));
-        when(visitorAnalyticsService.summary()).thenReturn(
-                new VisitorAnalyticsService.TrafficSummary(3, 2, 18, 5, java.time.LocalDate.now()));
 
         mockMvc.perform(get("/admin/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/dashboard"))
                 .andExpect(model().attribute("aiTrainingCount", 7L))
                 .andExpect(model().attribute("activeAiTrainingCount", 2))
-                .andExpect(model().attribute("humanVisitorsToday", 3L))
-                .andExpect(model().attribute("botTrafficToday", 2L))
-                .andExpect(model().attribute("projectCount", 5L));
+                .andExpect(model().attribute("unreadMessages", 2L))
+                .andExpect(model().attributeDoesNotExist(
+                        "humanVisitorsToday", "botTrafficToday", "humanVisitors30d", "botTraffic30d",
+                        "visitorClassificationAvailable", "totalDownloads30d", "totalMessages"));
     }
 }
